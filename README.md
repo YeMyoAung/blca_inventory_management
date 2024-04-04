@@ -1,3 +1,2 @@
-# inventory_management_with_sql
-
-A new Flutter project.
+## DB Digaram
+https://dbdocs.io/YeMyoAung/test
