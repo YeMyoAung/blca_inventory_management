@@ -1,8 +1,11 @@
-import 'package:inventory_management_with_sql/core/db/interface/curd_model.dart';
 import 'package:inventory_management_with_sql/core/db/interface/database_interface.dart';
+import 'package:inventory_management_with_sql/core/db/interface/database_model.dart';
 
-abstract class DatabaseCrud<D, M, MP extends DatabaseModel> {
-  final DataStore<D> store;
+/// static Pro = 1;
+
+abstract class DatabaseCrud<DatabaseType, Model extends DatabaseModel,
+    ModelParams extends DatabaseParamModel> {
+  final DataStore<DatabaseType> store;
   final String tableName;
 
   const DatabaseCrud({
@@ -10,11 +13,11 @@ abstract class DatabaseCrud<D, M, MP extends DatabaseModel> {
     required this.store,
   });
 
-  D get database => store.database!;
+  DatabaseType get database => store.database!;
 
-  Future<List<M>> find([int limit = 20, int offset = 0]);
-  Future<M?> get(int id);
-  Future<M?> create(MP values);
-  Future<M?> update(int id, MP values);
-  Future<M?> delete();
+  Future<List<Model>> find({int limit = 20, int offset = 0, String? where});
+  Future<Model?> get(int id);
+  Future<Model?> create(ModelParams values);
+  Future<Model?> update(int id, ModelParams values);
+  Future<Model?> delete(int id);
 }

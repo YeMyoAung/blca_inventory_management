@@ -1,6 +1,6 @@
 ///interface
 abstract class DataStore<D> {
-  D? database;
+  D? database; //postgres,mongo,firebase
 
   ///connection
   Future<void> connect();
@@ -9,8 +9,8 @@ abstract class DataStore<D> {
   Future<void> close();
 
   ///table create
-  Future<void> onUp([D? db]);
+  Future<void> onUp(int version, [D? db]);
 
   ///table drop
-  Future<void> onDown([D? db]);
+  Future<void> onDown(int old, current, [D? db]);
 }

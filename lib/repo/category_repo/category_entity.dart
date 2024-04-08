@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import 'package:inventory_management_with_sql/core/db/interface/curd_model.dart';
+import 'package:inventory_management_with_sql/core/db/interface/database_model.dart';
 
-class Category {
+class Category implements DatabaseModel {
   final int id;
   final String name;
   final DateTime createdAt;
@@ -40,7 +40,7 @@ class Category {
   }
 }
 
-class CategoryParams implements DatabaseModel {
+class CategoryParams implements DatabaseParamModel {
   final String name;
 
   const CategoryParams._({required this.name});
@@ -65,3 +65,36 @@ class CategoryParams implements DatabaseModel {
     return data;
   }
 }
+
+// class ProductParams implements DatabaseParamModel {
+//   final String name;
+//   final String photo;
+//   final String? category;
+//   final double price;
+//   final int qty;
+
+//   @override
+//   Map<String, dynamic> toCreate() {
+//     return {
+//       ///columnName:value
+//       "name": name,
+//       "photo": photo,
+//       "category": category,
+//       "price": price,
+//       "qty": qty,
+//     };
+//   }
+
+//   @override
+//   Map<String, dynamic> toUpdate() {
+//     final Map<String, dynamic> data = {};
+//     if (name.isNotEmpty) data['name'] = name;
+//     if (photo.isNotEmpty) data['photo'] = photo;
+//     if (category == null || category?.isNotEmpty == true) {
+//       data['category'] = category;
+//     }
+//     if (price > 0) data['price'] = price;
+//     if (qty > 0) data['qty'] = qty;
+//     return data;
+//   }
+// }
