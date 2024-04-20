@@ -1,3 +1,12 @@
+## App Story
+1. user can be choose shop or if empty create new one
+    (shop => 1 db)
+
+
+## App Requirement
+1. shop list db
+
+
 ## DB Digaram
 https://dbdocs.io/YeMyoAung/test
 

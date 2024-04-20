@@ -11,6 +11,10 @@ dependencies:
     sdk: flutter
   path_provider: ^2.1.2
   sqflite: ^2.3.2
+  starlight_utils:
+  image_picker: 
+  flutter_bloc: ^8.1.5
+  logger: ^2.2.0
 
 dev_dependencies:
   flutter_test:

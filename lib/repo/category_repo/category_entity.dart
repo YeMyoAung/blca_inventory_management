@@ -60,9 +60,9 @@ class CategoryParams implements DatabaseParamModel {
 
   @override
   Map<String, dynamic> toUpdate() {
+    assert(name.isNotEmpty);
     final Map<String, dynamic> payload = {};
     if (name.isNotEmpty) payload['name'] = name;
-    assert(payload.isNotEmpty);
     return payload;
   }
 }

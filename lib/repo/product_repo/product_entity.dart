@@ -114,12 +114,12 @@ class ProductParams extends DatabaseParamModel {
 
   @override
   Map<String, dynamic> toUpdate() {
+    assert(name.isNotEmpty || categoryId > 0 || barcode.isNotEmpty);
     final Map<String, dynamic> payload = {};
 
     if (name.isNotEmpty) payload['name'] = name;
     if (categoryId > 0) payload['category_id'] = categoryId;
     if (barcode.isNotEmpty) payload['barcode'] = barcode;
-    assert(payload.isNotEmpty);
     return payload;
   }
 }

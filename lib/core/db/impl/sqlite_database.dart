@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:inventory_management_with_sql/core/db/interface/database_interface.dart';
 import 'package:inventory_management_with_sql/core/db/interface/table.dart';
-import 'package:inventory_management_with_sql/core/db/utils/const.dart';
+import 'package:inventory_management_with_sql/core/db/utils/dep.dart';
 import 'package:inventory_management_with_sql/core/db/utils/sql_utils.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -12,13 +12,41 @@ import 'package:sqflite/sqflite.dart';
 class SqliteDatabase implements DataStore<Database> {
   final String dbName;
   final int version;
+  final Map<int, Map<String, List<TableProperties>>> tableColumns;
+  final String storePath;
   @override
   Database? database;
-  SqliteDatabase._(this.dbName, [this.version = 1]);
+  Directory? doc;
+
+  SqliteDatabase._(
+    this.dbName,
+    this.tableColumns, [
+    this.version = 1,
+    this.storePath = "/sqlite",
+  ]);
 
   ///singletone
   ///dbName => SqliteDatabase
   static final Map<String, SqliteDatabase> _instance = {};
+
+  Future<void> removeAllSqliteFiles() async {
+    if (doc == null) {
+      await checkStorePath();
+    }
+    // await doc!.list().forEach((fs) async {
+    //   final stat = await fs.stat();
+    //   if (stat.type == FileSystemEntityType.file) {
+    //     logger.i("Sqlite DB File `${fs.path}` was deleted.");
+    //     await fs.delete();
+    //   }
+    // });
+    await doc!.delete(recursive: true);
+
+    // final sqliteDir = Directory("${doc!.path}/sqlite/");
+    // if (await sqliteDir.exists()) {
+    //   await sqliteDir.delete();
+    // }
+  }
 
   // static SqliteDatabase? _single;
 
@@ -37,9 +65,29 @@ class SqliteDatabase implements DataStore<Database> {
   //   return _single!;
   // }
 
-  static SqliteDatabase newInstance(String dbName, [int version = 1]) {
-    _instance[dbName] ??= SqliteDatabase._(dbName, version);
+  static SqliteDatabase newInstance(
+      String dbName, Map<int, Map<String, List<TableProperties>>> tableColumns,
+      [int version = 1]) {
+    _instance[dbName] ??= SqliteDatabase._(
+      dbName,
+      tableColumns,
+      version,
+    );
     return _instance[dbName]!;
+  }
+
+  static SqliteDatabase getInstance(String dbName) {
+    return _instance[dbName]!;
+  }
+
+  Future<void> checkStorePath() async {
+    if (doc == null) {
+      doc = await getApplicationDocumentsDirectory();
+      doc = Directory(doc!.path + storePath);
+      if (await doc!.exists()) return;
+
+      await doc!.create();
+    }
   }
 
   @override
@@ -50,8 +98,8 @@ class SqliteDatabase implements DataStore<Database> {
 
     /// check db file
     /// open db
-    final Directory doc = await getApplicationDocumentsDirectory();
-    final File dbFile = File("${doc.path}/$dbName");
+    await checkStorePath();
+    final File dbFile = File("${doc!.path}/$dbName");
     if (!(await dbFile.exists())) {
       await dbFile.create();
     }
@@ -71,7 +119,14 @@ class SqliteDatabase implements DataStore<Database> {
       onDowngrade: (db, old, current) async {
         await onDown(old, current, db);
       },
+      readOnly: false,
     );
+    // database!
+    //     .rawInsert(
+    //         '''insert into "shops"("name","cover_photo","created_at") values ('hello world','','${DateTime.now().toIso8601String()}')''')
+    //     .then(logger.w)
+    //     .catchError(logger.e);
+    logger.i("$dbName was connected");
   }
 
   @override
@@ -88,11 +143,10 @@ class SqliteDatabase implements DataStore<Database> {
   ]) async {
     assert(db != null || database != null);
 
-    final migration = tableNames[version];
     final columnMigration = tableColumns[version];
-    if (migration == null || columnMigration == null) throw "version not found";
+    if (columnMigration == null) throw "version not found";
 
-    await Future.wait(migration.map((tableName) {
+    await Future.wait(columnMigration.keys.map((tableName) {
       String query = """Create table if not exists "$tableName" (
         id integer primary key autoincrement,
         created_at text not null,  
@@ -122,26 +176,24 @@ class SqliteDatabase implements DataStore<Database> {
       query += ");";
       return (db ?? database)!.execute(query);
     }));
-    print("object created");
+    logger.i("Migration Up");
   }
 
   @override
   Future<void> onDown(int old, current, [Database? db]) async {
     assert(db != null || database != null);
-    final currentMigration = tableNames[current];
-    final oldMigration = tableNames[old];
+    final currentMigration = tableColumns[current];
+    if (currentMigration == null) throw "version now found";
     final oldColumnMigration = tableColumns[old];
-    if (currentMigration == null ||
-        oldMigration == null ||
-        oldColumnMigration == null) {
+    if (oldColumnMigration == null) {
       throw "version not found";
     }
-    await Future.wait(currentMigration.reversed.map((e) {
+    await Future.wait(currentMigration.keys.toList().reversed.map((e) {
       return (db ?? database)!.execute(""" 
         drop table if exists "$e"; 
       """);
     }));
-    print("object deleted");
+    logger.i("Migration Down");
     await onUp(old, db);
   }
 }

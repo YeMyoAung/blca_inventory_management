@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:inventory_management_with_sql/core/db/interface/database_crud.dart';
 import 'package:inventory_management_with_sql/core/db/interface/database_interface.dart';
 import 'package:inventory_management_with_sql/core/db/interface/database_model.dart';
@@ -15,6 +17,12 @@ class SqliteRepo<Model extends DatabaseModel,
   final Model Function(dynamic) parser;
 
   SqliteRepo(this.store, this.parser, this.tableName);
+
+  final StreamController<DatabaseCrudOnChange<Model>> _onchange =
+      StreamController.broadcast();
+
+  @override
+  Stream<DatabaseCrudOnChange<Model>> get onChange => _onchange.stream;
 
   bool useRef = false;
 
@@ -95,7 +103,15 @@ class SqliteRepo<Model extends DatabaseModel,
       insert into "$tableName" ($insertColumns) values ($insertValues);
     """);
 
-    return get(insertedId);
+    final model = await get(insertedId);
+    if (model != null) {
+      _onchange.sink.add(DatabaseCrudOnChange(
+        model: model,
+        operation: CreateOperation(),
+      ));
+    }
+
+    return model;
   }
 
   @override
@@ -114,7 +130,15 @@ class SqliteRepo<Model extends DatabaseModel,
 
     if (effectedRows < 1) return null;
 
-    return get(id);
+    final model = await get(id);
+    if (model != null) {
+      _onchange.sink.add(DatabaseCrudOnChange(
+        model: model,
+        operation: UpdateOperation(),
+      ));
+    }
+
+    return model;
   }
 
   @override
@@ -124,6 +148,10 @@ class SqliteRepo<Model extends DatabaseModel,
     final effectedRows = await database
         .rawDelete("""delete from "$tableName" where id=?""", [id]);
     if (effectedRows < 1) return null;
+    _onchange.sink.add(DatabaseCrudOnChange(
+      model: model,
+      operation: DeleteOperation(),
+    ));
     return model;
   }
 
