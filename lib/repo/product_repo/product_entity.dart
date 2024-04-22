@@ -1,10 +1,7 @@
-import 'dart:convert';
-
 import 'package:inventory_management_with_sql/core/db/interface/database_model.dart';
 import 'package:inventory_management_with_sql/repo/category_repo/category_entity.dart';
 
 class Product extends DatabaseModel {
-  final int id;
   final String name;
   final int categoryId;
   final String barcode;
@@ -15,7 +12,7 @@ class Product extends DatabaseModel {
   final Category? category;
 
   const Product({
-    required this.id,
+    required super.id,
     required this.name,
     required this.categoryId,
     required this.barcode,
@@ -60,11 +57,6 @@ class Product extends DatabaseModel {
       "updated_at": updatedAt?.toIso8601String(),
       "category": category?.toJson(),
     };
-  }
-
-  @override
-  String toString() {
-    return json.encode(toJson());
   }
 }
 

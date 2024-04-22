@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inventory_management_with_sql/routes/route_name.dart';
-import 'package:inventory_management_with_sql/shop/controller/shop_list_bloc.dart';
-import 'package:inventory_management_with_sql/shop/controller/shop_list_state.dart';
+import 'package:inventory_management_with_sql/shop_list/controller/shop_list_bloc.dart';
+import 'package:inventory_management_with_sql/shop_list/controller/shop_list_state.dart';
 import 'package:starlight_utils/starlight_utils.dart';
 
-class ShopScreen extends StatelessWidget {
-  const ShopScreen({super.key});
+class ShopListScreen extends StatelessWidget {
+  const ShopListScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -32,5 +32,7 @@ class ShopListReceiveState extends ShopListState {
 }
 
 class ShopListErrorState extends ShopListState {
-  ShopListErrorState(super.list);
+  final String message;
+
+  ShopListErrorState(super.list, this.message);
 }

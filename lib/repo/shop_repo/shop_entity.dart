@@ -1,13 +1,10 @@
-import 'dart:convert';
-
 import 'package:inventory_management_with_sql/core/db/interface/database_model.dart';
 
 class Shop extends DatabaseModel {
-  final int id;
   final String name, coverPhoto;
 
   const Shop({
-    required this.id,
+    required super.id,
     required this.name,
     required this.coverPhoto,
   });
@@ -27,11 +24,6 @@ class Shop extends DatabaseModel {
       "name": name,
       "cover_photo": coverPhoto,
     };
-  }
-
-  @override
-  String toString() {
-    return json.encode(toJson());
   }
 }
 

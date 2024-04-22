@@ -1,19 +1,21 @@
 import 'package:inventory_management_with_sql/core/db/interface/database_interface.dart';
 import 'package:inventory_management_with_sql/core/db/interface/database_model.dart';
 
-abstract class _DatabaseCrudOperation {}
+// abstract class _DatabaseCrudOperation {}
 
-class CreateOperation implements _DatabaseCrudOperation {}
+// class CreateOperation implements _DatabaseCrudOperation {}
 
-class UpdateOperation implements _DatabaseCrudOperation {}
+// class UpdateOperation implements _DatabaseCrudOperation {}
 
-class DeleteOperation implements _DatabaseCrudOperation {}
+// class DeleteOperation implements _DatabaseCrudOperation {}
 
-class DatabaseCrudOnChange<Model extends DatabaseModel> {
-  final Model model;
-  final _DatabaseCrudOperation operation;
+enum DatabaseCrudAction { create, update, delete }
 
-  const DatabaseCrudOnChange({required this.model, required this.operation});
+class DatabaseCrudOnAction<Model extends DatabaseModel> {
+  final Result<Model> model;
+  final DatabaseCrudAction action;
+
+  const DatabaseCrudOnAction({required this.model, required this.action});
 }
 
 /// static Pro = 1;
@@ -27,7 +29,7 @@ abstract class DatabaseCrud<DatabaseType, Model extends DatabaseModel,
   final DataStore<DatabaseType> store;
   final String tableName;
 
-  Stream<DatabaseCrudOnChange<Model>> get onChange;
+  Stream<DatabaseCrudOnAction<Model>> get onAction;
 
   const DatabaseCrud({
     required this.tableName,
@@ -36,9 +38,10 @@ abstract class DatabaseCrud<DatabaseType, Model extends DatabaseModel,
 
   DatabaseType get database => store.database!;
 
-  Future<List<Model>> find({int limit = 20, int offset = 0, String? where});
-  Future<Model?> get(int id);
-  Future<Model?> create(ModelParams values);
-  Future<Model?> update(int id, ModelParams values);
-  Future<Model?> delete(int id);
+  Future<Result<List<Model>>> find(
+      {int limit = 20, int offset = 0, String? where});
+  Future<Result<Model>> get(int id);
+  Future<Result<Model>> create(ModelParams values);
+  Future<Result<Model>> update(int id, ModelParams values);
+  Future<Result<Model>> delete(int id);
 }

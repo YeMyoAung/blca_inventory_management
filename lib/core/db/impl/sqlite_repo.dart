@@ -18,11 +18,11 @@ class SqliteRepo<Model extends DatabaseModel,
 
   SqliteRepo(this.store, this.parser, this.tableName);
 
-  final StreamController<DatabaseCrudOnChange<Model>> _onchange =
+  final StreamController<DatabaseCrudOnAction<Model>> _action =
       StreamController.broadcast();
 
   @override
-  Stream<DatabaseCrudOnChange<Model>> get onChange => _onchange.stream;
+  Stream<DatabaseCrudOnAction<Model>> get onAction => _action.stream;
 
   bool useRef = false;
 
@@ -46,7 +46,7 @@ class SqliteRepo<Model extends DatabaseModel,
     return callback().whenComplete(() => this.useRef = false);
   }
 
-  Future<List<Model>> findModels({
+  Future<Result<List<Model>>> findModels({
     int limit = 20,
     int offset = 0,
     String? where,
@@ -59,18 +59,27 @@ class SqliteRepo<Model extends DatabaseModel,
   }
 
   @override
-  Future<List<Model>> find({
+  Future<Result<List<Model>>> find({
     int limit = 20,
     int offset = 0,
     String? where,
   }) async {
     final result = await database
         .rawQuery("""$query ${where ?? ""} limit ?,?;""", [offset, limit]);
-    if (result.isEmpty) return [];
-    return result.map(parser).toList();
+    if (result.isEmpty) {
+      return Result(
+        exception: Error(
+          "Not Found",
+          StackTrace.current,
+        ),
+      );
+    }
+    return Result(
+      result: result.map(parser).toList(),
+    );
   }
 
-  Future<Model?> getOne(int id, [bool useRef = false]) {
+  Future<Result<Model>> getOne(int id, [bool useRef = false]) {
     return _completer(
       () => get(id),
       useRef,
@@ -78,16 +87,25 @@ class SqliteRepo<Model extends DatabaseModel,
   }
 
   @override
-  Future<Model?> get(int id) async {
+  Future<Result<Model>> get(int id) async {
     final result = await database.rawQuery("""
           select * from "$tableName" where id=? limit 1;
         """, [id]);
-    if (result.isEmpty) return null;
-    return parser(result.first);
+    if (result.isEmpty) {
+      return Result(
+        exception: Error(
+          "Not Found",
+          StackTrace.current,
+        ),
+      );
+    }
+    return Result(
+      result: parser(result.first),
+    );
   }
 
   @override
-  Future<Model?> create(ModelParam values) async {
+  Future<Result<Model>> create(ModelParam values) async {
     /// table/column name = ""
     /// value = ''
     /// {
@@ -104,18 +122,16 @@ class SqliteRepo<Model extends DatabaseModel,
     """);
 
     final model = await get(insertedId);
-    if (model != null) {
-      _onchange.sink.add(DatabaseCrudOnChange(
-        model: model,
-        operation: CreateOperation(),
-      ));
-    }
+    _action.sink.add(DatabaseCrudOnAction(
+      model: model,
+      action: DatabaseCrudAction.create,
+    ));
 
     return model;
   }
 
   @override
-  Future<Model?> update(int id, ModelParam values) async {
+  Future<Result<Model>> update(int id, ModelParam values) async {
     final Map<String, dynamic> payload = values.toUpdate();
     payload
         .addEntries({MapEntry("updated_at", DateTime.now().toIso8601String())});
@@ -128,29 +144,39 @@ class SqliteRepo<Model extends DatabaseModel,
       update "$tableName" set $dataSet where id = ?;
     """, [id]);
 
-    if (effectedRows < 1) return null;
+    if (effectedRows < 1) {
+      return Result(
+        exception: Error(
+          "Failed to update.",
+          StackTrace.current,
+        ),
+      );
+    }
 
     final model = await get(id);
-    if (model != null) {
-      _onchange.sink.add(DatabaseCrudOnChange(
-        model: model,
-        operation: UpdateOperation(),
-      ));
-    }
+    _action.sink.add(DatabaseCrudOnAction(
+      model: model,
+      action: DatabaseCrudAction.update,
+    ));
 
     return model;
   }
 
   @override
-  Future<Model?> delete(int id) async {
+  Future<Result<Model>> delete(int id) async {
     final model = await get(id);
-    if (model == null) return null;
     final effectedRows = await database
         .rawDelete("""delete from "$tableName" where id=?""", [id]);
-    if (effectedRows < 1) return null;
-    _onchange.sink.add(DatabaseCrudOnChange(
+    if (effectedRows < 1) {
+      return Result(
+          exception: Error(
+        "Failed to delete.",
+        StackTrace.current,
+      ));
+    }
+    _action.sink.add(DatabaseCrudOnAction(
       model: model,
-      operation: DeleteOperation(),
+      action: DatabaseCrudAction.delete,
     ));
     return model;
   }

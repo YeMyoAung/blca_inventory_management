@@ -50,7 +50,9 @@ class CreateNewShopScreen extends StatelessWidget {
               width: context.width - 40,
               height: 55,
               child: ElevatedButton.icon(
-                onPressed: () {},
+                onPressed: () {
+                  ///bloc
+                },
                 label: const Text("Create"),
                 icon: const Icon(Icons.create),
               ),
