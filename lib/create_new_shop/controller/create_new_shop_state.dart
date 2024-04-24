@@ -1,11 +1,13 @@
 abstract class CreateNewShopState {
   final String? coverPhotoPath;
-
-  const CreateNewShopState({required this.coverPhotoPath});
+  final DateTime _dateTime;
+  CreateNewShopState({required this.coverPhotoPath})
+      : _dateTime = DateTime.now();
 
   @override
   operator ==(covariant CreateNewShopState other) {
-    return other.coverPhotoPath == coverPhotoPath;
+    return other.coverPhotoPath == coverPhotoPath &&
+        other._dateTime.toIso8601String() == _dateTime.toIso8601String();
   }
 
   @override
@@ -13,25 +15,25 @@ abstract class CreateNewShopState {
 }
 
 class CreateNewShopInitialState extends CreateNewShopState {
-  const CreateNewShopInitialState() : super(coverPhotoPath: null);
+  CreateNewShopInitialState() : super(coverPhotoPath: null);
 }
 
 class CreateNewShopCoverPhotoSelectedState extends CreateNewShopState {
-  const CreateNewShopCoverPhotoSelectedState({
+  CreateNewShopCoverPhotoSelectedState({
     required super.coverPhotoPath,
   });
 }
 
-class CreateNewShopCreateingState extends CreateNewShopState {
-  const CreateNewShopCreateingState({required super.coverPhotoPath});
+class CreateNewShopCreatingState extends CreateNewShopState {
+  CreateNewShopCreatingState({required super.coverPhotoPath});
 }
 
 class CreateNewShopCreatedState extends CreateNewShopState {
-  const CreateNewShopCreatedState() : super(coverPhotoPath: null);
+  CreateNewShopCreatedState() : super(coverPhotoPath: null);
 }
 
 class CreateNewShopErrorState extends CreateNewShopState {
-  const CreateNewShopErrorState({
+  CreateNewShopErrorState({
     required super.coverPhotoPath,
   });
 }

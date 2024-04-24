@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:inventory_management_with_sql/core/db/utils/dep.dart';
 import 'package:inventory_management_with_sql/create_new_shop/controller/create_new_shop_event.dart';
 import 'package:inventory_management_with_sql/create_new_shop/controller/create_new_shop_state.dart';
 import 'package:inventory_management_with_sql/repo/shop_repo/shop_entity.dart';
@@ -17,15 +18,29 @@ class CreateNewShopBloc extends Bloc<CreateNewShopEvent, CreateNewShopState> {
     on<CreateNewShopPickCoverPhotoEvent>(
         _createNewShopPickCoverPhotoEventListener);
 
-    on<CreateNewShopCreateShopEvent>((event, emit) async {
-      assert(state.coverPhotoPath != null);
-      final result = await shopRepo.create(
-        ShopParam.toCreate(
-          name: controller.text,
-          coverPhoto: state.coverPhotoPath!,
-        ),
-      );
-    });
+    on<CreateNewShopCreateShopEvent>(_createNewShopCreateShopEventListener);
+  }
+
+  FutureOr<void> _createNewShopCreateShopEventListener(event, emit) async {
+    assert(state.coverPhotoPath != null);
+    if (state is CreateNewShopCreatingState) return;
+
+    emit(CreateNewShopCreatingState(coverPhotoPath: state.coverPhotoPath));
+    final result = await shopRepo.create(
+      ShopParam.toCreate(
+        name: controller.text,
+        coverPhoto: state.coverPhotoPath!,
+      ),
+    );
+    logger.i("CreateNewShopCreateShopEvent Result: $result");
+    if (result.hasError) {
+      logger.e(
+          "CreateNewShopCreateShopEvent Error: ${result.exception?.stackTrace}");
+
+      emit(CreateNewShopErrorState(coverPhotoPath: state.coverPhotoPath));
+      return;
+    }
+    emit(CreateNewShopCreatedState());
   }
 
   FutureOr<void> _createNewShopPickCoverPhotoEventListener(_, emit) async {

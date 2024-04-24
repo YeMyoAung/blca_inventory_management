@@ -68,6 +68,9 @@ class ShopListBloc extends Bloc<ShopListEvent, ShopListState> {
   }
 
   FutureOr<void> _shopListGetEventListener(_, emit) async {
+    if (state is ShopListLoadingState || state is ShopListSoftLoadingState) {
+      return;
+    }
     final list = state.list.toList();
     if (list.isEmpty) {
       emit(ShopListLoadingState(list));

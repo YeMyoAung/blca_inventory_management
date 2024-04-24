@@ -1,7 +1,12 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:inventory_management_with_sql/core/db/utils/dep.dart';
+import 'package:inventory_management_with_sql/create_new_shop/controller/create_new_shop_bloc.dart';
+import 'package:inventory_management_with_sql/create_new_shop/controller/create_new_shop_event.dart';
+import 'package:inventory_management_with_sql/create_new_shop/controller/create_new_shop_state.dart';
 import 'package:starlight_utils/starlight_utils.dart';
 
 class CreateNewShopScreen extends StatelessWidget {
@@ -10,6 +15,7 @@ class CreateNewShopScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final middleWidth = context.width * 0.18;
+    final createNewShopBloc = context.read<CreateNewShopBloc>();
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -41,6 +47,7 @@ class CreateNewShopScreen extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(20),
               child: TextFormField(
+                controller: createNewShopBloc.controller,
                 decoration: const InputDecoration(
                   hintText: "Shop Name",
                 ),
@@ -49,13 +56,7 @@ class CreateNewShopScreen extends StatelessWidget {
             SizedBox(
               width: context.width - 40,
               height: 55,
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  ///bloc
-                },
-                label: const Text("Create"),
-                icon: const Icon(Icons.create),
-              ),
+              child: const CreateNewShopSubmitButton(),
             )
           ],
         ),
@@ -64,40 +65,74 @@ class CreateNewShopScreen extends StatelessWidget {
   }
 }
 
-class ShopCoverPhotoPicker extends StatefulWidget {
-  const ShopCoverPhotoPicker({super.key});
-
-  @override
-  State<ShopCoverPhotoPicker> createState() => _ShopCoverPhotoPickerState();
-}
-
-class _ShopCoverPhotoPickerState extends State<ShopCoverPhotoPicker> {
-  final ValueNotifier<String> imagePath = ValueNotifier("");
-
-  @override
-  void dispose() {
-    imagePath.dispose();
-    super.dispose();
-  }
+class CreateNewShopSubmitButton extends StatelessWidget {
+  const CreateNewShopSubmitButton({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () async {
-        final xFile =
-            await ImagePicker().pickImage(source: ImageSource.gallery);
-        imagePath.value = xFile?.path ?? "";
+    final createNewShopBloc = context.read<CreateNewShopBloc>();
+    return ElevatedButton.icon(
+      onPressed: () {
+        createNewShopBloc.add(const CreateNewShopCreateShopEvent());
       },
-      child: ValueListenableBuilder(
-        valueListenable: imagePath,
-        builder: (_, path, child) {
+      label: BlocConsumer<CreateNewShopBloc, CreateNewShopState>(
+        listenWhen: (_, c) {
+          return c is CreateNewShopCreatedState;
+        },
+        listener: (_, state) {
+          logger.w("CreateShopSubitButton listener get an event");
+          if (state is CreateNewShopCreatedState) {
+            StarlightUtils.pop();
+            StarlightUtils.snackbar(SnackBar(
+                content:
+                    Text("${createNewShopBloc.controller.text} was created.")));
+            return;
+          }
+        },
+        buildWhen: (_, c) {
+          return c is CreateNewShopCreatingState ||
+              c is CreateNewShopCreatedState ||
+              c is CreateNewShopErrorState;
+        },
+        builder: (_, state) {
+          logger.w("CreateShopSubitButton builder get an event");
+
+          if (state is CreateNewShopCreatingState) {
+            return const CupertinoActivityIndicator();
+          }
+          return const Text("Create");
+        },
+      ),
+      icon: const Icon(Icons.create),
+    );
+  }
+}
+
+class ShopCoverPhotoPicker extends StatelessWidget {
+  const ShopCoverPhotoPicker({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final createNewShopBloc = context.read<CreateNewShopBloc>();
+    return GestureDetector(
+      onTap: () {
+        createNewShopBloc.add(const CreateNewShopPickCoverPhotoEvent());
+      },
+      child: BlocBuilder<CreateNewShopBloc, CreateNewShopState>(
+        buildWhen: (p, c) {
+          return p.coverPhotoPath?.split("/").last !=
+              c.coverPhotoPath?.split("/").last;
+        },
+        builder: (_, state) {
+          logger.w("ShopCoverPhotoPicker builder get an event");
+
+          final path = state.coverPhotoPath ?? "";
           return CircleAvatar(
             radius: 80,
             backgroundImage: path.isNotEmpty ? FileImage(File(path)) : null,
-            child: path.isEmpty ? child : null,
+            child: path.isEmpty ? const Icon(Icons.image) : null,
           );
         },
-        child: const Icon(Icons.image),
       ),
     );
   }
