@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:inventory_management_with_sql/core/db/interface/database_interface.dart';
+import 'package:inventory_management_with_sql/core/db/interface/database_model.dart';
 import 'package:inventory_management_with_sql/core/db/interface/table.dart';
 import 'package:inventory_management_with_sql/core/db/utils/dep.dart';
 import 'package:inventory_management_with_sql/core/db/utils/sql_utils.dart';
@@ -91,42 +92,47 @@ class SqliteDatabase implements DataStore<Database> {
   }
 
   @override
-  Future<void> connect() async {
+  Future<Result> connect() async {
     if (database != null) {
-      return;
+      return const Result();
     }
 
-    /// check db file
-    /// open db
-    await checkStorePath();
-    final File dbFile = File("${doc!.path}/$dbName");
-    if (!(await dbFile.exists())) {
-      await dbFile.create();
-    }
+    try {
+      /// check db file
+      /// open db
+      await checkStorePath();
+      final File dbFile = File("${doc!.path}/$dbName");
+      if (!(await dbFile.exists())) {
+        await dbFile.create();
+      }
 
-    database = await openDatabase(
-      dbFile.path,
-      version: version,
-      onCreate: (db, current) async {
-        await onUp(
-          current,
-          db,
-        );
-      },
-      onUpgrade: (db, old, current) async {
-        await onUp(current, db);
-      },
-      onDowngrade: (db, old, current) async {
-        await onDown(old, current, db);
-      },
-      readOnly: false,
-    );
-    // database!
-    //     .rawInsert(
-    //         '''insert into "shops"("name","cover_photo","created_at") values ('hello world','','${DateTime.now().toIso8601String()}')''')
-    //     .then(logger.w)
-    //     .catchError(logger.e);
-    logger.i("$dbName was connected");
+      database = await openDatabase(
+        dbFile.path,
+        version: version,
+        onCreate: (db, current) async {
+          await onUp(
+            current,
+            db,
+          );
+        },
+        onUpgrade: (db, old, current) async {
+          await onUp(current, db);
+        },
+        onDowngrade: (db, old, current) async {
+          await onDown(old, current, db);
+        },
+        readOnly: false,
+      );
+      // database!
+      //     .rawInsert(
+      //         '''insert into "shops"("name","cover_photo","created_at") values ('hello world','','${DateTime.now().toIso8601String()}')''')
+      //     .then(logger.w)
+      //     .catchError(logger.e);
+      logger.i("$dbName was connected");
+      return const Result();
+    } catch (e) {
+      return Result(exception: Error(e.toString(), StackTrace.current));
+    }
   }
 
   @override
@@ -189,7 +195,7 @@ class SqliteDatabase implements DataStore<Database> {
       throw "version not found";
     }
     await Future.wait(currentMigration.keys.toList().reversed.map((e) {
-      return (db ?? database)!.execute(""" 
+      return (db ?? database)!.execute("""
         drop table if exists "$e"; 
       """);
     }));

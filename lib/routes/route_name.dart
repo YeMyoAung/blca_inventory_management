@@ -1,1 +1,3 @@
-const String shopList = "/shops", createNewShop = "/create/shops";
+const String shopList = "/shops",
+    createNewShop = "/create/shops",
+    dashboard = "/dashboard";

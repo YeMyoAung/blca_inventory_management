@@ -1,9 +1,15 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inventory_management_with_sql/routes/route_name.dart';
 import 'package:inventory_management_with_sql/shop_list/controller/shop_list_bloc.dart';
 import 'package:inventory_management_with_sql/shop_list/controller/shop_list_state.dart';
 import 'package:starlight_utils/starlight_utils.dart';
+
+void goToDashboardScreen(String shopName) {
+  StarlightUtils.pushReplacementNamed(dashboard, arguments: shopName);
+}
 
 class ShopListScreen extends StatelessWidget {
   const ShopListScreen({super.key});
@@ -59,7 +65,8 @@ class ShopList extends StatelessWidget {
     // });
     return BlocBuilder<ShopListBloc, ShopListState>(
       builder: (_, state) {
-        final int totalShops = state.list.length;
+        final shops = state.list;
+        final int totalShops = shops.length;
         if (totalShops == 0) {
           return SizedBox(
             width: context.width,
@@ -83,24 +90,34 @@ class ShopList extends StatelessWidget {
               itemBuilder: (_, i) {
                 return Card(
                   elevation: 0.5,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                    ),
-                    decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(8),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(10),
+                    onTap: () {
+                      goToDashboardScreen(shops[i].name);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
                       ),
-                    ),
-                    height: 70,
-                    child: Row(
-                      children: [
-                        const CircleAvatar(),
-                        const SizedBox(
-                          width: 20,
+                      decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(8),
                         ),
-                        Text("Shop $i"),
-                      ],
+                      ),
+                      height: 70,
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            backgroundImage: FileImage(
+                              File(shops[i].coverPhoto),
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 20,
+                          ),
+                          Text("Shop $i"),
+                        ],
+                      ),
                     ),
                   ),
                 );

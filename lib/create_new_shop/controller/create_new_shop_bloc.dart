@@ -13,8 +13,11 @@ class CreateNewShopBloc extends Bloc<CreateNewShopEvent, CreateNewShopState> {
   final TextEditingController controller;
   final ImagePicker imagePicker;
   final ShopRepo shopRepo;
-  CreateNewShopBloc(super.initialState, this.shopRepo, this.imagePicker)
-      : controller = TextEditingController() {
+  CreateNewShopBloc(
+    super.initialState,
+    this.shopRepo,
+    this.imagePicker,
+  ) : controller = TextEditingController() {
     on<CreateNewShopPickCoverPhotoEvent>(
         _createNewShopPickCoverPhotoEventListener);
 

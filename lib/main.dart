@@ -1,24 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:inventory_management_with_sql/core/bloc/bloc_observer.dart';
-import 'package:inventory_management_with_sql/core/db/impl/sqlite_database.dart';
-import 'package:inventory_management_with_sql/core/db/utils/const.dart';
+import 'package:inventory_management_with_sql/container.dart';
 import 'package:inventory_management_with_sql/routes/router.dart';
 import 'package:inventory_management_with_sql/theme/theme.dart';
 import 'package:starlight_utils/starlight_utils.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Bloc.observer = CustomBlocObserver();
-  final SqliteDatabase shopDB = SqliteDatabase.newInstance(
-    shopDbName,
-    shopTableColumns,
-    1,
-  );
-  // await shopDB.removeAllSqliteFiles();
-
-  await shopDB.connect();
-
+  await setup();
   runApp(const MainApp());
 }
 
