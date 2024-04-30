@@ -33,7 +33,9 @@ class CreateNewShopCreatedState extends CreateNewShopState {
 }
 
 class CreateNewShopErrorState extends CreateNewShopState {
+  final String message;
   CreateNewShopErrorState({
+    required this.message,
     required super.coverPhotoPath,
   });
 }

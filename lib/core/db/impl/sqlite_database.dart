@@ -69,11 +69,13 @@ class SqliteDatabase implements DataStore<Database> {
   static SqliteDatabase newInstance(
       String dbName, Map<int, Map<String, List<TableProperties>>> tableColumns,
       [int version = 1]) {
+    assert(_instance[dbName] == null);
     _instance[dbName] ??= SqliteDatabase._(
       dbName,
       tableColumns,
       version,
     );
+
     return _instance[dbName]!;
   }
 
@@ -139,6 +141,7 @@ class SqliteDatabase implements DataStore<Database> {
   Future<void> close() async {
     assert(database != null);
     await database!.close();
+    logger.e("SqliteDatabase $_instance");
     _instance.remove(dbName);
   }
 

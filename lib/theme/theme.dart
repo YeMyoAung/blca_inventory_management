@@ -3,22 +3,117 @@ import 'package:flutter/material.dart';
 abstract class StandardTheme {
   Color get scaffoldBackgroundColor;
   Color get cardColor;
+  Color get borderColor;
+  Color get primaryColor;
+  Color get outlinedButtonTextColor;
+  Color get unselectedColor;
 
-  ThemeData get ref => ThemeData.dark();
+  ButtonStyle get buttonStyle;
+  TextStyle get buttonTextStyle;
+
+  BorderRadius get borderRadius;
+  BorderSide get borderSide;
+
+  ThemeData get ref => ThemeData.light();
   ThemeData get theme => ref.copyWith(
+        appBarTheme: AppBarTheme(
+          backgroundColor: scaffoldBackgroundColor,
+          shape: RoundedRectangleBorder(
+            side: borderSide,
+          ),
+        ),
+        primaryColor: primaryColor,
+        shadowColor: borderColor,
         scaffoldBackgroundColor: scaffoldBackgroundColor,
         cardColor: cardColor,
         inputDecorationTheme: const InputDecorationTheme(
           border: OutlineInputBorder(),
         ),
+        bottomNavigationBarTheme: BottomNavigationBarThemeData(
+          elevation: 1,
+          backgroundColor: scaffoldBackgroundColor,
+          showUnselectedLabels: true,
+          unselectedItemColor: unselectedColor,
+          selectedItemColor: Colors.black,
+        ),
+        cardTheme: CardTheme(
+          color: scaffoldBackgroundColor,
+          surfaceTintColor: scaffoldBackgroundColor,
+          shadowColor: borderColor,
+          shape: RoundedRectangleBorder(
+            side: borderSide,
+            borderRadius: borderRadius,
+          ),
+        ),
+        textButtonTheme: TextButtonThemeData(
+          style: buttonStyle.copyWith(
+            foregroundColor: MaterialStatePropertyAll(primaryColor),
+            shape: const MaterialStatePropertyAll(null),
+          ),
+        ),
+        outlinedButtonTheme: OutlinedButtonThemeData(
+          style: buttonStyle,
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: buttonStyle.copyWith(
+            backgroundColor: MaterialStatePropertyAll(primaryColor),
+            foregroundColor: MaterialStatePropertyAll(scaffoldBackgroundColor),
+          ),
+        ),
       );
 }
 
-const Color lightCardColor = Color.fromRGBO(27, 42, 51, 1);
+const Color lightScaffoldBackgroundColor = Color.fromRGBO(255, 255, 255, 1),
+    lightBorderColor = Color.fromRGBO(208, 213, 221, 1),
+    lightPrimaryColor = Color.fromRGBO(23, 92, 211, 1),
+    lightOutlinedButtonTextColor = Color.fromRGBO(71, 84, 103, 1),
+    lightUnselectedColor = Color.fromRGBO(154, 164, 178, 1);
+
+const BorderRadius defaultBorderRadius = BorderRadius.all(Radius.circular(8));
 
 class LightTheme extends StandardTheme {
   @override
-  Color get scaffoldBackgroundColor => const Color.fromRGBO(27, 47, 65, 1);
+  Color get scaffoldBackgroundColor => lightScaffoldBackgroundColor;
   @override
-  Color get cardColor => lightCardColor;
+  Color get cardColor => lightScaffoldBackgroundColor;
+  @override
+  Color get borderColor => lightBorderColor;
+  @override
+  Color get primaryColor => lightPrimaryColor;
+  @override
+  Color get outlinedButtonTextColor => lightOutlinedButtonTextColor;
+  @override
+  Color get unselectedColor => lightUnselectedColor;
+
+  @override
+  BorderSide get borderSide => BorderSide(
+        color: borderColor,
+      );
+
+  @override
+  BorderRadius get borderRadius => defaultBorderRadius;
+
+  @override
+  TextStyle get buttonTextStyle => const TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+      );
+
+  @override
+  ButtonStyle get buttonStyle => ButtonStyle(
+        shape: MaterialStatePropertyAll(
+          RoundedRectangleBorder(
+            borderRadius: borderRadius,
+            side: borderSide,
+          ),
+        ),
+        foregroundColor: MaterialStatePropertyAll(
+          outlinedButtonTextColor,
+        ),
+        textStyle: MaterialStatePropertyAll(
+          buttonTextStyle,
+        ),
+        elevation: const MaterialStatePropertyAll(0),
+        overlayColor: MaterialStatePropertyAll(primaryColor.withOpacity(0.06)),
+      );
 }

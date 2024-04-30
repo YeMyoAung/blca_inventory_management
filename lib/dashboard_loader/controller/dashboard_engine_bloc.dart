@@ -1,11 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:inventory_management_with_sql/dashboard/controller/dashboard_engine_event.dart';
-import 'package:inventory_management_with_sql/dashboard/controller/dashboard_engine_state.dart';
+import 'package:inventory_management_with_sql/container.dart';
+import 'package:inventory_management_with_sql/dashboard_loader/controller/dashboard_engine_event.dart';
+import 'package:inventory_management_with_sql/dashboard_loader/controller/dashboard_engine_state.dart';
 import 'package:inventory_management_with_sql/repo/dashboard_repo/dashboard_repo.dart';
 
-class DashboardEngineBloc extends Bloc {
+class DashboardEngineBloc
+    extends Bloc<DashboardEngineEvent, DashboardEngineState> {
   final DashboardEngineRepo repo;
   StreamSubscription? _subscription;
   DashboardEngineBloc(super.initialState, this.repo) {
@@ -17,7 +19,11 @@ class DashboardEngineBloc extends Bloc {
 
     on<DashboardEngineStreamEvent>((event, emit) {
       if (event.result.hasError) {
-        return emit(DashboardEngineErrorState(message: event.toString()));
+        return emit(
+          DashboardEngineErrorState(
+            message: event.result.toString(),
+          ),
+        );
       }
       emit(const DashboardEngineReadyState());
     });
@@ -30,10 +36,14 @@ class DashboardEngineBloc extends Bloc {
     add(const DashboardEngineInitEvent());
   }
   @override
-  Future<void> close() {
-    return Future.wait([
+  Future<void> close() async {
+    await Future.wait([
       _subscription?.cancel() ?? Future.value(),
       repo.dispose(),
     ]);
+
+    return super.close().then((value) {
+      container.remove<DashboardEngineBloc>();
+    });
   }
 }

@@ -18,47 +18,57 @@ class CreateNewShopScreen extends StatelessWidget {
     final createNewShopBloc = context.read<CreateNewShopBloc>();
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: Row(
-                children: [
-                  const IconButton(
-                    onPressed: StarlightUtils.pop,
-                    icon: Icon(Icons.arrow_back),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(left: middleWidth),
-                    child: const Text(
-                      "Create New Shop",
-                      style: TextStyle(
-                        fontSize: 20,
-                      ),
+        child: Form(
+          key: createNewShopBloc.formKey,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: Row(
+                  children: [
+                    const IconButton(
+                      onPressed: StarlightUtils.pop,
+                      icon: Icon(Icons.arrow_back),
                     ),
-                  )
-                ],
-              ),
-            ),
-            const Padding(
-              padding: EdgeInsets.only(top: 40, bottom: 10),
-              child: ShopCoverPhotoPicker(),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: TextFormField(
-                controller: createNewShopBloc.controller,
-                decoration: const InputDecoration(
-                  hintText: "Shop Name",
+                    Padding(
+                      padding: EdgeInsets.only(left: middleWidth),
+                      child: const Text(
+                        "Create New Shop",
+                        style: TextStyle(
+                          fontSize: 20,
+                        ),
+                      ),
+                    )
+                  ],
                 ),
               ),
-            ),
-            SizedBox(
-              width: context.width - 40,
-              height: 55,
-              child: const CreateNewShopSubmitButton(),
-            )
-          ],
+              const Padding(
+                padding: EdgeInsets.only(top: 40, bottom: 10),
+                child: ShopCoverPhotoPicker(),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: TextFormField(
+                  validator: (value) {
+                    return value?.isNotEmpty == true
+                        ? value?.contains("_") == true
+                            ? "_ is not accept"
+                            : null
+                        : "Shop name is required";
+                  },
+                  controller: createNewShopBloc.controller,
+                  decoration: const InputDecoration(
+                    hintText: "Shop Name",
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: context.width - 40,
+                height: 55,
+                child: const CreateNewShopSubmitButton(),
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -71,13 +81,13 @@ class CreateNewShopSubmitButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final createNewShopBloc = context.read<CreateNewShopBloc>();
-    return ElevatedButton.icon(
+    return ElevatedButton(
       onPressed: () {
         createNewShopBloc.add(const CreateNewShopCreateShopEvent());
       },
-      label: BlocConsumer<CreateNewShopBloc, CreateNewShopState>(
+      child: BlocConsumer<CreateNewShopBloc, CreateNewShopState>(
         listenWhen: (_, c) {
-          return c is CreateNewShopCreatedState;
+          return c is CreateNewShopCreatedState || c is CreateNewShopErrorState;
         },
         listener: (_, state) {
           logger.w("CreateShopSubitButton listener get an event");
@@ -88,6 +98,22 @@ class CreateNewShopSubmitButton extends StatelessWidget {
                     Text("${createNewShopBloc.controller.text} was created.")));
             return;
           }
+          state as CreateNewShopErrorState;
+          StarlightUtils.dialog(AlertDialog(
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(8)),
+            ),
+            title: const Text("Failed to create"),
+            content: Text(state.message),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  StarlightUtils.pop();
+                },
+                child: const Text("Ok"),
+              )
+            ],
+          ));
         },
         buildWhen: (_, c) {
           return c is CreateNewShopCreatingState ||
@@ -100,10 +126,18 @@ class CreateNewShopSubmitButton extends StatelessWidget {
           if (state is CreateNewShopCreatingState) {
             return const CupertinoActivityIndicator();
           }
-          return const Text("Create");
+          return const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text("Create Shop"),
+              SizedBox(
+                width: 5,
+              ),
+              Icon(Icons.add_circle_outline),
+            ],
+          );
         },
       ),
-      icon: const Icon(Icons.create),
     );
   }
 }
@@ -127,10 +161,24 @@ class ShopCoverPhotoPicker extends StatelessWidget {
           logger.w("ShopCoverPhotoPicker builder get an event");
 
           final path = state.coverPhotoPath ?? "";
-          return CircleAvatar(
-            radius: 80,
-            backgroundImage: path.isNotEmpty ? FileImage(File(path)) : null,
-            child: path.isEmpty ? const Icon(Icons.image) : null,
+          if (path.isNotEmpty) {
+            return CircleAvatar(
+              radius: 80,
+              backgroundImage: FileImage(File(path)),
+            );
+          }
+          return Container(
+            height: 150,
+            width: 150,
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: context.theme.shadowColor,
+              ),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.image,
+            ),
           );
         },
       ),

@@ -7,9 +7,12 @@ import 'package:inventory_management_with_sql/core/db/utils/const.dart';
 import 'package:inventory_management_with_sql/create_new_shop/controller/create_new_shop_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_shop/controller/create_new_shop_state.dart';
 import 'package:inventory_management_with_sql/create_new_shop/screen/create_new_shop_screen.dart';
-import 'package:inventory_management_with_sql/dashboard/controller/dashboard_engine_bloc.dart';
-import 'package:inventory_management_with_sql/dashboard/controller/dashboard_engine_state.dart';
+import 'package:inventory_management_with_sql/dashboard/controller/dashboard_navigation_bloc.dart';
+import 'package:inventory_management_with_sql/dashboard/controller/dashboard_navigation_state.dart';
 import 'package:inventory_management_with_sql/dashboard/screen/dashboard_screen.dart';
+import 'package:inventory_management_with_sql/dashboard_loader/controller/dashboard_engine_bloc.dart';
+import 'package:inventory_management_with_sql/dashboard_loader/controller/dashboard_engine_state.dart';
+import 'package:inventory_management_with_sql/dashboard_loader/screen/dashboard_loader_screen.dart';
 import 'package:inventory_management_with_sql/repo/dashboard_repo/dashboard_repo.dart';
 import 'package:inventory_management_with_sql/repo/shop_repo/shop_repo.dart';
 import 'package:inventory_management_with_sql/routes/route_name.dart';
@@ -22,7 +25,7 @@ Route _shopScreen(RouteSettings settings) {
     BlocProvider(
       create: (_) => ShopListBloc(
         ShopListInitialState(),
-        container.get<ShopRepo>(),
+        container.get<SqliteShopRepo>(),
       ),
       child: const ShopListScreen(),
     ),
@@ -30,66 +33,88 @@ Route _shopScreen(RouteSettings settings) {
   );
 }
 
-Route router(RouteSettings settings) {
-  switch (settings.name) {
-    case shopList:
-      return _shopScreen(settings);
-    case createNewShop:
+final Map<String, Route Function(RouteSettings setting)> dashboardLoaderRoute =
+    {
+  dashboardLoading: (settings) {
+    final arg = settings.arguments;
+    if (arg is! String) {
+      ///TODO
+      return _route(ErrorWidget("Bad request"), settings);
+    }
+
+    if (container.exists<DashboardEngineBloc>()) {
       return _route(
+        BlocProvider.value(
+          value: container.get<DashboardEngineBloc>(),
+          child: const DashboardLoadingScreen(),
+        ),
+        settings,
+      );
+    }
+
+    return _route(
+      BlocProvider(
+        create: (_) {
+          container.set(
+            DashboardEngineBloc(
+              const DashboardEngineInitialState(),
+              DashboardEngineRepo(
+                shopName: arg,
+                database: SqliteDatabase.newInstance(
+                  arg,
+                  inventoryMangementTableColumns,
+                ),
+              ),
+            ),
+          );
+          return container.get<DashboardEngineBloc>();
+        },
+        child: const DashboardLoadingScreen(),
+      ),
+      settings,
+    );
+  }
+};
+
+final Map<String, Route Function(RouteSettings setting)> routes = {
+  shopList: (settings) => _shopScreen(settings),
+  createNewShop: (settings) => _route(
         BlocProvider(
           create: (_) => CreateNewShopBloc(
             CreateNewShopInitialState(),
-            container.get<ShopRepo>(),
+            container.get<SqliteShopRepo>(),
             container.get<ImagePicker>(),
           ),
           child: const CreateNewShopScreen(),
         ),
         settings,
-      );
-    case dashboard:
-
-      ///1 check arg
-      ///2 check bloc
-      ///BlocProvider.value || BlocProvider
-      final arg = settings.arguments;
-      if (arg is! String) {
-        ///TODO
-        return _route(ErrorWidget("Bad request"), settings);
-      }
-
-      if (container.exists<DashboardEngineBloc>(arg)) {
-        return _route(
-          BlocProvider.value(
-            value: container.get<DashboardEngineBloc>(arg),
-            child: const DashboardScreen(),
-          ),
-          settings,
-        );
-      }
-
-      return _route(
-        BlocProvider(
-          create: (_) {
-            container.set(
-              DashboardEngineBloc(
-                const DashboardEngineInitialState(),
-                DashboardEngineRepo(
-                  shopName: arg,
-                  database: SqliteDatabase.newInstance(
-                      shopDbName, inventoryMangementTableColumns),
-                ),
-              ),
-              instanceName: arg,
-            );
-            return container.get<DashboardEngineBloc>(arg);
-          },
-          child: const DashboardScreen(),
-        ),
-        settings,
-      );
-    default:
+      ),
+  ...dashboardLoaderRoute,
+  dashboard: (settings) {
+    if (!container.exists<DashboardEngineBloc>()) {
       return _shopScreen(settings);
+    }
+    return _route(
+      MultiBlocProvider(
+        providers: [
+          BlocProvider.value(
+            value: container.get<DashboardEngineBloc>(),
+          ),
+          BlocProvider(
+            create: (_) => DashboardNavigationBloc(
+              const DashboardNavigationState(0),
+            ),
+          )
+        ],
+        child: const DashboardScreen(),
+      ),
+      settings,
+    );
   }
+};
+
+Route router(RouteSettings settings) {
+  return routes[settings.name]?.call(settings) ?? _shopScreen(settings);
 }
 
 Route _route(Widget child, RouteSettings settings) {

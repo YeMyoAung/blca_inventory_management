@@ -12,7 +12,7 @@ import 'package:inventory_management_with_sql/repo/shop_repo/shop_repo.dart';
 class CreateNewShopBloc extends Bloc<CreateNewShopEvent, CreateNewShopState> {
   final TextEditingController controller;
   final ImagePicker imagePicker;
-  final ShopRepo shopRepo;
+  final SqliteShopRepo shopRepo;
   CreateNewShopBloc(
     super.initialState,
     this.shopRepo,
@@ -25,7 +25,15 @@ class CreateNewShopBloc extends Bloc<CreateNewShopEvent, CreateNewShopState> {
   }
 
   FutureOr<void> _createNewShopCreateShopEventListener(event, emit) async {
-    assert(state.coverPhotoPath != null);
+    assert(formKey?.currentState?.validate() == true);
+
+    if (state.coverPhotoPath == null) {
+      return emit(CreateNewShopErrorState(
+        message: "Cover photo is missing",
+        coverPhotoPath: null,
+      ));
+    }
+
     if (state is CreateNewShopCreatingState) return;
 
     emit(CreateNewShopCreatingState(coverPhotoPath: state.coverPhotoPath));
@@ -40,7 +48,10 @@ class CreateNewShopBloc extends Bloc<CreateNewShopEvent, CreateNewShopState> {
       logger.e(
           "CreateNewShopCreateShopEvent Error: ${result.exception?.stackTrace}");
 
-      emit(CreateNewShopErrorState(coverPhotoPath: state.coverPhotoPath));
+      emit(CreateNewShopErrorState(
+        coverPhotoPath: state.coverPhotoPath,
+        message: result.toString(),
+      ));
       return;
     }
     emit(CreateNewShopCreatedState());
@@ -52,9 +63,11 @@ class CreateNewShopBloc extends Bloc<CreateNewShopEvent, CreateNewShopState> {
     emit(CreateNewShopCoverPhotoSelectedState(coverPhotoPath: file?.path));
   }
 
+  GlobalKey<FormState>? formKey = GlobalKey<FormState>();
   @override
   Future<void> close() {
     controller.dispose();
+    formKey = null;
     return super.close();
   }
 }

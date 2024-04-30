@@ -21,7 +21,7 @@ Future<void> setup() async {
 
   container.setLazy(() => ImagePicker());
 
-  container.setLazy(() => ShopRepo(
+  container.setLazy(() => SqliteShopRepo(
         container.get<SqliteDatabase>(),
       ));
 }

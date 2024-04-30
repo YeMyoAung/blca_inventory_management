@@ -8,7 +8,7 @@ import 'package:inventory_management_with_sql/shop_list/controller/shop_list_sta
 import 'package:starlight_utils/starlight_utils.dart';
 
 void goToDashboardScreen(String shopName) {
-  StarlightUtils.pushReplacementNamed(dashboard, arguments: shopName);
+  StarlightUtils.pushReplacementNamed(dashboardLoading, arguments: shopName);
 }
 
 class ShopListScreen extends StatelessWidget {

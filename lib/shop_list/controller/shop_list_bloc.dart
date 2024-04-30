@@ -12,7 +12,7 @@ class ShopListBloc extends Bloc<ShopListEvent, ShopListState> {
 
   int currentOffset = 0;
 
-  final ShopRepo shop;
+  final SqliteShopRepo shop;
   ShopListBloc(
     super.initialState,
     this.shop,
