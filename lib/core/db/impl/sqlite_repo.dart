@@ -5,6 +5,8 @@ import 'package:inventory_management_with_sql/core/db/interface/database_interfa
 import 'package:inventory_management_with_sql/core/db/interface/database_model.dart';
 import 'package:sqflite/sqflite.dart';
 
+final Map<int, String> _sqliteErrors = {2067: "Already exists"};
+
 class SqliteRepo<Model extends DatabaseModel,
         ModelParam extends DatabaseParamModel>
     implements DatabaseCrud<Database, Model, ModelParam> {
@@ -117,17 +119,24 @@ class SqliteRepo<Model extends DatabaseModel,
         .addEntries({MapEntry("created_at", DateTime.now().toIso8601String())});
     final insertColumns = payload.keys.join(",");
     final insertValues = payload.values.map((e) => "'$e'").join(",");
-    final insertedId = await database.rawInsert("""
+    try {
+      final insertedId = await database.rawInsert("""
       insert into "$tableName" ($insertColumns) values ($insertValues);
     """);
+      final model = await get(insertedId);
+      _action.sink.add(DatabaseCrudOnAction(
+        model: model,
+        action: DatabaseCrudAction.create,
+      ));
 
-    final model = await get(insertedId);
-    _action.sink.add(DatabaseCrudOnAction(
-      model: model,
-      action: DatabaseCrudAction.create,
-    ));
-
-    return model;
+      return model;
+    } on DatabaseException catch (e) {
+      return Result(
+          exception: Error(_sqliteErrors[e.getResultCode()] ?? "Unknown Error",
+              StackTrace.current));
+    } catch (e) {
+      return Result(exception: Error(e.toString(), StackTrace.current));
+    }
   }
 
   @override

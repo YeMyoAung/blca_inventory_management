@@ -2,9 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:inventory_management_with_sql/core/bloc/sqlite_read_state.dart';
+import 'package:inventory_management_with_sql/repo/shop_repo/shop_entity.dart';
 import 'package:inventory_management_with_sql/routes/route_name.dart';
 import 'package:inventory_management_with_sql/shop_list/controller/shop_list_bloc.dart';
-import 'package:inventory_management_with_sql/shop_list/controller/shop_list_state.dart';
+import 'package:inventory_management_with_sql/widgest/button/bloc_outlined_button.dart';
 import 'package:starlight_utils/starlight_utils.dart';
 
 void goToDashboardScreen(String shopName) {
@@ -33,11 +35,11 @@ class ShopListScreen extends StatelessWidget {
             width: context.width * 0.87,
             margin: const EdgeInsets.only(left: 2, right: 2, top: 20),
             height: 60,
-            child: OutlinedButton(
+            child: CustomOutlinedButton(
               onPressed: () {
                 StarlightUtils.pushNamed(createNewShop);
               },
-              child: const Text("Create New Shop"),
+              label: "Create New Shop",
             ),
           ),
         ],
@@ -63,7 +65,7 @@ class ShopList extends StatelessWidget {
     //   //       ShopParam.toCreate(name: "Test ", coverPhoto: ""),
     //   //     );
     // });
-    return BlocBuilder<ShopListBloc, ShopListState>(
+    return BlocBuilder<ShopListBloc, SqliteState<Shop>>(
       builder: (_, state) {
         final shops = state.list;
         final int totalShops = shops.length;

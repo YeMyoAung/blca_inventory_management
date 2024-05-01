@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inventory_management_with_sql/core/db/utils/dep.dart';
+import 'package:inventory_management_with_sql/core/utils/dialog.dart';
 import 'package:inventory_management_with_sql/create_new_shop/controller/create_new_shop_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_shop/controller/create_new_shop_event.dart';
 import 'package:inventory_management_with_sql/create_new_shop/controller/create_new_shop_state.dart';
@@ -99,21 +100,7 @@ class CreateNewShopSubmitButton extends StatelessWidget {
             return;
           }
           state as CreateNewShopErrorState;
-          StarlightUtils.dialog(AlertDialog(
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(8)),
-            ),
-            title: const Text("Failed to create"),
-            content: Text(state.message),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  StarlightUtils.pop();
-                },
-                child: const Text("Ok"),
-              )
-            ],
-          ));
+          dialog("Failed to create new shop", state.message);
         },
         buildWhen: (_, c) {
           return c is CreateNewShopCreatingState ||

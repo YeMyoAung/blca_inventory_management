@@ -1,9 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:inventory_management_with_sql/cateogry/controller/category_list_bloc.dart';
 import 'package:inventory_management_with_sql/container.dart';
+import 'package:inventory_management_with_sql/core/bloc/sqlite_read_state.dart';
 import 'package:inventory_management_with_sql/core/db/impl/sqlite_database.dart';
 import 'package:inventory_management_with_sql/core/db/utils/const.dart';
+import 'package:inventory_management_with_sql/create_new_category/controller/create_new_category_bloc.dart';
+import 'package:inventory_management_with_sql/create_new_category/controller/create_new_category_state.dart';
+import 'package:inventory_management_with_sql/create_new_category/screen/create_new_category_screen.dart';
 import 'package:inventory_management_with_sql/create_new_shop/controller/create_new_shop_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_shop/controller/create_new_shop_state.dart';
 import 'package:inventory_management_with_sql/create_new_shop/screen/create_new_shop_screen.dart';
@@ -13,18 +18,20 @@ import 'package:inventory_management_with_sql/dashboard/screen/dashboard_screen.
 import 'package:inventory_management_with_sql/dashboard_loader/controller/dashboard_engine_bloc.dart';
 import 'package:inventory_management_with_sql/dashboard_loader/controller/dashboard_engine_state.dart';
 import 'package:inventory_management_with_sql/dashboard_loader/screen/dashboard_loader_screen.dart';
+import 'package:inventory_management_with_sql/repo/category_repo/category_entity.dart';
+import 'package:inventory_management_with_sql/repo/category_repo/category_repo.dart';
 import 'package:inventory_management_with_sql/repo/dashboard_repo/dashboard_repo.dart';
+import 'package:inventory_management_with_sql/repo/shop_repo/shop_entity.dart';
 import 'package:inventory_management_with_sql/repo/shop_repo/shop_repo.dart';
 import 'package:inventory_management_with_sql/routes/route_name.dart';
 import 'package:inventory_management_with_sql/shop_list/controller/shop_list_bloc.dart';
-import 'package:inventory_management_with_sql/shop_list/controller/shop_list_state.dart';
 import 'package:inventory_management_with_sql/shop_list/screen/shop_list_screen.dart';
 
 Route _shopScreen(RouteSettings settings) {
   return _route(
     BlocProvider(
       create: (_) => ShopListBloc(
-        ShopListInitialState(),
+        SqliteInitialState(<Shop>[]),
         container.get<SqliteShopRepo>(),
       ),
       child: const ShopListScreen(),
@@ -76,6 +83,36 @@ final Map<String, Route Function(RouteSettings setting)> dashboardLoaderRoute =
   }
 };
 
+final Map<String, Route Function(RouteSettings)> dashboardRoute = {
+  dashboard: (settings) {
+    if (!container.exists<DashboardEngineBloc>()) {
+      return _shopScreen(settings);
+    }
+    return _route(
+      MultiBlocProvider(
+        providers: [
+          BlocProvider.value(
+            value: container.get<DashboardEngineBloc>(),
+          ),
+          BlocProvider(
+            create: (_) => CategoryListBloc(
+              SqliteInitialState(<Category>[]),
+              container.get<SqliteCategoryRepo>(),
+            ),
+          ),
+          BlocProvider(
+            create: (_) => DashboardNavigationBloc(
+              const DashboardNavigationState(0),
+            ),
+          )
+        ],
+        child: const DashboardScreen(),
+      ),
+      settings,
+    );
+  }
+};
+
 final Map<String, Route Function(RouteSettings setting)> routes = {
   shopList: (settings) => _shopScreen(settings),
   createNewShop: (settings) => _route(
@@ -90,27 +127,15 @@ final Map<String, Route Function(RouteSettings setting)> routes = {
         settings,
       ),
   ...dashboardLoaderRoute,
-  dashboard: (settings) {
-    if (!container.exists<DashboardEngineBloc>()) {
-      return _shopScreen(settings);
-    }
-    return _route(
-      MultiBlocProvider(
-        providers: [
-          BlocProvider.value(
-            value: container.get<DashboardEngineBloc>(),
-          ),
-          BlocProvider(
-            create: (_) => DashboardNavigationBloc(
-              const DashboardNavigationState(0),
-            ),
-          )
-        ],
-        child: const DashboardScreen(),
-      ),
-      settings,
-    );
-  }
+  ...dashboardRoute,
+  createNewCategory: (settings) => _route(
+      BlocProvider(
+          create: (_) => CreateNewCategoryBloc(
+                CreateNewCategoryInitalState(),
+                container.get<SqliteCategoryRepo>(),
+              ),
+          child: const CreateNewCategoryScreen()),
+      settings),
 };
 
 Route router(RouteSettings settings) {

@@ -2,14 +2,13 @@ import 'dart:convert';
 
 import 'package:inventory_management_with_sql/core/db/interface/database_model.dart';
 
-class Category implements DatabaseModel {
-  final int id;
+class Category extends DatabaseModel {
   final String name;
   final DateTime createdAt;
   final DateTime? updatedAt;
 
   const Category({
-    required this.id,
+    required super.id,
     required this.name,
     required this.createdAt,
     required this.updatedAt,

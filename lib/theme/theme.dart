@@ -17,7 +17,7 @@ abstract class StandardTheme {
   ThemeData get ref => ThemeData.light();
   ThemeData get theme => ref.copyWith(
         appBarTheme: AppBarTheme(
-          backgroundColor: scaffoldBackgroundColor,
+          backgroundColor: cardColor,
           shape: RoundedRectangleBorder(
             side: borderSide,
           ),
@@ -26,19 +26,21 @@ abstract class StandardTheme {
         shadowColor: borderColor,
         scaffoldBackgroundColor: scaffoldBackgroundColor,
         cardColor: cardColor,
-        inputDecorationTheme: const InputDecorationTheme(
-          border: OutlineInputBorder(),
+        inputDecorationTheme: InputDecorationTheme(
+          border: OutlineInputBorder(
+            borderRadius: borderRadius,
+          ),
         ),
         bottomNavigationBarTheme: BottomNavigationBarThemeData(
           elevation: 1,
-          backgroundColor: scaffoldBackgroundColor,
+          backgroundColor: cardColor,
           showUnselectedLabels: true,
           unselectedItemColor: unselectedColor,
           selectedItemColor: Colors.black,
         ),
         cardTheme: CardTheme(
-          color: scaffoldBackgroundColor,
-          surfaceTintColor: scaffoldBackgroundColor,
+          color: cardColor,
+          surfaceTintColor: cardColor,
           shadowColor: borderColor,
           shape: RoundedRectangleBorder(
             side: borderSide,
@@ -57,13 +59,14 @@ abstract class StandardTheme {
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: buttonStyle.copyWith(
             backgroundColor: MaterialStatePropertyAll(primaryColor),
-            foregroundColor: MaterialStatePropertyAll(scaffoldBackgroundColor),
+            foregroundColor: MaterialStatePropertyAll(cardColor),
           ),
         ),
       );
 }
 
-const Color lightScaffoldBackgroundColor = Color.fromRGBO(255, 255, 255, 1),
+const Color lightScaffoldBackgroundColor = Color.fromRGBO(234, 236, 240, 1),
+    lightCardColor = Color.fromRGBO(255, 255, 255, 1),
     lightBorderColor = Color.fromRGBO(208, 213, 221, 1),
     lightPrimaryColor = Color.fromRGBO(23, 92, 211, 1),
     lightOutlinedButtonTextColor = Color.fromRGBO(71, 84, 103, 1),
@@ -75,7 +78,7 @@ class LightTheme extends StandardTheme {
   @override
   Color get scaffoldBackgroundColor => lightScaffoldBackgroundColor;
   @override
-  Color get cardColor => lightScaffoldBackgroundColor;
+  Color get cardColor => lightCardColor;
   @override
   Color get borderColor => lightBorderColor;
   @override

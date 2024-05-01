@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:inventory_management_with_sql/core/utils/dialog.dart';
 import 'package:inventory_management_with_sql/dashboard_loader/controller/dashboard_engine_bloc.dart';
 import 'package:inventory_management_with_sql/dashboard_loader/controller/dashboard_engine_state.dart';
 import 'package:inventory_management_with_sql/routes/route_name.dart';
@@ -22,21 +23,7 @@ class DashboardLoadingScreen extends StatelessWidget {
           return;
         }
         state as DashboardEngineErrorState;
-        await StarlightUtils.dialog(AlertDialog(
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(8)),
-          ),
-          title: const Text("Failed to load dashboard"),
-          content: Text(state.message),
-          actions: [
-            TextButton(
-              onPressed: () {
-                StarlightUtils.pop();
-              },
-              child: const Text("Ok"),
-            )
-          ],
-        ));
+        await dialog("Failed to load dashboard", state.message);
         StarlightUtils.pushReplacementNamed(shopList);
       },
       child: Scaffold(

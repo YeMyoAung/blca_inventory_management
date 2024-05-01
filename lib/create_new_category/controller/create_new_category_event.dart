@@ -1,0 +1,3 @@
+class CreateNewCategoryEvent {
+  const CreateNewCategoryEvent();
+}

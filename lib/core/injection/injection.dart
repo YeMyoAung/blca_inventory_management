@@ -1,10 +1,10 @@
 abstract class _ContainerValue<T> {
   ///will be overrride
-  final dynamic value;
+  get value;
   final Function(T)? dispose;
   final bool autoDispose;
 
-  const _ContainerValue(this.value, this.dispose, this.autoDispose);
+  const _ContainerValue(this.dispose, this.autoDispose);
 }
 
 /// actual value
@@ -16,7 +16,7 @@ class _Value<T> extends _ContainerValue<T> {
     this.value,
     Function(T)? dispose,
     bool autoDispose,
-  ) : super(value, dispose, autoDispose);
+  ) : super(dispose, autoDispose);
 }
 
 /// function
@@ -28,7 +28,7 @@ class _LazyValue<T> extends _ContainerValue<T> {
     this.value,
     Function(T)? dispose,
     bool autoDispose,
-  ) : super(value, dispose, autoDispose);
+  ) : super(dispose, autoDispose);
 }
 
 /// future
@@ -40,7 +40,7 @@ class _FutureValue<T> extends _ContainerValue<T> {
     this.value,
     Function(T)? dispose,
     bool autoDispose,
-  ) : super(value, dispose, autoDispose);
+  ) : super(dispose, autoDispose);
 }
 
 /// future function
@@ -52,7 +52,7 @@ class _LazyFutureValue<T> extends _ContainerValue<T> {
     this.value,
     Function(T)? dispose,
     bool autoDispose,
-  ) : super(value, dispose, autoDispose);
+  ) : super(dispose, autoDispose);
 }
 
 abstract class _ContainerKey {
