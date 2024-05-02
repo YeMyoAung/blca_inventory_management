@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inventory_management_with_sql/core/db/utils/dep.dart';
 import 'package:inventory_management_with_sql/core/utils/dialog.dart';
-import 'package:inventory_management_with_sql/create_new_shop/controller/create_new_shop_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_shop/controller/create_new_shop_event.dart';
 import 'package:inventory_management_with_sql/create_new_shop/controller/create_new_shop_state.dart';
+import 'package:inventory_management_with_sql/create_new_shop/controller/create_new_shop_with_form_bloc.dart';
 import 'package:starlight_utils/starlight_utils.dart';
 
 class CreateNewShopScreen extends StatelessWidget {
@@ -16,11 +16,11 @@ class CreateNewShopScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final middleWidth = context.width * 0.18;
-    final createNewShopBloc = context.read<CreateNewShopBloc>();
+    final createNewShopBloc = context.read<CreateNewShopWithFormBloc>();
     return Scaffold(
       body: SafeArea(
         child: Form(
-          key: createNewShopBloc.formKey,
+          key: createNewShopBloc.form.formKey,
           child: Column(
             children: [
               Padding(
@@ -57,7 +57,7 @@ class CreateNewShopScreen extends StatelessWidget {
                             : null
                         : "Shop name is required";
                   },
-                  controller: createNewShopBloc.controller,
+                  controller: createNewShopBloc.form.name.input,
                   decoration: const InputDecoration(
                     hintText: "Shop Name",
                   ),
@@ -81,12 +81,12 @@ class CreateNewShopSubmitButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final createNewShopBloc = context.read<CreateNewShopBloc>();
+    final createNewShopBloc = context.read<CreateNewShopWithFormBloc>();
     return ElevatedButton(
       onPressed: () {
         createNewShopBloc.add(const CreateNewShopCreateShopEvent());
       },
-      child: BlocConsumer<CreateNewShopBloc, CreateNewShopState>(
+      child: BlocConsumer<CreateNewShopWithFormBloc, CreateNewShopState>(
         listenWhen: (_, c) {
           return c is CreateNewShopCreatedState || c is CreateNewShopErrorState;
         },
@@ -95,8 +95,8 @@ class CreateNewShopSubmitButton extends StatelessWidget {
           if (state is CreateNewShopCreatedState) {
             StarlightUtils.pop();
             StarlightUtils.snackbar(SnackBar(
-                content:
-                    Text("${createNewShopBloc.controller.text} was created.")));
+                content: Text(
+                    "${createNewShopBloc.form.name.input?.text} was created.")));
             return;
           }
           state as CreateNewShopErrorState;
@@ -134,20 +134,16 @@ class ShopCoverPhotoPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final createNewShopBloc = context.read<CreateNewShopBloc>();
+    final createNewShopBloc = context.read<CreateNewShopWithFormBloc>();
     return GestureDetector(
       onTap: () {
         createNewShopBloc.add(const CreateNewShopPickCoverPhotoEvent());
       },
-      child: BlocBuilder<CreateNewShopBloc, CreateNewShopState>(
-        buildWhen: (p, c) {
-          return p.coverPhotoPath?.split("/").last !=
-              c.coverPhotoPath?.split("/").last;
-        },
+      child: BlocBuilder<CreateNewShopWithFormBloc, CreateNewShopState>(
         builder: (_, state) {
           logger.w("ShopCoverPhotoPicker builder get an event");
 
-          final path = state.coverPhotoPath ?? "";
+          final path = createNewShopBloc.form.coverPhoto.input ?? "";
           if (path.isNotEmpty) {
             return CircleAvatar(
               radius: 80,

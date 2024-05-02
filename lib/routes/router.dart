@@ -9,8 +9,8 @@ import 'package:inventory_management_with_sql/core/db/utils/const.dart';
 import 'package:inventory_management_with_sql/create_new_category/controller/create_new_category_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_category/controller/create_new_category_state.dart';
 import 'package:inventory_management_with_sql/create_new_category/screen/create_new_category_screen.dart';
-import 'package:inventory_management_with_sql/create_new_shop/controller/create_new_shop_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_shop/controller/create_new_shop_state.dart';
+import 'package:inventory_management_with_sql/create_new_shop/controller/create_new_shop_with_form_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_shop/screen/create_new_shop_screen.dart';
 import 'package:inventory_management_with_sql/dashboard/controller/dashboard_navigation_bloc.dart';
 import 'package:inventory_management_with_sql/dashboard/controller/dashboard_navigation_state.dart';
@@ -117,8 +117,9 @@ final Map<String, Route Function(RouteSettings setting)> routes = {
   shopList: (settings) => _shopScreen(settings),
   createNewShop: (settings) => _route(
         BlocProvider(
-          create: (_) => CreateNewShopBloc(
+          create: (_) => CreateNewShopWithFormBloc(
             CreateNewShopInitialState(),
+            ShopCreateForm.form(),
             container.get<SqliteShopRepo>(),
             container.get<ImagePicker>(),
           ),

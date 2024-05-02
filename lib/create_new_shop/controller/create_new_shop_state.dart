@@ -1,41 +1,35 @@
 abstract class CreateNewShopState {
-  final String? coverPhotoPath;
   final DateTime _dateTime;
-  CreateNewShopState({required this.coverPhotoPath})
-      : _dateTime = DateTime.now();
+  CreateNewShopState() : _dateTime = DateTime.now();
 
   @override
   operator ==(covariant CreateNewShopState other) {
-    return other.coverPhotoPath == coverPhotoPath &&
-        other._dateTime.toIso8601String() == _dateTime.toIso8601String();
+    return other._dateTime.toIso8601String() == _dateTime.toIso8601String();
   }
 
   @override
-  int get hashCode => coverPhotoPath?.hashCode ?? ''.hashCode;
+  int get hashCode => _dateTime.hashCode;
 }
 
 class CreateNewShopInitialState extends CreateNewShopState {
-  CreateNewShopInitialState() : super(coverPhotoPath: null);
+  CreateNewShopInitialState();
 }
 
 class CreateNewShopCoverPhotoSelectedState extends CreateNewShopState {
-  CreateNewShopCoverPhotoSelectedState({
-    required super.coverPhotoPath,
-  });
+  CreateNewShopCoverPhotoSelectedState();
 }
 
 class CreateNewShopCreatingState extends CreateNewShopState {
-  CreateNewShopCreatingState({required super.coverPhotoPath});
+  CreateNewShopCreatingState();
 }
 
 class CreateNewShopCreatedState extends CreateNewShopState {
-  CreateNewShopCreatedState() : super(coverPhotoPath: null);
+  CreateNewShopCreatedState();
 }
 
 class CreateNewShopErrorState extends CreateNewShopState {
   final String message;
   CreateNewShopErrorState({
     required this.message,
-    required super.coverPhotoPath,
   });
 }
