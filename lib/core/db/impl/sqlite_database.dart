@@ -155,7 +155,7 @@ class SqliteDatabase implements DataStore<Database> {
     Database? db,
   ]) async {
     assert(db != null || database != null);
-
+    logger.e(tableColumns);
     final columnMigration = tableColumns[version];
     if (columnMigration == null) throw "version not found";
 

@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+
 class Field<T> {
   final bool isRequired;
   T? input;
@@ -11,6 +13,14 @@ class Field<T> {
     this.dispose,
   }) : assert((isValid == null && !isRequired) ||
             (isRequired && isValid != null));
+
+  static Field<TextEditingController> textEditingController() => Field(
+        input: TextEditingController(),
+        isRequired: false,
+        dispose: (p0) {
+          return p0?.dispose();
+        },
+      );
 }
 
 String? formIsValid(List<Field> form) {

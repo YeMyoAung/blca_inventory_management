@@ -5,6 +5,7 @@ class Product extends DatabaseModel {
   final String name;
   final int categoryId;
   final String barcode;
+  final String description;
   final DateTime createdAt;
   final DateTime? updatedAt;
 
@@ -16,6 +17,7 @@ class Product extends DatabaseModel {
     required this.name,
     required this.categoryId,
     required this.barcode,
+    required this.description,
     required this.createdAt,
     required this.updatedAt,
     required this.category,
@@ -36,6 +38,7 @@ class Product extends DatabaseModel {
       name: data['name'],
       categoryId: categoryId,
       barcode: data['barcode'],
+      description: data['description'],
       createdAt: DateTime.parse(data['created_at']),
       updatedAt: DateTime.tryParse(data['updated_at'].toString()),
       category: categoryPayload == null
@@ -53,6 +56,7 @@ class Product extends DatabaseModel {
       "name": name,
       "category_id": categoryId,
       "barcode": barcode,
+      "description": description,
       "created_at": createdAt.toIso8601String(),
       "updated_at": updatedAt?.toIso8601String(),
       "category": category?.toJson(),
@@ -64,22 +68,26 @@ class ProductParams extends DatabaseParamModel {
   final String name;
   final int categoryId;
   final String barcode;
+  final String description;
 
   const ProductParams._({
     required this.name,
     required this.categoryId,
     required this.barcode,
+    required this.description,
   });
 
   factory ProductParams.toCreate({
     required String name,
     required int categoryId,
     required String barcode,
+    String description = "",
   }) {
     return ProductParams._(
       name: name,
       categoryId: categoryId,
       barcode: barcode,
+      description: description,
     );
   }
 
@@ -87,11 +95,13 @@ class ProductParams extends DatabaseParamModel {
     String? name,
     int? categoryId,
     String? barcode,
+    String? description,
   }) {
     return ProductParams._(
       name: name ?? "",
       categoryId: categoryId ?? -1,
       barcode: barcode ?? "",
+      description: description ?? "",
     );
   }
 
@@ -101,6 +111,7 @@ class ProductParams extends DatabaseParamModel {
       "name": name,
       "category_id": categoryId,
       "barcode": barcode,
+      "description": description,
     };
   }
 
@@ -112,6 +123,7 @@ class ProductParams extends DatabaseParamModel {
     if (name.isNotEmpty) payload['name'] = name;
     if (categoryId > 0) payload['category_id'] = categoryId;
     if (barcode.isNotEmpty) payload['barcode'] = barcode;
+    if (description.isNotEmpty) payload['description'] = description;
     return payload;
   }
 }

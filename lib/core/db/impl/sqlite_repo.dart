@@ -3,9 +3,13 @@ import 'dart:async';
 import 'package:inventory_management_with_sql/core/db/interface/database_crud.dart';
 import 'package:inventory_management_with_sql/core/db/interface/database_interface.dart';
 import 'package:inventory_management_with_sql/core/db/interface/database_model.dart';
+import 'package:inventory_management_with_sql/core/db/utils/dep.dart';
 import 'package:sqflite/sqflite.dart';
 
-final Map<int, String> _sqliteErrors = {2067: "Already exists"};
+const Map<int, String> _sqliteErrors = {
+  2067: "Already exists",
+  1: "Column not found.",
+};
 
 class SqliteRepo<Model extends DatabaseModel,
         ModelParam extends DatabaseParamModel>
@@ -131,6 +135,8 @@ class SqliteRepo<Model extends DatabaseModel,
 
       return model;
     } on DatabaseException catch (e) {
+      logger.wtf(e.getResultCode());
+      logger.wtf(e.toString());
       return Result(
           exception: Error(_sqliteErrors[e.getResultCode()] ?? "Unknown Error",
               StackTrace.current));

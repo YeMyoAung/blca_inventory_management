@@ -5,11 +5,14 @@ import 'package:inventory_management_with_sql/cateogry/controller/category_list_
 import 'package:inventory_management_with_sql/container.dart';
 import 'package:inventory_management_with_sql/core/bloc/sqlite_read_state.dart';
 import 'package:inventory_management_with_sql/core/db/impl/sqlite_database.dart';
-import 'package:inventory_management_with_sql/core/db/utils/const.dart';
+import 'package:inventory_management_with_sql/core/db/utils/sqlite_table_const.dart';
 import 'package:inventory_management_with_sql/create_new_category/controller/create_new_category_bloc.dart';
-import 'package:inventory_management_with_sql/create_new_category/controller/create_new_category_state.dart';
+import 'package:inventory_management_with_sql/create_new_category/controller/create_new_category_form.dart';
 import 'package:inventory_management_with_sql/create_new_category/screen/create_new_category_screen.dart';
-import 'package:inventory_management_with_sql/create_new_shop/controller/create_new_shop_state.dart';
+import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_bloc.dart';
+import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_form.dart';
+import 'package:inventory_management_with_sql/create_new_product/screen/create_new_product_screen.dart';
+import 'package:inventory_management_with_sql/create_new_shop/controller/create_new_shop_form.dart';
 import 'package:inventory_management_with_sql/create_new_shop/controller/create_new_shop_with_form_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_shop/screen/create_new_shop_screen.dart';
 import 'package:inventory_management_with_sql/dashboard/controller/dashboard_navigation_bloc.dart';
@@ -21,6 +24,7 @@ import 'package:inventory_management_with_sql/dashboard_loader/screen/dashboard_
 import 'package:inventory_management_with_sql/repo/category_repo/category_entity.dart';
 import 'package:inventory_management_with_sql/repo/category_repo/category_repo.dart';
 import 'package:inventory_management_with_sql/repo/dashboard_repo/dashboard_repo.dart';
+import 'package:inventory_management_with_sql/repo/product_repo/v2/product_repo.dart';
 import 'package:inventory_management_with_sql/repo/shop_repo/shop_entity.dart';
 import 'package:inventory_management_with_sql/repo/shop_repo/shop_repo.dart';
 import 'package:inventory_management_with_sql/routes/route_name.dart';
@@ -70,6 +74,7 @@ final Map<String, Route Function(RouteSettings setting)> dashboardLoaderRoute =
                 database: SqliteDatabase.newInstance(
                   arg,
                   inventoryMangementTableColumns,
+                  2,
                 ),
               ),
             ),
@@ -117,8 +122,7 @@ final Map<String, Route Function(RouteSettings setting)> routes = {
   shopList: (settings) => _shopScreen(settings),
   createNewShop: (settings) => _route(
         BlocProvider(
-          create: (_) => CreateNewShopWithFormBloc(
-            CreateNewShopInitialState(),
+          create: (_) => CreateNewShopBloc(
             ShopCreateForm.form(),
             container.get<SqliteShopRepo>(),
             container.get<ImagePicker>(),
@@ -130,13 +134,25 @@ final Map<String, Route Function(RouteSettings setting)> routes = {
   ...dashboardLoaderRoute,
   ...dashboardRoute,
   createNewCategory: (settings) => _route(
-      BlocProvider(
+        BlocProvider(
           create: (_) => CreateNewCategoryBloc(
-                CreateNewCategoryInitalState(),
-                container.get<SqliteCategoryRepo>(),
-              ),
-          child: const CreateNewCategoryScreen()),
-      settings),
+            CreateNewCategoryForm.form(),
+            container.get<SqliteCategoryRepo>(),
+          ),
+          child: const CreateNewCategoryScreen(),
+        ),
+        settings,
+      ),
+  createNewProduct: (settings) => _route(
+        BlocProvider(
+          create: (_) => CreateNewProductBloc(
+            CreateNewProductForm.form(),
+            container.get<SqliteProductRepo>(),
+          ),
+          child: const CreateNewProductScreen(),
+        ),
+        settings,
+      )
 };
 
 Route router(RouteSettings settings) {

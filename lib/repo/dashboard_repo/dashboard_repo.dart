@@ -4,7 +4,7 @@ import 'package:inventory_management_with_sql/container.dart';
 import 'package:inventory_management_with_sql/core/db/impl/sqlite_database.dart';
 import 'package:inventory_management_with_sql/core/db/interface/database_model.dart';
 import 'package:inventory_management_with_sql/repo/category_repo/category_repo.dart';
-import 'package:inventory_management_with_sql/repo/product_repo/product_repo.dart';
+import 'package:inventory_management_with_sql/repo/product_repo/v2/product_repo.dart';
 
 class DashboardEngineRepo {
   final String shopName;
