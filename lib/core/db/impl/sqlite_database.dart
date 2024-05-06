@@ -112,28 +112,33 @@ class SqliteDatabase implements DataStore<Database> {
         await dbFile.create();
       }
 
-      database = await openDatabase(
+      await openDatabase(
         dbFile.path,
         version: version,
+        onConfigure: (db) {
+          database = db;
+        },
         onCreate: (db, current) async {
+          logger.f("onCreate Run");
+
           await onUp(
             current,
             db,
           );
         },
         onUpgrade: (db, old, current) async {
+          logger.f("OnUpgrade Run");
+          await onDown(old, current, db);
           await onUp(current, db);
         },
         onDowngrade: (db, old, current) async {
+          logger.f("onDowngrade Run");
+
           await onDown(old, current, db);
         },
         readOnly: false,
       );
-      // database!
-      //     .rawInsert(
-      //         '''insert into "shops"("name","cover_photo","created_at") values ('hello world','','${DateTime.now().toIso8601String()}')''')
-      //     .then(logger.w)
-      //     .catchError(logger.e);
+
       logger.i("$dbName was connected");
       return const Result();
     } catch (e) {
@@ -155,7 +160,7 @@ class SqliteDatabase implements DataStore<Database> {
     Database? db,
   ]) async {
     assert(db != null || database != null);
-    logger.e(tableColumns);
+
     final columnMigration = tableColumns[version];
     if (columnMigration == null) throw "version not found";
 
@@ -207,6 +212,6 @@ class SqliteDatabase implements DataStore<Database> {
       """);
     }));
     logger.i("Migration Down");
-    await onUp(old, db);
+    // await onUp(current, db);
   }
 }

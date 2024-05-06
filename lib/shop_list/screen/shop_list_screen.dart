@@ -117,7 +117,9 @@ class ShopList extends StatelessWidget {
                           const SizedBox(
                             width: 20,
                           ),
-                          Text("Shop $i"),
+                          Text(
+                            shops[i].name,
+                          ),
                         ],
                       ),
                     ),

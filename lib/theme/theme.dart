@@ -5,8 +5,11 @@ abstract class StandardTheme {
   Color get cardColor;
   Color get borderColor;
   Color get primaryColor;
+
   Color get outlinedButtonTextColor;
   Color get unselectedColor;
+  Color get unselectedWidgetColor;
+  Color get iconColor;
 
   ButtonStyle get buttonStyle;
   TextStyle get buttonTextStyle;
@@ -16,6 +19,9 @@ abstract class StandardTheme {
 
   ThemeData get ref => ThemeData.light();
   ThemeData get theme => ref.copyWith(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: primaryColor,
+        ),
         appBarTheme: AppBarTheme(
           backgroundColor: cardColor,
           shape: RoundedRectangleBorder(
@@ -30,6 +36,7 @@ abstract class StandardTheme {
           border: OutlineInputBorder(
             borderRadius: borderRadius,
           ),
+          isDense: true,
         ),
         bottomNavigationBarTheme: BottomNavigationBarThemeData(
           elevation: 1,
@@ -62,6 +69,28 @@ abstract class StandardTheme {
             foregroundColor: MaterialStatePropertyAll(cardColor),
           ),
         ),
+        listTileTheme: const ListTileThemeData(
+          dense: true,
+        ),
+        switchTheme: SwitchThemeData(
+          trackOutlineWidth: const MaterialStatePropertyAll(0),
+          trackColor: MaterialStateProperty.resolveWith((states) {
+            if (states.contains(MaterialState.selected)) {
+              return primaryColor;
+            }
+            return unselectedWidgetColor;
+          }),
+          trackOutlineColor: MaterialStateProperty.resolveWith((states) {
+            if (states.contains(MaterialState.selected)) {
+              return primaryColor;
+            }
+            return unselectedWidgetColor;
+          }),
+        ),
+        unselectedWidgetColor: unselectedWidgetColor,
+        iconTheme: IconThemeData(
+          color: iconColor,
+        ),
       );
 }
 
@@ -70,8 +99,9 @@ const Color lightScaffoldBackgroundColor = Color.fromRGBO(234, 236, 240, 1),
     lightBorderColor = Color.fromRGBO(208, 213, 221, 1),
     lightPrimaryColor = Color.fromRGBO(23, 92, 211, 1),
     lightOutlinedButtonTextColor = Color.fromRGBO(71, 84, 103, 1),
-    lightUnselectedColor = Color.fromRGBO(154, 164, 178, 1);
-
+    lightUnselectedColor = Color.fromRGBO(154, 164, 178, 1),
+    lightUnselectedWidgetColor = Color.fromRGBO(242, 244, 247, 1),
+    lightIconColor = Color.fromRGBO(102, 112, 133, 1);
 const BorderRadius defaultBorderRadius = BorderRadius.all(Radius.circular(8));
 
 class LightTheme extends StandardTheme {
@@ -87,6 +117,10 @@ class LightTheme extends StandardTheme {
   Color get outlinedButtonTextColor => lightOutlinedButtonTextColor;
   @override
   Color get unselectedColor => lightUnselectedColor;
+  @override
+  Color get unselectedWidgetColor => lightUnselectedWidgetColor;
+  @override
+  Color get iconColor => lightIconColor;
 
   @override
   BorderSide get borderSide => BorderSide(

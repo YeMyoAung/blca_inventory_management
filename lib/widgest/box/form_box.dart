@@ -8,10 +8,12 @@ class FormBox extends StatelessWidget {
     this.height,
     this.padding,
     this.margin,
+    this.alignment,
     required this.child,
   });
   final double? width, height;
   final EdgeInsetsGeometry? padding, margin;
+  final AlignmentGeometry? alignment;
   final Widget child;
   @override
   Widget build(BuildContext context) {
@@ -23,6 +25,7 @@ class FormBox extends StatelessWidget {
       decoration: BoxDecoration(
         color: context.theme.cardColor,
       ),
+      alignment: alignment,
       child: child,
     );
   }

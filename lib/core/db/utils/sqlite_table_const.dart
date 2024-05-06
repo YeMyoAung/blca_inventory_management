@@ -23,9 +23,12 @@ final SqliteInventoryMigrationV1 _inventoryMigrationV1 =
     SqliteInventoryMigrationV1();
 final SqliteInventoryMigrationV2 _inventoryMigrationV2 =
     SqliteInventoryMigrationV2();
+final SqliteInventoryMigrationV3 _inventoryMigrationV3 =
+    SqliteInventoryMigrationV3();
 
 Map<int, Map<String, List<TableProperties>>>
     get inventoryMangementTableColumns => {
           1: _inventoryMigrationV1.table,
           2: _inventoryMigrationV2.table,
+          3: _inventoryMigrationV3.table,
         };

@@ -17,6 +17,20 @@ Future<void> setup() async {
     1,
   ));
 
+  // final dbv1 = SqliteDatabase.newInstance(
+  //   "migration_test_4",
+  //   inventoryMangementTableColumns,
+  //   1,
+  // );
+  // await dbv1.connect();
+  // await dbv1.close();
+  // final dbv2 = SqliteDatabase.newInstance(
+  //   "migration_test_4",
+  //   inventoryMangementTableColumns,
+  //   2,
+  // );
+  // await dbv2.connect();
+  // await dbv2.close();
   await container.get<SqliteDatabase>().connect();
 
   container.setLazy(() => ImagePicker());

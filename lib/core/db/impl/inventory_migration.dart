@@ -82,6 +82,11 @@ class SqliteInventoryMigration extends SqliteBaseMigration {
               options: "default 0",
             ),
             const TableColumn(
+              name: "available",
+              type: "NUMERIC",
+              options: "default 0",
+            ),
+            const TableColumn(
               name: "on_hand",
               type: "NUMERIC",
               options: "default 0",
@@ -154,7 +159,26 @@ class SqliteInventoryMigrationV2 extends SqliteInventoryMigration {
   @override
   Map<String, List<TableProperties>> get up => const {
         productTb: [
+          TableColumn(
+            name: "description",
+            type: "varchar",
+          ),
+        ],
+      };
+}
+
+class SqliteInventoryMigrationV3 extends SqliteInventoryMigration {
+  @override
+  Map<String, List<TableProperties>> get up => const {
+        productTb: [
+          TableColumn(name: "photo", type: "varchar"),
           TableColumn(name: "description", type: "varchar"),
         ],
+        variantTb: [
+          TableColumn(
+            name: "allow_purchase_when_out_of_stock",
+            type: "bool",
+          ),
+        ]
       };
 }

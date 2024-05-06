@@ -74,7 +74,9 @@ final Map<String, Route Function(RouteSettings setting)> dashboardLoaderRoute =
                 database: SqliteDatabase.newInstance(
                   arg,
                   inventoryMangementTableColumns,
-                  2,
+                  // 1,
+                  // 2,
+                  3,
                 ),
               ),
             ),
@@ -143,16 +145,30 @@ final Map<String, Route Function(RouteSettings setting)> routes = {
         ),
         settings,
       ),
-  createNewProduct: (settings) => _route(
-        BlocProvider(
-          create: (_) => CreateNewProductBloc(
-            CreateNewProductForm.form(),
-            container.get<SqliteProductRepo>(),
-          ),
-          child: const CreateNewProductScreen(),
-        ),
+  createNewProduct: (settings) {
+    final value = settings.arguments;
+    if (value is! CategoryListBloc) {
+      return _route(
+        ErrorWidget("Category List Bloc not found"),
         settings,
-      )
+      );
+    }
+    return _route(
+      MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (_) => CreateNewProductBloc(
+              CreateNewProductForm.form(),
+              container.get<SqliteProductRepo>(),
+            ),
+          ),
+          BlocProvider.value(value: value),
+        ],
+        child: const CreateNewProductScreen(),
+      ),
+      settings,
+    );
+  }
 };
 
 Route router(RouteSettings settings) {

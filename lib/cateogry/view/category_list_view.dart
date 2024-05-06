@@ -21,8 +21,7 @@ class CategoryListView extends StatelessWidget {
             padding: const EdgeInsets.only(right: 10),
             child: CustomOutlinedButton(
               onPressed: () {
-                // StarlightUtils.pushNamed(createNewCategory);
-                StarlightUtils.pushNamed(createNewProduct);
+                StarlightUtils.pushNamed(createNewCategory);
               },
               label: "Create Category",
               icon: Icons.add_circle_outline,
