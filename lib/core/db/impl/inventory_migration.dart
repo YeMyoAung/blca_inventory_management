@@ -92,7 +92,7 @@ class SqliteInventoryMigration extends SqliteBaseMigration {
               options: "default 0",
             ),
             const TableColumn(
-              name: "damange",
+              name: "damage",
               type: "NUMERIC",
               options: "default 0",
             ),

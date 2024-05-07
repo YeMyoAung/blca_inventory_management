@@ -31,7 +31,6 @@ class CreateNewProductForm extends FormGroup<ProductParams> {
   ///TODO product photo
 
   @override
-  // TODO: implement form
   List<Field> get form => [name, description, barcode, categoryId];
 
   @override

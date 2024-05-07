@@ -1,11 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:starlight_utils/starlight_utils.dart';
 
 abstract class StandardTheme {
+  static TextStyle getBodyTextStyle(BuildContext context) {
+    return TextStyle(
+      fontSize: 14,
+      fontWeight: FontWeight.w400,
+      color: context.theme.appBarTheme.titleTextStyle?.color,
+    );
+  }
+
   Color get scaffoldBackgroundColor;
   Color get cardColor;
   Color get borderColor;
   Color get primaryColor;
+  Color get tileColor;
 
+  ///Title Text,
   Color get outlinedButtonTextColor;
   Color get unselectedColor;
   Color get unselectedWidgetColor;
@@ -17,12 +28,19 @@ abstract class StandardTheme {
   BorderRadius get borderRadius;
   BorderSide get borderSide;
 
+  TextStyle get titleTextStyle => TextStyle(
+        fontSize: 18,
+        color: outlinedButtonTextColor,
+        fontWeight: FontWeight.w500,
+      );
+
   ThemeData get ref => ThemeData.light();
   ThemeData get theme => ref.copyWith(
         colorScheme: ColorScheme.fromSeed(
           seedColor: primaryColor,
         ),
         appBarTheme: AppBarTheme(
+          titleTextStyle: titleTextStyle,
           backgroundColor: cardColor,
           shape: RoundedRectangleBorder(
             side: borderSide,
@@ -69,8 +87,12 @@ abstract class StandardTheme {
             foregroundColor: MaterialStatePropertyAll(cardColor),
           ),
         ),
-        listTileTheme: const ListTileThemeData(
-          dense: true,
+        listTileTheme: ListTileThemeData(
+          tileColor: tileColor,
+          titleTextStyle: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+          ),
         ),
         switchTheme: SwitchThemeData(
           trackOutlineWidth: const MaterialStatePropertyAll(0),
@@ -121,6 +143,8 @@ class LightTheme extends StandardTheme {
   Color get unselectedWidgetColor => lightUnselectedWidgetColor;
   @override
   Color get iconColor => lightIconColor;
+  @override
+  Color get tileColor => lightCardColor;
 
   @override
   BorderSide get borderSide => BorderSide(

@@ -5,6 +5,7 @@ import 'package:inventory_management_with_sql/core/db/impl/sqlite_database.dart'
 import 'package:inventory_management_with_sql/core/db/interface/database_model.dart';
 import 'package:inventory_management_with_sql/repo/category_repo/category_repo.dart';
 import 'package:inventory_management_with_sql/repo/product_repo/v2/product_repo.dart';
+import 'package:inventory_management_with_sql/repo/variant_repo/variant_repo.dart';
 
 class DashboardEngineRepo {
   final String shopName;
@@ -34,6 +35,11 @@ class DashboardEngineRepo {
     ///product repo
     container.setLazy<SqliteProductRepo>(() {
       return SqliteProductRepo(database);
+    });
+
+    ///variant repo
+    container.setLazy<SqliteVariantRepo>(() {
+      return SqliteVariantRepo(database);
     });
 
     ///inventory repo

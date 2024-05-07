@@ -14,7 +14,6 @@ class SqliteCreateErrorState extends SqliteCreateState {
   SqliteCreateErrorState(this.message);
   @override
   String toString() {
-    // TODO: implement toString
     return "${runtimeType.toString()}\n$message";
   }
 }

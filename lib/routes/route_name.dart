@@ -3,4 +3,6 @@ const String shopList = "/shops",
     createNewCategory = "/create/categories",
     createNewProduct = "/create/products",
     dashboardLoading = "/dashboard-loading",
-    dashboard = "/dashboard";
+    dashboard = "/dashboard",
+    addCategoryScreen = "/add/category",
+    setProductPriceScreen = "/set/price";
