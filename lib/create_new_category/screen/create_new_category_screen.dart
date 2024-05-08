@@ -18,7 +18,8 @@ class CreateNewCategoryScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Create Categories"),
         actions: [
-          CustomOutlinedButton<SqliteCreateState, CreateNewCategoryBloc>.bloc(
+          CustomOutlinedButton<SqliteCreateBaseState,
+              CreateNewCategoryBloc>.bloc(
             onPressed: (bloc) {
               bloc.add(const SqliteCreateEvent());
             },

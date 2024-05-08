@@ -29,7 +29,7 @@ class CategoryListView extends StatelessWidget {
           )
         ],
       ),
-      body: BlocBuilder<CategoryListBloc, SqliteState<Category>>(
+      body: BlocBuilder<CategoryListBloc, SqliteReadState<Category>>(
           builder: (_, state) {
         return ListView.builder(
           itemCount: state.list.length,

@@ -3,7 +3,7 @@ import 'package:inventory_management_with_sql/repo/shop_repo/shop_entity.dart';
 import 'package:inventory_management_with_sql/repo/shop_repo/shop_repo.dart';
 
 class ShopListBloc extends SqliteReadBloc<Shop, ShopParam, SqliteShopRepo> {
-  ShopListBloc(super.initialState, super.repo);
+  ShopListBloc(super.repo);
   // StreamSubscription? onChangeSubscription;
 
   // int currentOffset = 0;

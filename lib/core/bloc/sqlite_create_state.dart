@@ -1,14 +1,14 @@
 import 'package:inventory_management_with_sql/core/bloc/bloc_state.dart';
 
-abstract class SqliteCreateState extends BasicState {
-  SqliteCreateState();
+abstract class SqliteCreateBaseState extends BasicState {
+  SqliteCreateBaseState();
 }
 
-class SqliteCreateInitialState extends SqliteCreateState {}
+class SqliteCreateInitialState extends SqliteCreateBaseState {}
 
-class SqliteCreatingState extends SqliteCreateState {}
+class SqliteCreatingState extends SqliteCreateBaseState {}
 
-class SqliteCreateErrorState extends SqliteCreateState {
+class SqliteCreateErrorState extends SqliteCreateBaseState {
   final String message;
 
   SqliteCreateErrorState(this.message);
@@ -18,4 +18,4 @@ class SqliteCreateErrorState extends SqliteCreateState {
   }
 }
 
-class SqliteCreatedState extends SqliteCreateState {}
+class SqliteCreatedState extends SqliteCreateBaseState {}

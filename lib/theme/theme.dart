@@ -89,9 +89,10 @@ abstract class StandardTheme {
         ),
         listTileTheme: ListTileThemeData(
           tileColor: tileColor,
-          titleTextStyle: const TextStyle(
+          titleTextStyle: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w400,
+            color: outlinedButtonTextColor,
           ),
         ),
         switchTheme: SwitchThemeData(

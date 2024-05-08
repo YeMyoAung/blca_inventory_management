@@ -1,10 +1,14 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inventory_management_with_sql/cateogry/controller/category_list_bloc.dart';
 import 'package:inventory_management_with_sql/core/bloc/sqlite_create_event.dart';
 import 'package:inventory_management_with_sql/core/bloc/sqlite_create_state.dart';
-import 'package:inventory_management_with_sql/core/db/utils/dep.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_bloc.dart';
+import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_event.dart';
+import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_state.dart';
+import 'package:inventory_management_with_sql/repo/category_repo/category_entity.dart';
 import 'package:inventory_management_with_sql/routes/route_name.dart';
 import 'package:inventory_management_with_sql/theme/theme.dart';
 import 'package:inventory_management_with_sql/widgest/box/form_box.dart';
@@ -16,6 +20,7 @@ class CreateNewProductScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final createNewProductBloc = context.read<CreateNewProductBloc>();
     final theme = context.theme;
     final primaryColor = theme.primaryColor;
     final categoryListBloc = context.read<CategoryListBloc>();
@@ -37,17 +42,12 @@ class CreateNewProductScreen extends StatelessWidget {
         appBar: AppBar(
           title: const Text("Create Products"),
           actions: [
-            CustomOutlinedButton<SqliteCreateState, CreateNewProductBloc>.bloc(
+            CustomOutlinedButton<SqliteCreateBaseState,
+                CreateNewProductBloc>.bloc(
               buildWhen: (p0, p1) {
-                logger.e(p0);
-                logger.e(p1);
                 return false;
               },
               onPressed: (bloc) {
-                bloc.form.name.input?.text = "Product 1";
-                bloc.form.categoryId.input = 1;
-                bloc.form.barcode.input?.text = "1001";
-                bloc.form.description.input?.text = "A good product";
                 bloc.add(const SqliteCreateEvent());
               },
               label: "Save",
@@ -67,22 +67,55 @@ class CreateNewProductScreen extends StatelessWidget {
                     "Product Photo",
                     style: titleTextStyle,
                   ),
-                  Container(
-                    margin: const EdgeInsets.only(
-                      top: 12,
-                      bottom: 20,
-                    ),
-                    decoration: BoxDecoration(
-                      color: context.theme.unselectedWidgetColor,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    width: 80,
-                    height: 80,
-                    alignment: Alignment.center,
-                    child: const Icon(
-                      Icons.upload,
-                      size: 30,
-                    ),
+                  InkWell(
+                    onTap: () {
+                      createNewProductBloc
+                          .add(const CreateNewProductPickCoverPhotoEvent());
+                    },
+                    child: BlocBuilder<CreateNewProductBloc,
+                            SqliteCreateBaseState>(
+                        buildWhen: (_, state) =>
+                            state is CreateNewProductCoverPhotoSelectedState,
+                        builder: (_, state) {
+                          if (createNewProductBloc.form.coverPhoto.input !=
+                              null) {
+                            return Container(
+                              margin: const EdgeInsets.only(
+                                top: 12,
+                                bottom: 20,
+                              ),
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image: FileImage(
+                                    File(createNewProductBloc
+                                        .form.coverPhoto.notNullInput),
+                                  ),
+                                ),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              width: 80,
+                              height: 80,
+                              alignment: Alignment.center,
+                            );
+                          }
+                          return Container(
+                            margin: const EdgeInsets.only(
+                              top: 12,
+                              bottom: 20,
+                            ),
+                            decoration: BoxDecoration(
+                              color: context.theme.unselectedWidgetColor,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            width: 80,
+                            height: 80,
+                            alignment: Alignment.center,
+                            child: const Icon(
+                              Icons.upload,
+                              size: 30,
+                            ),
+                          );
+                        }),
                   ),
                   Text(
                     "Product Title",
@@ -91,6 +124,9 @@ class CreateNewProductScreen extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(top: 6, bottom: 20),
                     child: TextFormField(
+                      controller: createNewProductBloc.form.name.notNullInput,
+                      validator: (value) =>
+                          value?.isNotEmpty == true ? null : "",
                       decoration: const InputDecoration(
                         hintText: "Shoes etc...",
                       ),
@@ -103,6 +139,8 @@ class CreateNewProductScreen extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 6),
                     child: TextFormField(
+                      controller:
+                          createNewProductBloc.form.description.notNullInput,
                       maxLines: 5,
                       minLines: 3,
                       decoration: const InputDecoration(
@@ -123,28 +161,40 @@ class CreateNewProductScreen extends StatelessWidget {
                   addCategoryScreen,
                   arguments: categoryListBloc,
                 );
-
-                ///TODO
-                print(result?.id);
+                if (result is Category) {
+                  createNewProductBloc
+                      .add(CreateNewProducCategorySelectEvent(result));
+                }
               },
               leading: const Icon(
                 Icons.category_outlined,
               ),
-              title: const Text(
-                "Category",
-              ),
+              title: BlocBuilder<CreateNewProductBloc, SqliteCreateBaseState>(
+                  buildWhen: (_, state) =>
+                      state is CreateNewProductCategorySelectedState,
+                  builder: (_, state) {
+                    if (createNewProductBloc.form.category.input != null) {
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Category",
+                          ),
+                          Text(createNewProductBloc
+                              .form.category.notNullInput.name),
+                        ],
+                      );
+                    }
+                    return const Text(
+                      "Category",
+                    );
+                  }),
             ),
             Padding(
               padding: const EdgeInsets.only(top: 20),
               child: ListTile(
                 onTap: () async {
-                  final result = await StarlightUtils.pushNamed(
-                    addCategoryScreen,
-                    arguments: categoryListBloc,
-                  );
-
                   ///TODO
-                  print(result?.id);
                 },
                 leading: const Icon(
                   Icons.archive_outlined,
@@ -164,7 +214,12 @@ class CreateNewProductScreen extends StatelessWidget {
                     leading: const Icon(Icons.inventory),
                     title: const Text("Inventory"),
                     trailing: TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        StarlightUtils.pushNamed(
+                          setProductInventoryScreen,
+                          arguments: createNewProductBloc,
+                        );
+                      },
                       child: const Text("Edit"),
                     ),
                   ),
@@ -188,13 +243,25 @@ class CreateNewProductScreen extends StatelessWidget {
                       textAlign: TextAlign.end,
                     ),
                   ),
-                  SwitchListTile(
-                    contentPadding: EdgeInsets.zero,
-                    dense: true,
-                    value: false,
-                    onChanged: (value) {},
-                    title: const Text("Allow Purhcase When Out Of Stock"),
-                  ),
+                  BlocBuilder<CreateNewProductBloc, SqliteCreateBaseState>(
+                      buildWhen: (_, state) => state
+                          is CreateNewProductAvailableToSellWhenOutOfStockSelectedState,
+                      builder: (_, state) {
+                        return SwitchListTile(
+                          contentPadding: EdgeInsets.zero,
+                          dense: true,
+                          value: createNewProductBloc
+                              .form.availableToSellWhenOutOfStock.notNullInput,
+                          onChanged: (value) {
+                            createNewProductBloc.add(
+                              CreateNewProductAvailabeToSellWhenOutOfStockEvent(
+                                value,
+                              ),
+                            );
+                          },
+                          title: const Text("Allow Purhcase When Out Of Stock"),
+                        );
+                      }),
                   const Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -209,8 +276,10 @@ class CreateNewProductScreen extends StatelessWidget {
             ),
             ListTile(
               onTap: () async {
-                final price =
-                    await StarlightUtils.pushNamed(setProductPriceScreen);
+                final price = await StarlightUtils.pushNamed(
+                  setProductPriceScreen,
+                  arguments: createNewProductBloc,
+                );
 
                 ///TODO
                 print(price);

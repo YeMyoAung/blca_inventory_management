@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 
-class Field<T> {
+class Field<F> {
   final bool isRequired;
-  T? input;
-  final String? Function(T?)? isValid;
-  final Function(T?)? dispose;
+  F? input;
+  final String? Function(F?)? isValid;
+  final Function(F?)? dispose;
 
   Field({
     this.input,
@@ -20,7 +20,10 @@ class Field<T> {
         dispose: (p0) {
           return p0?.dispose();
         },
+        // value: (p0)=> p0.value.text,
       );
+
+  F get notNullInput => input!;
 }
 
 String? formIsValid(List<Field> form) {

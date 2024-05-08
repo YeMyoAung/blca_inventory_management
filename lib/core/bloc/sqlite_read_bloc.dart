@@ -10,16 +10,15 @@ import 'package:inventory_management_with_sql/core/db/utils/dep.dart';
 
 abstract class SqliteReadBloc<Model extends DatabaseModel,
         Param extends DatabaseParamModel, Repo extends SqliteRepo<Model, Param>>
-    extends Bloc<SqliteEvent<Model>, SqliteState<Model>> {
+    extends Bloc<SqliteEvent<Model>, SqliteReadState<Model>> {
   StreamSubscription? onChangeSubscription;
 
   int currentOffset = 0;
 
   final Repo repo;
   SqliteReadBloc(
-    super.initialState,
     this.repo,
-  ) {
+  ) : super(SqliteInitialState(<Model>[])) {
     //on action
     onChangeSubscription = repo.onAction.listen(_repOnActionListener);
 
@@ -86,7 +85,8 @@ abstract class SqliteReadBloc<Model extends DatabaseModel,
     } else {
       emit(SqliteSoftLoadingState(list));
     }
-    final result = await repo.findModels(offset: currentOffset);
+
+    final result = await onRead();
 
     logger.i("SqliteGetEvent Result: $result");
     if (result.hasError) {
@@ -107,6 +107,10 @@ abstract class SqliteReadBloc<Model extends DatabaseModel,
     list.addAll(incommingList);
     currentOffset += incommingList.length;
     emit(SqliteReceiveState(list));
+  }
+
+  FutureOr<Result<List<Model>>> onRead() {
+    return repo.findModels(offset: currentOffset);
   }
 
   @override

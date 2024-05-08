@@ -65,7 +65,7 @@ class ShopList extends StatelessWidget {
     //   //       ShopParam.toCreate(name: "Test ", coverPhoto: ""),
     //   //     );
     // });
-    return BlocBuilder<ShopListBloc, SqliteState<Shop>>(
+    return BlocBuilder<ShopListBloc, SqliteReadState<Shop>>(
       builder: (_, state) {
         final shops = state.list;
         final int totalShops = shops.length;

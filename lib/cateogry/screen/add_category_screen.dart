@@ -27,7 +27,7 @@ class AddCategoryScreen extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: BlocBuilder<CategoryListBloc, SqliteState<Category>>(
+            child: BlocBuilder<CategoryListBloc, SqliteReadState<Category>>(
               builder: (_, state) {
                 return ListView.separated(
                   padding: const EdgeInsets.only(bottom: 20),

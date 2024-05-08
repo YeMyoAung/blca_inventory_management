@@ -1,6 +1,5 @@
 import 'package:inventory_management_with_sql/core/db/interface/database_model.dart';
 import 'package:inventory_management_with_sql/repo/category_repo/category_entity.dart';
-import 'package:inventory_management_with_sql/repo/variant_repo/variant_entity.dart';
 
 class Product extends DatabaseModel {
   final String name;
@@ -13,8 +12,6 @@ class Product extends DatabaseModel {
   ///ref
   final Category? category;
 
-  ///TODO
-  final List<Variant> variants;
   const Product({
     required super.id,
     required this.name,
@@ -23,7 +20,6 @@ class Product extends DatabaseModel {
     required this.createdAt,
     required this.updatedAt,
     required this.category,
-    required this.variants,
   });
 
   factory Product.fromJson(dynamic data) {
@@ -43,9 +39,6 @@ class Product extends DatabaseModel {
       barcode: data['barcode'],
       createdAt: DateTime.parse(data['created_at']),
       updatedAt: DateTime.tryParse(data['updated_at'].toString()),
-
-      ///TODO
-      variants: [],
       category: categoryPayload == null
           ? null
           : Category.fromJson(

@@ -5,15 +5,15 @@ import 'package:inventory_management_with_sql/core/bloc/sqlite_create_bloc.dart'
 import 'package:inventory_management_with_sql/create_new_shop/controller/create_new_shop_event.dart';
 import 'package:inventory_management_with_sql/create_new_shop/controller/create_new_shop_form.dart';
 import 'package:inventory_management_with_sql/create_new_shop/controller/create_new_shop_state.dart';
+import 'package:inventory_management_with_sql/create_new_shop/use_case/shop_create_use_case.dart';
 import 'package:inventory_management_with_sql/repo/shop_repo/shop_entity.dart';
-import 'package:inventory_management_with_sql/repo/shop_repo/shop_repo.dart';
 
-class CreateNewShopBloc
-    extends SqliteCreateBloc<Shop, ShopParam, SqliteShopRepo, ShopCreateForm> {
+class CreateNewShopBloc extends SqliteCreateBloc<Shop, ShopParam,
+    SqliteShopCreateUseCase, ShopCreateForm> {
   final ImagePicker imagePicker;
   CreateNewShopBloc(
     super.form,
-    super.repo,
+    super.useCase,
     this.imagePicker,
   ) {
     on<CreateNewShopPickCoverPhotoEvent>(

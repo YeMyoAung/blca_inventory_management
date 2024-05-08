@@ -4,5 +4,5 @@ import 'package:inventory_management_with_sql/repo/category_repo/category_repo.d
 
 class CategoryListBloc
     extends SqliteReadBloc<Category, CategoryParams, SqliteCategoryRepo> {
-  CategoryListBloc(super.initialState, super.repo);
+  CategoryListBloc(super.repo);
 }

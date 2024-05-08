@@ -4,40 +4,42 @@ import 'package:image_picker/image_picker.dart';
 import 'package:inventory_management_with_sql/cateogry/controller/category_list_bloc.dart';
 import 'package:inventory_management_with_sql/cateogry/screen/add_category_screen.dart';
 import 'package:inventory_management_with_sql/container.dart';
-import 'package:inventory_management_with_sql/core/bloc/sqlite_read_state.dart';
 import 'package:inventory_management_with_sql/core/db/impl/sqlite_database.dart';
 import 'package:inventory_management_with_sql/core/db/utils/sqlite_table_const.dart';
 import 'package:inventory_management_with_sql/create_new_category/controller/create_new_category_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_category/controller/create_new_category_form.dart';
 import 'package:inventory_management_with_sql/create_new_category/screen/create_new_category_screen.dart';
+import 'package:inventory_management_with_sql/create_new_category/use_case/create_new_category_use_case.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_form.dart';
 import 'package:inventory_management_with_sql/create_new_product/screen/create_new_product_screen.dart';
+import 'package:inventory_management_with_sql/create_new_product/screen/set_product_inventory_screen.dart';
 import 'package:inventory_management_with_sql/create_new_product/screen/set_product_price_screen.dart';
 import 'package:inventory_management_with_sql/create_new_shop/controller/create_new_shop_form.dart';
 import 'package:inventory_management_with_sql/create_new_shop/controller/create_new_shop_with_form_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_shop/screen/create_new_shop_screen.dart';
+import 'package:inventory_management_with_sql/create_new_shop/use_case/shop_create_use_case.dart';
 import 'package:inventory_management_with_sql/dashboard/controller/dashboard_navigation_bloc.dart';
 import 'package:inventory_management_with_sql/dashboard/controller/dashboard_navigation_state.dart';
 import 'package:inventory_management_with_sql/dashboard/screen/dashboard_screen.dart';
 import 'package:inventory_management_with_sql/dashboard_loader/controller/dashboard_engine_bloc.dart';
 import 'package:inventory_management_with_sql/dashboard_loader/controller/dashboard_engine_state.dart';
 import 'package:inventory_management_with_sql/dashboard_loader/screen/dashboard_loader_screen.dart';
-import 'package:inventory_management_with_sql/repo/category_repo/category_entity.dart';
+import 'package:inventory_management_with_sql/product/controller/product_list_bloc.dart';
 import 'package:inventory_management_with_sql/repo/category_repo/category_repo.dart';
 import 'package:inventory_management_with_sql/repo/dashboard_repo/dashboard_repo.dart';
 import 'package:inventory_management_with_sql/repo/product_repo/v2/product_repo.dart';
-import 'package:inventory_management_with_sql/repo/shop_repo/shop_entity.dart';
 import 'package:inventory_management_with_sql/repo/shop_repo/shop_repo.dart';
+import 'package:inventory_management_with_sql/repo/variant_repo/variant_repo.dart';
 import 'package:inventory_management_with_sql/routes/route_name.dart';
 import 'package:inventory_management_with_sql/shop_list/controller/shop_list_bloc.dart';
 import 'package:inventory_management_with_sql/shop_list/screen/shop_list_screen.dart';
+import 'package:inventory_management_with_sql/use_case/sqlite_product_related_use_case.dart';
 
 Route _shopScreen(RouteSettings settings) {
   return _route(
     BlocProvider(
       create: (_) => ShopListBloc(
-        SqliteInitialState(<Shop>[]),
         container.get<SqliteShopRepo>(),
       ),
       child: const ShopListScreen(),
@@ -105,8 +107,12 @@ final Map<String, Route Function(RouteSettings)> dashboardRoute = {
           ),
           BlocProvider(
             create: (_) => CategoryListBloc(
-              SqliteInitialState(<Category>[]),
               container.get<SqliteCategoryRepo>(),
+            ),
+          ),
+          BlocProvider(
+            create: (_) => ProductListBloc(
+              container.get<SqliteProductRepo>(),
             ),
           ),
           BlocProvider(
@@ -128,7 +134,9 @@ final Map<String, Route Function(RouteSettings setting)> routes = {
         BlocProvider(
           create: (_) => CreateNewShopBloc(
             ShopCreateForm.form(),
-            container.get<SqliteShopRepo>(),
+            SqliteShopCreateUseCase(
+              shopRepo: container.get<SqliteShopRepo>(),
+            ),
             container.get<ImagePicker>(),
           ),
           child: const CreateNewShopScreen(),
@@ -141,7 +149,8 @@ final Map<String, Route Function(RouteSettings setting)> routes = {
         BlocProvider(
           create: (_) => CreateNewCategoryBloc(
             CreateNewCategoryForm.form(),
-            container.get<SqliteCategoryRepo>(),
+            SqliteCategoryCreateUseCase(
+                categoryRepo: container.get<SqliteCategoryRepo>()),
           ),
           child: const CreateNewCategoryScreen(),
         ),
@@ -161,7 +170,11 @@ final Map<String, Route Function(RouteSettings setting)> routes = {
           BlocProvider(
             create: (_) => CreateNewProductBloc(
               CreateNewProductForm.form(),
-              container.get<SqliteProductRepo>(),
+              container.get<ImagePicker>(),
+              SqliteProductCreateUseCase(
+                productRepo: container.get<SqliteProductRepo>(),
+                variantRepo: container.get<SqliteVariantRepo>(),
+              ),
             ),
           ),
           BlocProvider.value(value: value),
@@ -185,8 +198,32 @@ final Map<String, Route Function(RouteSettings setting)> routes = {
     );
   },
   setProductPriceScreen: (settings) {
+    final bloc = settings.arguments;
+    if (bloc is! CreateNewProductBloc) {
+      return _route(
+        ErrorWidget("Create new product bloc not found"),
+        settings,
+      );
+    }
     return _route(
-      const SetProductPriceScreen(),
+      BlocProvider.value(value: bloc, child: const SetProductPriceScreen()),
+      settings,
+    );
+  },
+  setProductInventoryScreen: (settings) {
+    final bloc = settings.arguments;
+    if (bloc is! CreateNewProductBloc) {
+      return _route(
+        ErrorWidget("Create new product bloc not found"),
+        settings,
+      );
+    }
+
+    return _route(
+      BlocProvider.value(
+        value: bloc,
+        child: const SetProductInventoryScreen(),
+      ),
       settings,
     );
   }

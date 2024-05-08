@@ -89,7 +89,7 @@ class CreateNewShopSubmitButton extends StatelessWidget {
       onPressed: () {
         createNewShopBloc.add(const SqliteCreateEvent());
       },
-      child: BlocConsumer<CreateNewShopBloc, SqliteCreateState>(
+      child: BlocConsumer<CreateNewShopBloc, SqliteCreateBaseState>(
         listenWhen: (_, c) {
           return c is SqliteCreatedState || c is SqliteCreateErrorState;
         },
@@ -142,7 +142,7 @@ class ShopCoverPhotoPicker extends StatelessWidget {
       onTap: () {
         createNewShopBloc.add(const CreateNewShopPickCoverPhotoEvent());
       },
-      child: BlocBuilder<CreateNewShopBloc, SqliteCreateState>(
+      child: BlocBuilder<CreateNewShopBloc, SqliteCreateBaseState>(
         builder: (_, state) {
           logger.w("ShopCoverPhotoPicker builder get an event");
 

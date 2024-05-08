@@ -5,4 +5,5 @@ const String shopList = "/shops",
     dashboardLoading = "/dashboard-loading",
     dashboard = "/dashboard",
     addCategoryScreen = "/add/category",
-    setProductPriceScreen = "/set/price";
+    setProductPriceScreen = "/set/price",
+    setProductInventoryScreen = "/set/inventory";

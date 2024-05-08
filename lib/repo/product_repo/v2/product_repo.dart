@@ -4,7 +4,7 @@ import 'package:inventory_management_with_sql/core/db/utils/sqlite_table_const.d
 import 'package:inventory_management_with_sql/repo/product_repo/v2/product_entity.dart';
 import 'package:sqflite/sqflite.dart';
 
-class SqliteProductRepo extends SqliteRepo<Product, ProductParams> {
+class SqliteProductRepo extends SqliteRepo<Product, VariantProductParams> {
   SqliteProductRepo(DataStore<Database> store)
       : super(
           store,
