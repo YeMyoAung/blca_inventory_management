@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:inventory_management_with_sql/core/db/interface/database_crud.dart';
 import 'package:inventory_management_with_sql/core/db/interface/database_interface.dart';
 import 'package:inventory_management_with_sql/core/db/interface/database_model.dart';
+import 'package:inventory_management_with_sql/core/db/utils/dep.dart';
 import 'package:sqflite/sqflite.dart';
 
 const Map<int, String> _sqliteErrors = {
@@ -104,6 +105,7 @@ class SqliteRepo<Model extends DatabaseModel,
         ),
       );
     }
+    logger.t(result);
     return Result(
       result: parser(result.first),
     );
@@ -120,7 +122,7 @@ class SqliteRepo<Model extends DatabaseModel,
     final Map<String, dynamic> payload = values.toCreate();
     payload
         .addEntries({MapEntry("created_at", DateTime.now().toIso8601String())});
-    final insertColumns = payload.keys.join(",");
+    final insertColumns = payload.keys.map((e) => '"$e"').join(",");
     final insertValues = payload.values.map((e) => "'$e'").join(",");
     try {
       final insertedId = await database.rawInsert("""
@@ -134,11 +136,69 @@ class SqliteRepo<Model extends DatabaseModel,
 
       return model;
     } on DatabaseException catch (e) {
+      logger.e("DatabaseException: $e");
+
       return Result(
-          exception: Error(_sqliteErrors[e.getResultCode()] ?? "Unknown Error",
-              StackTrace.current));
+        exception: Error(_sqliteErrors[e.getResultCode()] ?? "Unknown Error",
+            StackTrace.current),
+      );
     } catch (e) {
+      logger.e("DatabaseError: $e");
+
       return Result(exception: Error(e.toString(), StackTrace.current));
+    }
+  }
+
+  @override
+  Future<Result<List<Model>>> bulkCreate(
+    List<ModelParam> values,
+    String indexColumn,
+    Function(ModelParam param) indexValue,
+  ) async {
+    try {
+      if (values.isEmpty) {
+        return const Result(
+          result: [],
+        );
+      }
+
+      String columnNames = "";
+      final List<String> columnValues = [];
+
+      for (final value in values) {
+        final payload = value.toCreate();
+        payload.addEntries(
+          {MapEntry("created_at", DateTime.now().toIso8601String())},
+        );
+        if (columnNames.isEmpty) {
+          columnNames = "(${payload.keys.map((e) => '"$e"').join(",")})";
+        }
+        columnValues.add("(${payload.values.map((e) => "'$e'").join(",")})");
+      }
+      // "insert into "shops"
+      //("name","cover_photo","created_at")
+      // values
+      //('2','2','${DateTime.now().toIso8601String()}'),
+      //('3','3','${DateTime.now().toIso8601String()}') "
+      await database.rawQuery(
+          "Insert into \"$tableName\" $columnNames values ${columnValues.join(",")}");
+
+      final String indexList =
+          values.map(indexValue).toList().map((e) => "'$e'").join(",");
+      final result = await database.rawQuery(
+          "select * from \"$tableName\" where \"$indexColumn\" in ($indexList)");
+
+      return Result(
+        result: result.map(parser).toList(),
+      );
+    } on DatabaseException catch (e) {
+      return Result(
+        exception: Error(e.toString(), StackTrace.current),
+      );
+    } catch (e) {
+      return Result(
+        exception: Error(e.toString(), StackTrace.current),
+      );
     }
   }
 

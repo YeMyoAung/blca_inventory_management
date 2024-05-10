@@ -1,24 +1,17 @@
 import 'package:inventory_management_with_sql/core/db/impl/sqlite_use_case.dart';
 import 'package:inventory_management_with_sql/core/db/interface/database_model.dart';
+import 'package:inventory_management_with_sql/core/db/utils/dep.dart';
+import 'package:inventory_management_with_sql/core/db/utils/sqlite_table_const.dart';
 import 'package:inventory_management_with_sql/repo/product_repo/v2/product_entity.dart';
 import 'package:inventory_management_with_sql/repo/product_repo/v2/product_repo.dart';
 import 'package:inventory_management_with_sql/repo/variant_repo/variant_repo.dart';
 
-// abstract class ProductRelatedUseCase {
-//   const ProductRelatedUseCase();
-//   Future<Result<Product>> createNoneVariantProduct(VariantProductParams params);
-
-//   Future<Result<Product>> getProductDetails(int id);
-//   Future<Result<Product>> getProduct(int id);
-//   Future<Result<List<Product>>> getProducts();
-// }
-
-class SqliteProductCreateUseCase
+class SqliteCreateNewProductUseCase
     extends SqliteCreateUseCase<Product, VariantProductParams> {
   final SqliteProductRepo productRepo;
   final SqliteVariantRepo variantRepo;
 
-  const SqliteProductCreateUseCase({
+  const SqliteCreateNewProductUseCase({
     required this.productRepo,
     required this.variantRepo,
   });
@@ -27,26 +20,64 @@ class SqliteProductCreateUseCase
   Future<Result<Product>> create(
     VariantProductParams param,
   ) async {
+    final barcode = param.barcode;
+    if (barcode.isNotEmpty == true) {
+      final isBarcodeAreadyExits = await productRepo.findModels(
+          where: "where \"$productTb\".\"barcode\"='$barcode'");
+
+      if (!isBarcodeAreadyExits.hasError) {
+        return Result(
+          exception: Error(
+              "Barcode already exist with Product ID:${isBarcodeAreadyExits.result?.first.id}"),
+        );
+      }
+    }
+
+    final sku = param.variant.where((element) => element.sku.isNotEmpty);
+    if (sku.isNotEmpty == true) {
+      final isSkuAreadyExits = await variantRepo.findModels(
+          where: "where \"$variantTb\".\"sku\" in '${sku.toList()}'");
+
+      if (!isSkuAreadyExits.hasError) {
+        return Result(
+          exception: Error(
+              "Sku already exist with Variant ID:${isSkuAreadyExits.result?.first.id}"),
+        );
+      }
+    }
+
     final productCreateResult = await productRepo.create(param);
     if (productCreateResult.hasError) {
+      logger.t("Product Create Error $productCreateResult");
       return productCreateResult;
     }
     final id = productCreateResult.result!.id;
-    param.variant.productID = id;
-    final variantCreateResult = await variantRepo.create(param.variant);
-    if (variantCreateResult.hasError) {
+
+    final variantCreateResult = await Future.wait(param.variant.map((e) {
+      e.productID = id;
+      return variantRepo.create(e);
+    }));
+    final errors = variantCreateResult.where((element) => element.hasError);
+    if (errors.isNotEmpty) {
+      logger.t("Variant Create Error $variantCreateResult");
+
       final deleteResult = await productRepo.delete(id);
       if (deleteResult.hasError) {
+        logger.t("Product Delete Error $deleteResult");
         return Result(exception: deleteResult.exception);
       }
-      return Result(exception: variantCreateResult.exception);
+      return Result(exception: errors.first.exception);
     }
     //category,variant
     final productFetchResult = await productRepo.getOne(id, true);
     if (productFetchResult.hasError) {
+      logger.t("Product Fetch Error $productFetchResult");
+
       return productFetchResult;
     }
-    productFetchResult.result!.variants.add(variantCreateResult.result!);
+    productFetchResult.result!.variants.addAll(
+      variantCreateResult.map((e) => e.result!),
+    );
     return productFetchResult;
   }
 

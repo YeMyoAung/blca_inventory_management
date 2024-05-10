@@ -44,4 +44,9 @@ abstract class DatabaseCrud<DatabaseType, Model extends DatabaseModel,
   Future<Result<Model>> create(ModelParams values);
   Future<Result<Model>> update(int id, ModelParams values);
   Future<Result<Model>> delete(int id);
+  Future<Result<List<Model>>> bulkCreate(
+    List<ModelParams> values,
+    String indexColumn,
+    Function(ModelParams param) indexValue,
+  );
 }

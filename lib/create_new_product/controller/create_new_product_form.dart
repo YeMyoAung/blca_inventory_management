@@ -6,6 +6,7 @@ import 'package:inventory_management_with_sql/repo/category_repo/category_entity
 import 'package:inventory_management_with_sql/repo/product_repo/v2/product_entity.dart';
 import 'package:inventory_management_with_sql/repo/variant_repo/variant_entity.dart';
 
+//TODO
 class CreateNewProductForm extends FormGroup<VariantProductParams> {
   final Field<String> coverPhoto;
   final Field<TextEditingController> name,
@@ -89,17 +90,19 @@ class CreateNewProductForm extends FormGroup<VariantProductParams> {
           description: description.input!.text,
           coverPhoto: coverPhoto.notNullInput,
         ),
-        variant: VariantParam.toCreate(
-          coverPhoto: coverPhoto.notNullInput,
-          sku: sku.notNullInput.text,
-          price: double.parse(price.notNullInput.text),
-          available: double.parse(available.notNullInput.text),
-          damage: double.parse(damange.notNullInput.text),
-          onHand: double.parse(onHand.notNullInput.text),
-          lost: double.parse(lost.notNullInput.text),
-          allowPurchaseWhenOutOfStock:
-              availableToSellWhenOutOfStock.notNullInput,
-        ),
+        variant: [
+          VariantParam.toCreate(
+            coverPhoto: coverPhoto.notNullInput,
+            sku: sku.notNullInput.text,
+            price: double.parse(price.notNullInput.text),
+            available: double.tryParse(available.notNullInput.text) ?? 0,
+            damage: double.tryParse(damange.notNullInput.text) ?? 0,
+            onHand: double.tryParse(onHand.notNullInput.text) ?? 0,
+            lost: double.tryParse(lost.notNullInput.text) ?? 0,
+            allowPurchaseWhenOutOfStock:
+                availableToSellWhenOutOfStock.notNullInput,
+          )
+        ],
       ),
     );
   }

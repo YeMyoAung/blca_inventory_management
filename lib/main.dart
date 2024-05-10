@@ -52,6 +52,31 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // final db = container.get<SqliteDatabase>().database;
+    // db?.rawQuery("select count(id) from $shopTb").then((value) {
+    //   logger.t(value);
+
+    //   db
+    //       .rawQuery(
+    // "insert into \"$shopTb\" (\"name\",\"cover_photo\",\"created_at\") values ('2','2','${DateTime.now().toIso8601String()}'), ('3','3','${DateTime.now().toIso8601String()}') "
+    //
+    // )
+    //       .then((v) {
+    //     db.rawQuery("select count(id) from $shopTb").then((value) {
+    //       logger.t(value);
+    //     });
+    //   });
+    // });
+
+    // container.get<SqliteShopRepo>().bulkCreate(
+    //   [
+    //     ShopParam.toCreate(name: "hello world 1", coverPhoto: "2"),
+    //     ShopParam.toCreate(name: "hellow world 2", coverPhoto: "3"),
+    //   ],
+    //   "name",
+    //   (para) => para.name,
+    // ).then((value) => logger.t(value),);
+
     return MaterialApp(
       navigatorKey: StarlightUtils.navigatorKey,
       theme: LightTheme().theme,

@@ -9,7 +9,7 @@ import 'package:inventory_management_with_sql/core/db/utils/sqlite_table_const.d
 import 'package:inventory_management_with_sql/create_new_category/controller/create_new_category_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_category/controller/create_new_category_form.dart';
 import 'package:inventory_management_with_sql/create_new_category/screen/create_new_category_screen.dart';
-import 'package:inventory_management_with_sql/create_new_category/use_case/create_new_category_use_case.dart';
+import 'package:inventory_management_with_sql/create_new_category/use_case/sqlite_create_new_category_use_case.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_form.dart';
 import 'package:inventory_management_with_sql/create_new_product/screen/create_new_product_screen.dart';
@@ -18,7 +18,7 @@ import 'package:inventory_management_with_sql/create_new_product/screen/set_prod
 import 'package:inventory_management_with_sql/create_new_shop/controller/create_new_shop_form.dart';
 import 'package:inventory_management_with_sql/create_new_shop/controller/create_new_shop_with_form_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_shop/screen/create_new_shop_screen.dart';
-import 'package:inventory_management_with_sql/create_new_shop/use_case/shop_create_use_case.dart';
+import 'package:inventory_management_with_sql/create_new_shop/use_case/sqlite_create_new_shop_use_case.dart';
 import 'package:inventory_management_with_sql/dashboard/controller/dashboard_navigation_bloc.dart';
 import 'package:inventory_management_with_sql/dashboard/controller/dashboard_navigation_state.dart';
 import 'package:inventory_management_with_sql/dashboard/screen/dashboard_screen.dart';
@@ -34,7 +34,7 @@ import 'package:inventory_management_with_sql/repo/variant_repo/variant_repo.dar
 import 'package:inventory_management_with_sql/routes/route_name.dart';
 import 'package:inventory_management_with_sql/shop_list/controller/shop_list_bloc.dart';
 import 'package:inventory_management_with_sql/shop_list/screen/shop_list_screen.dart';
-import 'package:inventory_management_with_sql/use_case/sqlite_product_related_use_case.dart';
+import 'package:inventory_management_with_sql/use_case/sqlite_create_new_product_use_case.dart';
 
 Route _shopScreen(RouteSettings settings) {
   return _route(
@@ -171,7 +171,7 @@ final Map<String, Route Function(RouteSettings setting)> routes = {
             create: (_) => CreateNewProductBloc(
               CreateNewProductForm.form(),
               container.get<ImagePicker>(),
-              SqliteProductCreateUseCase(
+              SqliteCreateNewProductUseCase(
                 productRepo: container.get<SqliteProductRepo>(),
                 variantRepo: container.get<SqliteVariantRepo>(),
               ),

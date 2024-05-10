@@ -6,10 +6,10 @@ import 'package:inventory_management_with_sql/create_new_product/controller/crea
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_form.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_state.dart';
 import 'package:inventory_management_with_sql/repo/product_repo/v2/product_entity.dart';
-import 'package:inventory_management_with_sql/use_case/sqlite_product_related_use_case.dart';
+import 'package:inventory_management_with_sql/use_case/sqlite_create_new_product_use_case.dart';
 
 class CreateNewProductBloc extends SqliteCreateBloc<Product,
-    VariantProductParams, SqliteProductCreateUseCase, CreateNewProductForm> {
+    VariantProductParams, SqliteCreateNewProductUseCase, CreateNewProductForm> {
   final ImagePicker imagePicker;
 
   CreateNewProductBloc(

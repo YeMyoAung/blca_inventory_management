@@ -44,6 +44,20 @@ class CreateNewProductScreen extends StatelessWidget {
           actions: [
             CustomOutlinedButton<SqliteCreateBaseState,
                 CreateNewProductBloc>.bloc(
+              listenWhen: (p0, p1) =>
+                  p1 is SqliteCreateErrorState || p1 is SqliteCreatedState,
+              listener: (p0, p1, state) {
+                if (state is SqliteCreateErrorState) {
+                  StarlightUtils.snackbar(
+                    SnackBar(
+                      content: Text(state.message),
+                    ),
+                  );
+                  return;
+                }
+
+                StarlightUtils.pop();
+              },
               buildWhen: (p0, p1) {
                 return false;
               },

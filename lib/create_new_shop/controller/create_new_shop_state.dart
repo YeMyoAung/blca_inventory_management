@@ -1,3 +1,5 @@
+import 'package:inventory_management_with_sql/core/bloc/sqlite_create_state.dart';
+
 abstract class CreateNewShopState {
   final DateTime _dateTime;
   CreateNewShopState() : _dateTime = DateTime.now();
@@ -15,7 +17,7 @@ class CreateNewShopInitialState extends CreateNewShopState {
   CreateNewShopInitialState();
 }
 
-class CreateNewShopCoverPhotoSelectedState extends CreateNewShopState {
+class CreateNewShopCoverPhotoSelectedState extends SqliteCreateBaseState {
   CreateNewShopCoverPhotoSelectedState();
 }
 

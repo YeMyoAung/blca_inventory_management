@@ -147,7 +147,13 @@ class ProductParams extends DatabaseParamModel {
 
 class VariantProductParams extends DatabaseParamModel {
   final ProductParams _product;
-  final VariantParam variant;
+  final List<VariantParam> variant;
+
+  String get name => _product.name;
+  String get coverPhoto => _product.coverPhoto;
+  int get categoryId => _product.categoryId;
+  String get barcode => _product.barcode;
+  String get description => _product.description;
 
   const VariantProductParams({
     required ProductParams product,

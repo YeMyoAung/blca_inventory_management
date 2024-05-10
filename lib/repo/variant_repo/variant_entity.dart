@@ -25,16 +25,17 @@ class Variant extends DatabaseModel {
 
   factory Variant.fromJson(dynamic data) {
     return Variant(
-      id: int.parse(data['id']),
-      productID: int.parse(data['product_id']),
+      id: int.parse(data['id'].toString()),
+      productID: int.parse(data['product_id'].toString()),
       coverPhoto: data['cover_photo'],
-      sku: data['sku'],
+      sku: data['sku'].toString(),
       price: double.parse(data['price'].toString()),
       available: double.parse(data['available'].toString()),
       damage: double.parse(data['damage'].toString()),
       onHand: double.parse(data['on_hand'].toString()),
       lost: double.parse(data['lost'].toString()),
-      allowPurchaseWhenOutOfStock: data['allow_purchase_when_out_of_stock'],
+      allowPurchaseWhenOutOfStock:
+          data['allow_purchase_when_out_of_stock'] == true,
       createdAt: DateTime.parse(data['created_at']),
       updatedAt: DateTime.tryParse(data['updated_at'] ?? ""),
     );
@@ -111,6 +112,7 @@ class VariantParam extends DatabaseParamModel {
       "on_hand": onHand,
       "damage": damage,
       "lost": lost,
+      "allow_purchase_when_out_of_stock": allowPurchaseWhenOutOfStock == true,
     };
   }
 
@@ -137,6 +139,12 @@ class VariantParam extends DatabaseParamModel {
     }
     if (lost >= 0) {
       payload.addEntries({MapEntry("lost", lost)});
+    }
+    if (allowPurchaseWhenOutOfStock != null) {
+      payload.addEntries({
+        MapEntry(
+            "allow_purchase_when_out_of_stock", allowPurchaseWhenOutOfStock)
+      });
     }
     return payload;
   }

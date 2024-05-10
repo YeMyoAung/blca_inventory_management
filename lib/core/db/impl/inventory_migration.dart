@@ -34,7 +34,6 @@ class SqliteInventoryMigration extends SqliteBaseMigration {
             const TableColumn(
               name: "barcode",
               type: "varchar",
-              options: "unique",
             ),
           ],
           optionTb: [
@@ -74,7 +73,6 @@ class SqliteInventoryMigration extends SqliteBaseMigration {
             const TableColumn(
               name: "sku",
               type: "varchar",
-              options: "not null unique",
             ),
             const TableColumn(
               name: "price",
@@ -178,6 +176,7 @@ class SqliteInventoryMigrationV3 extends SqliteInventoryMigration {
           TableColumn(
             name: "allow_purchase_when_out_of_stock",
             type: "bool",
+            options: "default false",
           ),
         ]
       };
