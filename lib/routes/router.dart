@@ -13,6 +13,7 @@ import 'package:inventory_management_with_sql/create_new_category/use_case/sqlit
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_form.dart';
 import 'package:inventory_management_with_sql/create_new_product/screen/create_new_product_screen.dart';
+import 'package:inventory_management_with_sql/create_new_product/screen/set_option_value_screen.dart';
 import 'package:inventory_management_with_sql/create_new_product/screen/set_product_inventory_screen.dart';
 import 'package:inventory_management_with_sql/create_new_product/screen/set_product_price_screen.dart';
 import 'package:inventory_management_with_sql/create_new_shop/controller/create_new_shop_form.dart';
@@ -224,6 +225,12 @@ final Map<String, Route Function(RouteSettings setting)> routes = {
         value: bloc,
         child: const SetProductInventoryScreen(),
       ),
+      settings,
+    );
+  },
+  setOptionValueScreen: (settings) {
+    return _route(
+      const SetOptionValueScreen(),
       settings,
     );
   }

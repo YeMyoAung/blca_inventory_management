@@ -1,4 +1,5 @@
 import 'package:inventory_management_with_sql/core/db/interface/database_model.dart';
+import 'package:inventory_management_with_sql/repo/variant_properties_repo/variant_property_entity.dart';
 
 class Variant extends DatabaseModel {
   final int productID;
@@ -7,6 +8,8 @@ class Variant extends DatabaseModel {
   final bool allowPurchaseWhenOutOfStock;
   final DateTime createdAt;
   final DateTime? updatedAt;
+
+  final List<VaraintProperty> properties;
 
   const Variant({
     required super.id,
@@ -21,6 +24,7 @@ class Variant extends DatabaseModel {
     required this.allowPurchaseWhenOutOfStock,
     required this.createdAt,
     required this.updatedAt,
+    required this.properties,
   });
 
   factory Variant.fromJson(dynamic data) {
@@ -38,6 +42,7 @@ class Variant extends DatabaseModel {
           data['allow_purchase_when_out_of_stock'] == true,
       createdAt: DateTime.parse(data['created_at']),
       updatedAt: DateTime.tryParse(data['updated_at'] ?? ""),
+      properties: [], //TODO
     );
   }
 
@@ -67,6 +72,8 @@ class VariantParam extends DatabaseParamModel {
   final double price, available, damage, onHand, lost;
   final bool? allowPurchaseWhenOutOfStock;
 
+  final List<VariantPropertyParam> properties;
+
   VariantParam._({
     required this.coverPhoto,
     required this.sku,
@@ -76,6 +83,7 @@ class VariantParam extends DatabaseParamModel {
     required this.onHand,
     required this.lost,
     required this.allowPurchaseWhenOutOfStock,
+    required this.properties,
   });
 
   VariantParam.toCreate({
@@ -87,6 +95,7 @@ class VariantParam extends DatabaseParamModel {
     required this.onHand,
     required this.lost,
     required this.allowPurchaseWhenOutOfStock,
+    required this.properties,
   }) : assert(allowPurchaseWhenOutOfStock != null);
 
   VariantParam.toUpdate({
@@ -98,6 +107,7 @@ class VariantParam extends DatabaseParamModel {
     this.onHand = -1,
     this.lost = -1,
     this.allowPurchaseWhenOutOfStock,
+    required this.properties,
   }) : productID = -1;
 
   @override

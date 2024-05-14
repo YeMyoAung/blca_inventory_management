@@ -169,4 +169,7 @@ class VariantProductParams extends DatabaseParamModel {
   Map<String, dynamic> toUpdate() {
     return _product.toUpdate();
   }
+
+  ///TODO
+  ///generate variant properties
 }

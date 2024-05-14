@@ -49,4 +49,5 @@ abstract class DatabaseCrud<DatabaseType, Model extends DatabaseModel,
     String indexColumn,
     Function(ModelParams param) indexValue,
   );
+  Future<Result<List<Model>>> deleteWhere(String condition);
 }

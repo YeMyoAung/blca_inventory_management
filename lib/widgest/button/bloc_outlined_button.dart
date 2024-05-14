@@ -25,6 +25,12 @@ class CustomOutlinedButton<State extends Object,
     this.style,
     this.listenWhen,
     this.buildWhen,
+
+    ///bloc_state (loading,succesr,error)
+    ///Function(bloc_state)
+    /// bloc_state == loading return loading widget
+    /// bloc_state == error return error widget
+    /// bloc_state == success return null
     this.placeholder,
     this.listener,
   })  : useBloc = true,

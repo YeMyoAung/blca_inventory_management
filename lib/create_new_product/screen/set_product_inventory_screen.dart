@@ -20,7 +20,7 @@ class SetProductInventoryScreen extends StatelessWidget {
     if (!_doubleCheck(bloc.form.lost.notNullInput.text)) {
       return _showSnackBar("Lost must be num");
     }
-    if (!_doubleCheck(bloc.form.damange.notNullInput.text)) {
+    if (!_doubleCheck(bloc.form.damage.notNullInput.text)) {
       return _showSnackBar("Damange must be num");
     }
     StarlightUtils.pop();
@@ -124,7 +124,7 @@ class SetProductInventoryScreen extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(top: 20),
                   child: TextFormField(
-                    controller: createNewProductBloc.form.damange.notNullInput,
+                    controller: createNewProductBloc.form.damage.notNullInput,
                     keyboardType: TextInputType.number,
                     validator: (value) => value == null
                         ? null

@@ -188,9 +188,13 @@ class SqliteRepo<Model extends DatabaseModel,
       final result = await database.rawQuery(
           "select * from \"$tableName\" where \"$indexColumn\" in ($indexList)");
 
-      return Result(
+      final response = Result(
         result: result.map(parser).toList(),
       );
+
+      _addAll(response, DatabaseCrudAction.create);
+
+      return response;
     } on DatabaseException catch (e) {
       return Result(
         exception: Error(e.toString(), StackTrace.current),
@@ -237,14 +241,17 @@ class SqliteRepo<Model extends DatabaseModel,
   @override
   Future<Result<Model>> delete(int id) async {
     final model = await get(id);
-    final effectedRows = await database
-        .rawDelete("""delete from "$tableName" where id=?""", [id]);
+    final effectedRows = await database.rawDelete(
+      """delete from "$tableName" where id=?""",
+      [id],
+    );
     if (effectedRows < 1) {
       return Result(
-          exception: Error(
-        "Failed to delete.",
-        StackTrace.current,
-      ));
+        exception: Error(
+          "Failed to delete.",
+          StackTrace.current,
+        ),
+      );
     }
     _action.sink.add(DatabaseCrudOnAction(
       model: model,
@@ -255,4 +262,32 @@ class SqliteRepo<Model extends DatabaseModel,
 
   @override
   Database get database => store.database!;
+
+  @override
+  Future<Result<List<Model>>> deleteWhere(String condition) async {
+    final count = await database.rawDelete(
+      "Delete From \"$tableName\" Where $condition,",
+    );
+    if (count < 1) {
+      return Result(
+        exception: Error(
+          "Failed to delete.",
+          StackTrace.current,
+        ),
+      );
+    }
+    final result = await findModels(where: "where $condition");
+    _addAll(result, DatabaseCrudAction.delete);
+    return result;
+  }
+
+  void _addAll(Result<List<Model>> models, DatabaseCrudAction action) {
+    if (models.hasError) return;
+    for (var model in models.result!) {
+      _action.add(DatabaseCrudOnAction(
+        model: Result(result: model),
+        action: action,
+      ));
+    }
+  }
 }

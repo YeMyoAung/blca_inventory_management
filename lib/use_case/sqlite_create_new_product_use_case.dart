@@ -23,25 +23,31 @@ class SqliteCreateNewProductUseCase
     final barcode = param.barcode;
     if (barcode.isNotEmpty == true) {
       final isBarcodeAreadyExits = await productRepo.findModels(
-          where: "where \"$productTb\".\"barcode\"='$barcode'");
+        where: "where \"$productTb\".\"barcode\"='$barcode'",
+      );
 
       if (!isBarcodeAreadyExits.hasError) {
         return Result(
           exception: Error(
-              "Barcode already exist with Product ID:${isBarcodeAreadyExits.result?.first.id}"),
+            "Barcode already exist with Product ID:${isBarcodeAreadyExits.result?.first.id}",
+          ),
         );
       }
     }
 
-    final sku = param.variant.where((element) => element.sku.isNotEmpty);
-    if (sku.isNotEmpty == true) {
+    final skus = param.variant.where(
+      (element) => element.sku.isNotEmpty,
+    );
+    if (skus.isNotEmpty) {
       final isSkuAreadyExits = await variantRepo.findModels(
-          where: "where \"$variantTb\".\"sku\" in '${sku.toList()}'");
+        where: "where \"$variantTb\".\"sku\" in '${skus.toList()}'",
+      );
 
       if (!isSkuAreadyExits.hasError) {
         return Result(
           exception: Error(
-              "Sku already exist with Variant ID:${isSkuAreadyExits.result?.first.id}"),
+            "Sku already exist with Variant ID:${isSkuAreadyExits.result?.first.id}",
+          ),
         );
       }
     }
@@ -51,7 +57,15 @@ class SqliteCreateNewProductUseCase
       logger.t("Product Create Error $productCreateResult");
       return productCreateResult;
     }
+
     final id = productCreateResult.result!.id;
+
+    ///1. vairant count > 1 ? {
+    /// . 1. Option  (product_id) color,size,package  ToParam()
+    /// . 2. Value   (option_id) (red,green,blue,black,white),(s,m,l,xl,xxl),  ToParam(),(1star,2start,3start,4start,5start)//5*5*5 = 125  ToParam()
+    /// . 3. Variant (product_id) [] * 125, ToParam(),
+    /// . 4. Variant Properties (variant_id,value_id)  ToParam(), [[1,2],[2,1],[2,3]]
+    ///}: create variant
 
     final variantCreateResult = await Future.wait(param.variant.map((e) {
       e.productID = id;
@@ -60,11 +74,16 @@ class SqliteCreateNewProductUseCase
     final errors = variantCreateResult.where((element) => element.hasError);
     if (errors.isNotEmpty) {
       logger.t("Variant Create Error $variantCreateResult");
-
       final deleteResult = await productRepo.delete(id);
       if (deleteResult.hasError) {
         logger.t("Product Delete Error $deleteResult");
         return Result(exception: deleteResult.exception);
+      }
+      final variantDeleteResult =
+          await variantRepo.deleteWhere("\"product_id\"='$id'");
+      if (variantDeleteResult.hasError) {
+        logger.t("Variant Delete Error $variantDeleteResult");
+        return Result(exception: variantDeleteResult.exception);
       }
       return Result(exception: errors.first.exception);
     }

@@ -14,12 +14,19 @@ class Field<F> {
   }) : assert((isValid == null && !isRequired) ||
             (isRequired && isValid != null));
 
-  static Field<TextEditingController> textEditingController() => Field(
+  static Field<TextEditingController> textEditingController({
+    bool isRequired = false,
+    String? Function(TextEditingController?)? isValid,
+    dynamic Function(TextEditingController?)? dispose,
+  }) =>
+      Field(
         input: TextEditingController(),
-        isRequired: false,
-        dispose: (p0) {
-          return p0?.dispose();
-        },
+        isRequired: isRequired,
+        isValid: isValid,
+        dispose: dispose ??
+            (p0) {
+              return p0?.dispose();
+            },
         // value: (p0)=> p0.value.text,
       );
 

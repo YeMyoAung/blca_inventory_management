@@ -208,7 +208,7 @@ class CreateNewProductScreen extends StatelessWidget {
               padding: const EdgeInsets.only(top: 20),
               child: ListTile(
                 onTap: () async {
-                  ///TODO
+                  StarlightUtils.pushNamed(setOptionValueScreen);
                 },
                 leading: const Icon(
                   Icons.archive_outlined,
