@@ -12,6 +12,7 @@ import 'package:inventory_management_with_sql/create_new_category/screen/create_
 import 'package:inventory_management_with_sql/create_new_category/use_case/sqlite_create_new_category_use_case.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_form.dart';
+import 'package:inventory_management_with_sql/create_new_product/controller/set_option_value_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_product/screen/create_new_product_screen.dart';
 import 'package:inventory_management_with_sql/create_new_product/screen/set_option_value_screen.dart';
 import 'package:inventory_management_with_sql/create_new_product/screen/set_product_inventory_screen.dart';
@@ -178,6 +179,9 @@ final Map<String, Route Function(RouteSettings setting)> routes = {
               ),
             ),
           ),
+          BlocProvider(
+            create: (context) => SetOptionValueBloc(),
+          ),
           BlocProvider.value(value: value),
         ],
         child: const CreateNewProductScreen(),
@@ -207,7 +211,10 @@ final Map<String, Route Function(RouteSettings setting)> routes = {
       );
     }
     return _route(
-      BlocProvider.value(value: bloc, child: const SetProductPriceScreen()),
+      BlocProvider.value(
+        value: bloc,
+        child: const SetProductPriceScreen(),
+      ),
       settings,
     );
   },
@@ -229,8 +236,18 @@ final Map<String, Route Function(RouteSettings setting)> routes = {
     );
   },
   setOptionValueScreen: (settings) {
+    final value = settings.arguments;
+    if (value is! SetOptionValueBloc) {
+      return _route(
+        ErrorWidget("Set option value bloc not found"),
+        settings,
+      );
+    }
     return _route(
-      const SetOptionValueScreen(),
+      BlocProvider.value(
+        value: value,
+        child: const SetOptionValueScreen(),
+      ),
       settings,
     );
   }

@@ -8,6 +8,7 @@ import 'package:inventory_management_with_sql/core/bloc/sqlite_create_state.dart
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_event.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_state.dart';
+import 'package:inventory_management_with_sql/create_new_product/controller/set_option_value_bloc.dart';
 import 'package:inventory_management_with_sql/repo/category_repo/category_entity.dart';
 import 'package:inventory_management_with_sql/routes/route_name.dart';
 import 'package:inventory_management_with_sql/theme/theme.dart';
@@ -21,6 +22,7 @@ class CreateNewProductScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final createNewProductBloc = context.read<CreateNewProductBloc>();
+    final setOptionValueBloc = context.read<SetOptionValueBloc>();
     final theme = context.theme;
     final primaryColor = theme.primaryColor;
     final categoryListBloc = context.read<CategoryListBloc>();
@@ -208,7 +210,10 @@ class CreateNewProductScreen extends StatelessWidget {
               padding: const EdgeInsets.only(top: 20),
               child: ListTile(
                 onTap: () async {
-                  StarlightUtils.pushNamed(setOptionValueScreen);
+                  StarlightUtils.pushNamed(
+                    setOptionValueScreen,
+                    arguments: setOptionValueBloc,
+                  );
                 },
                 leading: const Icon(
                   Icons.archive_outlined,
