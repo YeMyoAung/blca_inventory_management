@@ -9,3 +9,5 @@ class AddNewOptionValueState extends SetOptionValueBaseState {}
 class RemoveOptionValueState extends SetOptionValueBaseState {}
 
 class GenerateOptionValueState extends SetOptionValueBaseState {}
+
+class GeneratedOptionValueState extends SetOptionValueBaseState {}

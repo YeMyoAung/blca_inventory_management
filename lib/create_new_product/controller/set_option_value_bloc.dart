@@ -29,6 +29,8 @@ class SetOptionValueBloc
         {
           1: SetOptionValueForm.instance(),
         };
+    variants = [];
+    selectedVariants.value = [];
     emit(AddNewOptionValueState());
   }
 
@@ -100,10 +102,11 @@ class SetOptionValueBloc
     on<GenerateOptionValueEvent>(_generateOptionValueEvent);
   }
 
+  List<List<Map>> variants = [];
+
   FutureOr<void> _generateOptionValueEvent(
       GenerateOptionValueEvent _, Emitter<SetOptionValueBaseState> emit) async {
     emit(GenerateOptionValueState());
-    print("_generateOptionValueEvent");
 
     /// [{size},{color},{package}]
     ///
@@ -111,44 +114,27 @@ class SetOptionValueBloc
     final payload = getPayload();
     if (payload.hasError) return;
 
-    final sizeColorPackageExampleResult =
-        payload.result ?? []; //size,color,package
+    final sizeColorPackageExampleResult = (payload.result ?? [])
+        .map((e) => e['attributes'].toList() as List<Map>)
+        .toList(); //size,color,package
     if (sizeColorPackageExampleResult.isEmpty) return;
+    variants = sizeColorPackageExampleResult.fold<List<List<Map>>>([],
+        (previousValue, element) {
+      if (previousValue.isEmpty) {
+        return element.map((e) => [e]).toList();
+      }
 
-    // sizeColorPackageExampleResult.fold([], (previousValue, element) {
-    //   print(previousValue);
-    //   final current = element['attributes'].toList();
-    //   print(current);
-    //   print("-----");
-    //   if (previousValue.isNotEmpty) {
-    //     for (final value in current) {
-    //       for (final pValue in previousValue) {
-
-    //       }
-    //     }
-    //   }
-
-    //   return current;
-    // });
-
-    // final first = sizeColorPackageExampleResult[0];
-    // final name = first['name'];
-    // final attributes = first["attributes"]; //size
-    // final total = sizeColorPackageExampleResult.length;
-
-    // for (final size in attributes) {
-    //   print("First Loop: $name");
-    //   print("size is ${size['name']}");
-    //   final pair =
-    //       {}; //color,package ,(Red,Gold)(Green,Gold)(Blue,Gold) (Red,Sliver),(Green,Sliver),(Blue,Sliver)
-    //   for (final colorPackage
-    //       in sizeColorPackageExampleResult.getRange(1, total)) {
-    //     final otherName = colorPackage['name'];
-    //     final otherAttributes = colorPackage['attributes'];
-    //     print("Other Loop: $otherName");
-    //     print("other data: $otherAttributes");
-    //   }
-    // }
+      ///previousValue = List<List>
+      final List<List<Map>> prob = [];
+      for (final i in element) {
+        for (final j in previousValue) {
+          prob.add([...j, i]);
+        }
+      }
+      return prob;
+    });
+    selectedVariants.value = [];
+    emit(GeneratedOptionValueState());
   }
 
   FutureOr<void> _addNewOptionValueEvent(
@@ -194,9 +180,20 @@ class SetOptionValueBloc
     );
   }
 
+  final ValueNotifier<List<int>> selectedVariants = ValueNotifier([]);
+
+  void addVariants(int index) {
+    selectedVariants.value = selectedVariants.value.toList()..add(index);
+  }
+
+  void removeVariants(int index) {
+    selectedVariants.value = selectedVariants.value.toList()..remove(index);
+  }
+
   @override
   Future<void> close() {
     scrollController.dispose();
+    selectedVariants.dispose();
 
     ///formGroups.forEach((key, value) => value.dispose());
     return super.close();

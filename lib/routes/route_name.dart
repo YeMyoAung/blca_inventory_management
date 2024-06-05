@@ -7,4 +7,5 @@ const String shopList = "/shops",
     addCategoryScreen = "/add/category",
     setProductPriceScreen = "/set/price",
     setProductInventoryScreen = "/set/inventory",
-    setOptionValueScreen = "/set/option-value";
+    setOptionValueScreen = "/set/option-value",
+    setVariantScreen = "/set/variant";

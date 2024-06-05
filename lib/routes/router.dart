@@ -17,6 +17,7 @@ import 'package:inventory_management_with_sql/create_new_product/screen/create_n
 import 'package:inventory_management_with_sql/create_new_product/screen/set_option_value_screen.dart';
 import 'package:inventory_management_with_sql/create_new_product/screen/set_product_inventory_screen.dart';
 import 'package:inventory_management_with_sql/create_new_product/screen/set_product_price_screen.dart';
+import 'package:inventory_management_with_sql/create_new_product/screen/set_variant_screen.dart';
 import 'package:inventory_management_with_sql/create_new_shop/controller/create_new_shop_form.dart';
 import 'package:inventory_management_with_sql/create_new_shop/controller/create_new_shop_with_form_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_shop/screen/create_new_shop_screen.dart';
@@ -250,8 +251,41 @@ final Map<String, Route Function(RouteSettings setting)> routes = {
       ),
       settings,
     );
+  },
+  setVariantScreen: (settings) {
+    final value = settings.arguments;
+    if (value is! VariantScreenArgs) {
+      return _route(
+        ErrorWidget("missing args"),
+        settings,
+      );
+    }
+    return _route(
+      MultiBlocProvider(
+        providers: [
+          BlocProvider.value(
+            value: value.createNewProductBloc,
+          ),
+          BlocProvider.value(
+            value: value.setOptionValueBloc,
+          )
+        ],
+        child: const SetVariantScreen(),
+      ),
+      settings,
+    );
   }
 };
+
+class VariantScreenArgs {
+  final SetOptionValueBloc setOptionValueBloc;
+  final CreateNewProductBloc createNewProductBloc;
+
+  const VariantScreenArgs({
+    required this.setOptionValueBloc,
+    required this.createNewProductBloc,
+  });
+}
 
 Route router(RouteSettings settings) {
   return routes[settings.name]?.call(settings) ?? _shopScreen(settings);

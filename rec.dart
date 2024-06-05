@@ -5,13 +5,28 @@ void main() {
     [5, 6]
   ];
 
-final resul =  a.fold([], (previousValue, element) {
-    print("Prev: $previousValue");
-    print(element);
-    previousValue.addAll(element);
-    return previousValue;
+  // final resul = a.fold([], (previousValue, element) {
+  //   print("Prev: $previousValue");
+  //   print(element);
+  //   previousValue.addAll(element);
+  //   return previousValue;
+  // });
+  final resul = fold(a, [], (p0, p1) {
+    p0.addAll(p1);
+    return p0;
   });
   print(resul);
+}
+
+List fold(
+  List source,
+  List previousValue,
+  List Function(dynamic, dynamic) callback,
+) {
+  for (final nextValue in source) {
+    callback(previousValue, nextValue);
+  }
+  return previousValue;
 }
 
 
