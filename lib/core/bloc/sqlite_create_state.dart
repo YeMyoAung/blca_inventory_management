@@ -1,6 +1,6 @@
 import 'package:inventory_management_with_sql/core/bloc/bloc_state.dart';
 
-abstract class SqliteCreateBaseState extends BasicState {
+abstract class SqliteCreateBaseState extends BlocBaseState {
   SqliteCreateBaseState();
 }
 

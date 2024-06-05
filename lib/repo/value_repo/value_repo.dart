@@ -8,6 +8,6 @@ class SqliteValueRepo extends SqliteRepo<Value, ValueParam> {
       : super(
           store,
           Value.fromJson,
-          valueTb,
+          attributeTb,
         );
 }

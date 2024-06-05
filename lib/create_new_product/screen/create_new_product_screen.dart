@@ -9,6 +9,7 @@ import 'package:inventory_management_with_sql/create_new_product/controller/crea
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_event.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_state.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/set_option_value_bloc.dart';
+import 'package:inventory_management_with_sql/create_new_product/controller/set_option_value_state.dart';
 import 'package:inventory_management_with_sql/repo/category_repo/category_entity.dart';
 import 'package:inventory_management_with_sql/routes/route_name.dart';
 import 'package:inventory_management_with_sql/theme/theme.dart';
@@ -208,110 +209,224 @@ class CreateNewProductScreen extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.only(top: 20),
-              child: ListTile(
-                onTap: () async {
-                  StarlightUtils.pushNamed(
-                    setOptionValueScreen,
-                    arguments: setOptionValueBloc,
-                  );
-                },
-                leading: const Icon(
-                  Icons.archive_outlined,
-                ),
-                title: const Text(
-                  "Add Variants",
-                ),
-              ),
-            ),
-            FormBox(
-              margin: const EdgeInsets.symmetric(vertical: 20),
-              padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
-              child: Column(
-                children: [
-                  ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: const Icon(Icons.inventory),
-                    title: const Text("Inventory"),
-                    trailing: TextButton(
-                      onPressed: () {
-                        StarlightUtils.pushNamed(
-                          setProductInventoryScreen,
-                          arguments: createNewProductBloc,
-                        );
-                      },
-                      child: const Text("Edit"),
-                    ),
-                  ),
-                  KeyValuePairWidget(
-                    leading: Text(
-                      "Sku",
-                      style: bodyTextStyle,
-                    ),
-                    trailing: const Text(
-                      "-",
-                      textAlign: TextAlign.end,
-                    ),
-                  ),
-                  KeyValuePairWidget(
-                    leading: Text(
-                      "Barcode",
-                      style: bodyTextStyle,
-                    ),
-                    trailing: const Text(
-                      "-",
-                      textAlign: TextAlign.end,
-                    ),
-                  ),
-                  BlocBuilder<CreateNewProductBloc, SqliteCreateBaseState>(
-                      buildWhen: (_, state) => state
-                          is CreateNewProductAvailableToSellWhenOutOfStockSelectedState,
-                      builder: (_, state) {
-                        return SwitchListTile(
-                          contentPadding: EdgeInsets.zero,
-                          dense: true,
-                          value: createNewProductBloc
-                              .form.availableToSellWhenOutOfStock.notNullInput,
-                          onChanged: (value) {
-                            createNewProductBloc.add(
-                              CreateNewProductAvailabeToSellWhenOutOfStockEvent(
-                                value,
-                              ),
-                            );
-                          },
-                          title: const Text("Allow Purhcase When Out Of Stock"),
-                        );
-                      }),
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      StockValue(title: "Available", value: 0),
-                      StockValue(title: "On Hand", value: 0),
-                      StockValue(title: "Lost", value: 0),
-                      StockValue(title: "Damage", value: 0),
-                    ],
-                  )
-                ],
-              ),
-            ),
-            ListTile(
-              onTap: () async {
-                final price = await StarlightUtils.pushNamed(
-                  setProductPriceScreen,
-                  arguments: createNewProductBloc,
-                );
+              child: BlocBuilder<SetOptionValueBloc, SetOptionValueBaseState>(
+                builder: (_, state) {
+                  final payload = setOptionValueBloc.getPayload();
+                  if (state is GenerateOptionValueState && !payload.hasError) {
+                    final result = payload.result ?? [];
+                    print(result);
+                    if (result.isNotEmpty) {
+                      return FormBox(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Options",
+                              style: titleTextStyle,
+                            ),
+                            for (final optionAttributes in result) ...[
+                              Padding(
+                                  padding: const EdgeInsets.only(top: 20),
+                                  child: Text(optionAttributes['name'])),
+                              Container(
+                                margin: const EdgeInsets.only(top: 10),
+                                height: 30,
+                                width: context.width,
+                                child: ListView.builder(
 
-                ///TODO
-                print(price);
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount:
+                                      optionAttributes['attributes'].length,
+                                  itemBuilder: (_, i) {
+                                    return Container(
+                                      margin: const EdgeInsets.only(right: 10),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20, vertical: 5),
+                                      decoration: BoxDecoration(
+                                        border: Border.all(),
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        optionAttributes['attributes']
+                                            .elementAt(i)['name'],
+                                      ),
+                                    );
+                                  },
+                                ),
+                                // child: Text(optionAttributes['attributes'].elementAt(0).toString()),
+                              )
+                            ],
+                            Padding(
+                              padding: const EdgeInsets.only(top: 20),
+                              child: CustomOutlinedButton(
+                                onPressed: () {
+                                  StarlightUtils.pushNamed(
+                                    setOptionValueScreen,
+                                    arguments: setOptionValueBloc,
+                                  );
+                                },
+                                label: "Add More Variants",
+                                icon: Icons.add_circle_outline,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                  }
+                  return const AddVariantButton();
+                },
+              ),
+            ),
+            BlocBuilder<SetOptionValueBloc, SetOptionValueBaseState>(
+              builder: (_, state) {
+                final payload = setOptionValueBloc.getPayload();
+                if (state is GenerateOptionValueState && !payload.hasError) {
+                  //TODO variant widgets
+                  if (payload.result!.isNotEmpty) return const SizedBox();
+                }
+                return const ProductInventoryButton();
               },
-              leading: const Icon(
-                Icons.monetization_on,
-              ),
-              title: const Text(
-                "Price",
-              ),
+            ),
+            BlocBuilder<SetOptionValueBloc, SetOptionValueBaseState>(
+              builder: (_, state) {
+                final payload = setOptionValueBloc.getPayload();
+                if (state is GenerateOptionValueState && !payload.hasError) {
+                  if (payload.result!.isNotEmpty) return const SizedBox();
+                }
+                return const ProductPriceButton();
+              },
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class AddVariantButton extends StatelessWidget {
+  const AddVariantButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final setOptionValueBloc = context.read<SetOptionValueBloc>();
+    return ListTile(
+      onTap: () async {
+        StarlightUtils.pushNamed(
+          setOptionValueScreen,
+          arguments: setOptionValueBloc,
+        );
+      },
+      leading: const Icon(
+        Icons.archive_outlined,
+      ),
+      title: const Text(
+        "Add Variants",
+      ),
+    );
+  }
+}
+
+class ProductInventoryButton extends StatelessWidget {
+  const ProductInventoryButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final createNewProductBloc = context.read<CreateNewProductBloc>();
+    final bodyTextStyle = StandardTheme.getBodyTextStyle(context);
+    return FormBox(
+      margin: const EdgeInsets.symmetric(vertical: 20),
+      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+      child: Column(
+        children: [
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.inventory),
+            title: const Text("Inventory"),
+            trailing: TextButton(
+              onPressed: () {
+                StarlightUtils.pushNamed(
+                  setProductInventoryScreen,
+                  arguments: createNewProductBloc,
+                );
+              },
+              child: const Text("Edit"),
+            ),
+          ),
+          KeyValuePairWidget(
+            leading: Text(
+              "Sku",
+              style: bodyTextStyle,
+            ),
+            trailing: const Text(
+              "-",
+              textAlign: TextAlign.end,
+            ),
+          ),
+          KeyValuePairWidget(
+            leading: Text(
+              "Barcode",
+              style: bodyTextStyle,
+            ),
+            trailing: const Text(
+              "-",
+              textAlign: TextAlign.end,
+            ),
+          ),
+          BlocBuilder<CreateNewProductBloc, SqliteCreateBaseState>(
+              buildWhen: (_, state) => state
+                  is CreateNewProductAvailableToSellWhenOutOfStockSelectedState,
+              builder: (_, state) {
+                return SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  dense: true,
+                  value: createNewProductBloc
+                      .form.availableToSellWhenOutOfStock.notNullInput,
+                  onChanged: (value) {
+                    createNewProductBloc.add(
+                      CreateNewProductAvailabeToSellWhenOutOfStockEvent(
+                        value,
+                      ),
+                    );
+                  },
+                  title: const Text("Allow Purhcase When Out Of Stock"),
+                );
+              }),
+          const Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              StockValue(title: "Available", value: 0),
+              StockValue(title: "On Hand", value: 0),
+              StockValue(title: "Lost", value: 0),
+              StockValue(title: "Damage", value: 0),
+            ],
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class ProductPriceButton extends StatelessWidget {
+  const ProductPriceButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final createNewProductBloc = context.read<CreateNewProductBloc>();
+
+    return ListTile(
+      onTap: () async {
+        await StarlightUtils.pushNamed(
+          setProductPriceScreen,
+          arguments: createNewProductBloc,
+        );
+      },
+      leading: const Icon(
+        Icons.monetization_on,
+      ),
+      title: const Text(
+        "Price",
       ),
     );
   }

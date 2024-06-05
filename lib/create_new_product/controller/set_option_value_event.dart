@@ -13,3 +13,8 @@ class RemoveOptionValueEvent extends SetOptionValueBaseEvent {
   final int groupId;
   const RemoveOptionValueEvent(this.groupId);
 }
+
+class ClearOptionValueEvent extends SetOptionValueBaseEvent {}
+
+
+class GenerateOptionValueEvent extends SetOptionValueBaseEvent{}

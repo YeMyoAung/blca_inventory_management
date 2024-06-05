@@ -48,7 +48,7 @@ class SqliteInventoryMigration extends SqliteBaseMigration {
               options: "not null",
             )
           ],
-          valueTb: [
+          attributeTb: [
             const TableColumn(
               name: "name",
               type: "varchar",

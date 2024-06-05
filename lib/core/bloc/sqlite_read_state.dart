@@ -4,7 +4,7 @@ import 'package:inventory_management_with_sql/core/db/interface/database_model.d
 // const array = fix size
 //       list  = dynamic size
 
-abstract class SqliteReadState<Model extends DatabaseModel> extends BasicState {
+abstract class SqliteReadState<Model extends DatabaseModel> extends BlocBaseState {
   final List<Model> list;
 
   SqliteReadState(this.list);

@@ -2,6 +2,13 @@ import 'dart:convert';
 
 import 'package:inventory_management_with_sql/core/db/interface/database_model.dart';
 
+///Set Option Value
+///Option Name
+/// - Attribute Name 
+/// {
+///   option_name:"",
+///   attribute_names:["","",""]  
+/// }
 class Option extends DatabaseModel {
   final int productId;
   final String name;

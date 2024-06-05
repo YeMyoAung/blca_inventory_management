@@ -1,6 +1,6 @@
 import 'package:inventory_management_with_sql/core/bloc/bloc_state.dart';
 
-abstract class CreateNewCategoryState extends BasicState {}
+abstract class CreateNewCategoryState extends BlocBaseState {}
 
 class CreateNewCategoryInitalState extends CreateNewCategoryState {}
 

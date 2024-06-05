@@ -19,7 +19,9 @@ class SetOptionValueScreen extends StatelessWidget {
           CustomOutlinedButton<SetOptionValueBaseState,
               SetOptionValueBloc>.bloc(
             onPressed: (bloc) {
-              bloc.validate();
+              if (bloc.validate()) {
+                StarlightUtils.pop();
+              }
             },
             label: "Save",
             icon: Icons.save_outlined,

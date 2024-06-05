@@ -1,10 +1,10 @@
-class BasicState {
+class BlocBaseState {
   final DateTime _time;
 
-  BasicState() : _time = DateTime.now();
+  BlocBaseState() : _time = DateTime.now();
 
   @override
-  bool operator ==(covariant BasicState other) {
+  bool operator ==(covariant BlocBaseState other) {
     return other._time.toIso8601String() == _time.toIso8601String() &&
         other.runtimeType == runtimeType;
   }

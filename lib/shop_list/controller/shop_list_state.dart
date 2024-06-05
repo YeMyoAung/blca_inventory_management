@@ -1,7 +1,7 @@
 import 'package:inventory_management_with_sql/core/bloc/bloc_state.dart';
 import 'package:inventory_management_with_sql/repo/shop_repo/shop_entity.dart';
 
-abstract class ShopListState extends BasicState {
+abstract class ShopListState extends BlocBaseState {
   final List<Shop> list;
 
   ShopListState(this.list);
