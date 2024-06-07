@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:inventory_management_with_sql/create_new_product/widgets/create_new_product_option_attribute_info.dart';
 import 'package:starlight_utils/starlight_utils.dart';
 
 class VariantAttributeBuilder extends StatelessWidget {
@@ -18,17 +19,8 @@ class VariantAttributeBuilder extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         itemCount: attributes.length,
         itemBuilder: (_, i) {
-          return Container(
-            margin: const EdgeInsets.only(right: 10),
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              border: Border.all(),
-              borderRadius: BorderRadius.circular(15),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-            child: Text(
-              attributes[i]['name'].toString(),
-            ),
+          return AttributeCard(
+            name: attributes[i]['name'].toString(),
           );
         },
       ),

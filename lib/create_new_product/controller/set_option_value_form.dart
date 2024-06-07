@@ -44,6 +44,7 @@ class SetOptionValueForm extends FormGroup {
 
   @override
   bool validate() {
+    print(formKey?.currentState?.validate());
     return formKey?.currentState?.validate() ?? false;
   }
 }

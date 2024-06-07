@@ -15,3 +15,11 @@ class CreateNewProducCategorySelectEvent extends SqliteCreateBaseEvent {
   final Category category;
   const CreateNewProducCategorySelectEvent(this.category);
 }
+
+class CreateNewProductNewStockEvent extends SqliteCreateBaseEvent {}
+
+class CreateNewProductSetPriceEvent extends SqliteCreateBaseEvent {
+  final int index;
+
+  CreateNewProductSetPriceEvent({required this.index});
+}

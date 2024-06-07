@@ -5,6 +5,8 @@ class SetOptionValueBaseState extends BlocBaseState {}
 class SetOptionValueInitialState extends SetOptionValueBaseState {}
 
 class AddNewOptionValueState extends SetOptionValueBaseState {}
+class ClearOptionValueState extends SetOptionValueBaseState {}
+
 
 class RemoveOptionValueState extends SetOptionValueBaseState {}
 

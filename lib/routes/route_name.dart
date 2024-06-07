@@ -8,4 +8,5 @@ const String shopList = "/shops",
     setProductPriceScreen = "/set/price",
     setProductInventoryScreen = "/set/inventory",
     setOptionValueScreen = "/set/option-value",
-    setVariantScreen = "/set/variant";
+    setVariantScreen = "/set/variant",
+    variantDataSetupScreen = "/variant/edit";

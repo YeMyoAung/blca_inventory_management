@@ -20,19 +20,26 @@ abstract class SqliteCreateBloc<
     on<SqliteCreateEvent>(_sqliteCreateEventListener);
   }
 
+  bool isValid() => form.validate();
+
+  Result<Param> toParam() => form.toParam();
+
+  FutureOr<Result<Model>> onCreate(Param param) => useCase.create(param);
+
   FutureOr<void> _sqliteCreateEventListener(_, emit) async {
     if (state is SqliteCreatingState) {
       return;
     }
 
-    if (!form.validate()) return;
+    if (!isValid()) return;
 
-    final values = form.toParam();
+    final values = toParam();
 
     if (values.hasError) {
       return emit(SqliteCreateErrorState(values.toString()));
     }
     emit(SqliteCreatingState());
+    
     final result = await onCreate(values.result!);
 
     if (result.hasError) {
@@ -44,10 +51,6 @@ abstract class SqliteCreateBloc<
     emit(SqliteCreatingState());
 
     emit(SqliteCreatedState());
-  }
-
-  FutureOr<Result<Model>> onCreate(Param param) {
-    return useCase.create(param);
   }
 
   @override

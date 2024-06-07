@@ -11,6 +11,8 @@ class CreateNewProductForm extends FormGroup<VariantProductParams> {
   final Field<String> coverPhoto;
   final Field<TextEditingController> name, description, barcode;
   final Field<Category> category;
+  // single product = varaints.length(1)
+  // variant product = varaints.length(>1)
   final List<CreateNewVariantForm> varaints;
 
   ///TODO Option,Value Form
@@ -138,6 +140,8 @@ class CreateNewVariantForm extends FormGroup<VariantParam> {
       onHand,
       lost;
   final Field<bool> allowPurchaseWhenOutOfStock;
+  //variant product = true
+  final bool isVariant;
 
   const CreateNewVariantForm({
     required this.coverPhoto,
@@ -148,9 +152,10 @@ class CreateNewVariantForm extends FormGroup<VariantParam> {
     required this.onHand,
     required this.lost,
     required this.allowPurchaseWhenOutOfStock,
+    required this.isVariant,
   });
 
-  factory CreateNewVariantForm.form() {
+  factory CreateNewVariantForm.form([bool isVariant = false]) {
     return CreateNewVariantForm(
       coverPhoto: Field<String>(
         isValid: (p0) => p0 != null ? null : "Cover Photo is required",
@@ -167,6 +172,7 @@ class CreateNewVariantForm extends FormGroup<VariantParam> {
         isValid: (p0) =>
             p0 == null ? "Allow purchase when out of stock is reqruied" : null,
       ),
+      isVariant: isVariant,
     );
   }
 
@@ -195,11 +201,13 @@ class CreateNewVariantForm extends FormGroup<VariantParam> {
     if (errorMessage != null) {
       return Result(exception: Error(errorMessage));
     }
+    final priceData = double.tryParse(price.notNullInput.text);
+    if (priceData == null) return Result(exception: Error("Missing price"));
     return Result(
       result: VariantParam.toCreate(
         coverPhoto: coverPhoto.notNullInput,
         sku: sku.notNullInput.text,
-        price: double.parse(price.notNullInput.text),
+        price: priceData,
         available: double.tryParse(available.notNullInput.text) ?? 0,
         damage: double.tryParse(damage.notNullInput.text) ?? 0,
         onHand: double.tryParse(onHand.notNullInput.text) ?? 0,

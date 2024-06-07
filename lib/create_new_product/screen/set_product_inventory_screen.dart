@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_bloc.dart';
+import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_event.dart';
 import 'package:inventory_management_with_sql/widgest/box/form_box.dart';
 import 'package:inventory_management_with_sql/widgest/button/bloc_outlined_button.dart';
 import 'package:starlight_utils/starlight_utils.dart';
@@ -23,7 +24,9 @@ class SetProductInventoryScreen extends StatelessWidget {
     if (!_doubleCheck(bloc.form.damage.notNullInput.text)) {
       return _showSnackBar("Damange must be num");
     }
+    bloc.add(CreateNewProductNewStockEvent());
     StarlightUtils.pop();
+
   }
 
   void _showSnackBar(String text) =>

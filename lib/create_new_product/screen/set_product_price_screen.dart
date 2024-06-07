@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_bloc.dart';
+import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_event.dart';
 import 'package:inventory_management_with_sql/widgest/box/form_box.dart';
 import 'package:inventory_management_with_sql/widgest/button/bloc_outlined_button.dart';
 import 'package:starlight_utils/starlight_utils.dart';
@@ -8,7 +9,7 @@ import 'package:starlight_utils/starlight_utils.dart';
 class SetProductPriceScreen extends StatelessWidget {
   const SetProductPriceScreen({super.key});
 
-  void submit(String text) {
+  void submit(String text, CreateNewProductBloc bloc) {
     final value = double.tryParse(text) ?? -1;
     if (value == -1) {
       StarlightUtils.snackbar(
@@ -18,6 +19,7 @@ class SetProductPriceScreen extends StatelessWidget {
       );
       return;
     }
+    bloc.add(CreateNewProductSetPriceEvent(index: bloc.form.index));
     StarlightUtils.pop(result: value);
   }
 
@@ -30,7 +32,8 @@ class SetProductPriceScreen extends StatelessWidget {
         actions: [
           CustomOutlinedButton(
             onPressed: () {
-              submit(createNewProductBloc.form.price.input!.text);
+              submit(createNewProductBloc.form.price.input!.text,
+                  createNewProductBloc);
             },
             label: "Save",
             icon: Icons.save_outlined,
@@ -51,7 +54,8 @@ class SetProductPriceScreen extends StatelessWidget {
                     : null;
           },
           onEditingComplete: () {
-            submit(createNewProductBloc.form.price.input!.text);
+            submit(createNewProductBloc.form.price.input!.text,
+                createNewProductBloc);
           },
           keyboardType: TextInputType.number,
           decoration: const InputDecoration(

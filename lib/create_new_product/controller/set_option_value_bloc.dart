@@ -32,11 +32,13 @@ class SetOptionValueBloc
     variants = [];
     selectedVariants.value = [];
     emit(AddNewOptionValueState());
+    emit(ClearOptionValueState());
   }
 
   Result<List<Map<String, dynamic>>> getPayload() {
     final List<Map<String, dynamic>> payload = [];
-    if (formGroups.isEmpty) {
+    if (formGroups.isEmpty ||
+        formGroups.values.first.form.first.input?.text.isNotEmpty == false) {
       return Result(
         result: payload,
       );
@@ -61,8 +63,8 @@ class SetOptionValueBloc
     );
   }
 
-  List<Field<TextEditingController>> getForm(int index) {
-    return formGroups[index]?.form ?? [];
+  List<Field<TextEditingController>> getForm(int optionId) {
+    return formGroups[optionId]?.form ?? [];
   }
 
   GlobalKey<FormState>? getFormKey(int index) {
@@ -70,15 +72,19 @@ class SetOptionValueBloc
   }
 
   bool validate() {
-    for (final form in formGroups.values) {
-      if (!form.validate()) {
-        return false;
-      }
+    // for (final form in ) {
+    //   print(form);
+    //   if (!form.validate()) {
+    //     return false;
+    //   }
+    // }
+
+    if (formGroups.values.first.formKey?.currentState?.validate() == true) {
+      add(GenerateOptionValueEvent());
+
+      return true;
     }
-
-    add(GenerateOptionValueEvent());
-
-    return true;
+    return false;
   }
 
   final ScrollController scrollController = ScrollController();
@@ -100,12 +106,36 @@ class SetOptionValueBloc
     on<ClearOptionValueEvent>(_clearOptionValueEvent);
 
     on<GenerateOptionValueEvent>(_generateOptionValueEvent);
+
+    on<RemoveAttributeFieldEvent>(
+      (event, emit) {
+        _removeAttributeFieldEvent(event, emit);
+      },
+    );
+  }
+
+  void _removeAttributeFieldEvent(
+    RemoveAttributeFieldEvent event,
+    Emitter<SetOptionValueBaseState> emit,
+  ) {
+    if (formGroups.isEmpty) return;
+    final group = formGroups[event.optionId];
+
+    if (group == null) return;
+    final result = group.form.toList()..removeAt(event.attributeId);
+    group.form.clear();
+    group.form.addAll(result);
+    print(formGroups);
+    emit(AddNewOptionValueState());
   }
 
   List<List<Map>> variants = [];
 
   FutureOr<void> _generateOptionValueEvent(
-      GenerateOptionValueEvent _, Emitter<SetOptionValueBaseState> emit) async {
+    GenerateOptionValueEvent _,
+    Emitter<SetOptionValueBaseState> emit,
+  ) async {
+    print("Start Generating");
     emit(GenerateOptionValueState());
 
     /// [{size},{color},{package}]
@@ -114,9 +144,16 @@ class SetOptionValueBloc
     final payload = getPayload();
     if (payload.hasError) return;
 
-    final sizeColorPackageExampleResult = (payload.result ?? [])
-        .map((e) => e['attributes'].toList() as List<Map>)
-        .toList(); //size,color,package
+    final sizeColorPackageExampleResult = (payload.result ?? []).map((e) {
+      final v = e['attributes'].toList() as List<Map>;
+      print(v);
+      return v.map((Map v) {
+        return {
+          ...v,
+          "option": e['name'],
+        };
+      });
+    }).toList(); //size,color,package
     if (sizeColorPackageExampleResult.isEmpty) return;
     variants = sizeColorPackageExampleResult.fold<List<List<Map>>>([],
         (previousValue, element) {
@@ -147,10 +184,10 @@ class SetOptionValueBloc
 
   FutureOr<void> _addNewAttributeValueEvent(AddNewAttributeValueEvent event,
       Emitter<SetOptionValueBaseState> emit) async {
-    final form = formGroups[event.groupId];
+    final form = formGroups[event.attributeId];
     if (form == null) return;
-    if (!isLastAttribute(event.fieldId, event.groupId)) return;
-    if (form.form[event.fieldId].input?.isNotEmpty == true) {
+    if (!isLastAttribute(event.optionId, event.attributeId)) return;
+    if (form.form[event.optionId].input?.isNotEmpty == true) {
       form.addNewAttribute();
       emit(AddNewOptionValueState());
     }
@@ -158,7 +195,7 @@ class SetOptionValueBloc
 
   FutureOr<void> _removeOptionValueEvent(
       RemoveOptionValueEvent event, Emitter<SetOptionValueBaseState> emit) {
-    formGroups.remove(event.groupId);
+    formGroups.remove(event.optionId);
     emit(RemoveOptionValueState());
   }
 

@@ -5,4 +5,12 @@ class CreateNewProductCoverPhotoSelectedState extends SqliteCreateBaseState {}
 class CreateNewProductAvailableToSellWhenOutOfStockSelectedState
     extends SqliteCreateBaseState {}
 
+class CreateNewProductNewStockState extends SqliteCreateBaseState {}
+
 class CreateNewProductCategorySelectedState extends SqliteCreateBaseState {}
+
+class CreateNewProductSetPriceState extends SqliteCreateBaseState {
+  final int index;
+
+  CreateNewProductSetPriceState({required this.index});
+}

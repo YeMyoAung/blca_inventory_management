@@ -58,23 +58,7 @@ class CreateNewProductInfo extends StatelessWidget {
                       alignment: Alignment.center,
                     );
                   }
-                  return Container(
-                    margin: const EdgeInsets.only(
-                      top: 12,
-                      bottom: 20,
-                    ),
-                    decoration: BoxDecoration(
-                      color: context.theme.unselectedWidgetColor,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    width: 80,
-                    height: 80,
-                    alignment: Alignment.center,
-                    child: const Icon(
-                      Icons.upload,
-                      size: 30,
-                    ),
-                  );
+                  return const UploadPhotoPlaceholder();
                 }),
           ),
           Text(
@@ -113,5 +97,30 @@ class CreateNewProductInfo extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class UploadPhotoPlaceholder extends StatelessWidget {
+  const UploadPhotoPlaceholder({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+                    margin: const EdgeInsets.only(
+                      top: 12,
+                      bottom: 20,
+                    ),
+                    decoration: BoxDecoration(
+                      color: context.theme.unselectedWidgetColor,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    width: 80,
+                    height: 80,
+                    alignment: Alignment.center,
+                    child: const Icon(
+                      Icons.upload,
+                      size: 30,
+                    ),
+                  );
   }
 }

@@ -11,8 +11,9 @@ class SetVariantScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final setOptionValueBloc = context.read<SetOptionValueBloc>();
+    final createNewProductBloc = context.read<CreateNewProductBloc>();
     final createNewProductBlocName =
-        context.read<CreateNewProductBloc>().form.name.input?.text ?? "";
+        createNewProductBloc.form.name.input?.text ?? "";
     final name =
         createNewProductBlocName.isNotEmpty ? createNewProductBlocName : "NA";
     final titleTextStyle = context.theme.appBarTheme.titleTextStyle;
@@ -50,13 +51,15 @@ class SetVariantScreen extends StatelessWidget {
                         valueListenable: setOptionValueBloc.selectedVariants,
                         builder: (_, value, child) {
                           final isExist = value.contains(index);
-                          print(value);
+                         
                           return Checkbox(
                             value: isExist,
                             onChanged: (value) {
                               if (isExist) {
+                                createNewProductBloc.removeVariant(index);
                                 setOptionValueBloc.removeVariants(index);
                               } else {
+                                createNewProductBloc.addVariant(index);
                                 setOptionValueBloc.addVariants(index);
                               }
                             },
@@ -90,4 +93,3 @@ class SetVariantScreen extends StatelessWidget {
     );
   }
 }
-

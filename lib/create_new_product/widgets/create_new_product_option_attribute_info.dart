@@ -46,19 +46,9 @@ class CreateNewProductOptionAttributeInfo extends StatelessWidget {
                           scrollDirection: Axis.horizontal,
                           itemCount: optionAttributes['attributes'].length,
                           itemBuilder: (_, i) {
-                            return Container(
-                              margin: const EdgeInsets.only(right: 10),
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 5),
-                              decoration: BoxDecoration(
-                                border: Border.all(),
-                                borderRadius: BorderRadius.circular(15),
-                              ),
-                              alignment: Alignment.center,
-                              child: Text(
-                                optionAttributes['attributes']
-                                    .elementAt(i)['name'],
-                              ),
+                            return AttributeCard(
+                              name: optionAttributes['attributes']
+                                  .elementAt(i)['name'],
                             );
                           },
                         ),
@@ -85,6 +75,33 @@ class CreateNewProductOptionAttributeInfo extends StatelessWidget {
           }
           return const AddVariantButton();
         },
+      ),
+    );
+  }
+}
+
+class AttributeCard extends StatelessWidget {
+  final String name;
+  final TextStyle? style;
+  const AttributeCard({
+    super.key,
+    required this.name,
+    this.style,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(right: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+      decoration: BoxDecoration(
+        border: Border.all(),
+        borderRadius: BorderRadius.circular(15),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        name,
+        style: style,
       ),
     );
   }

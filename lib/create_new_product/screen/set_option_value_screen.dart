@@ -14,6 +14,12 @@ class SetOptionValueScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            StarlightUtils.pop();
+          },
+          icon: const Icon(Icons.arrow_back),
+        ),
         title: const Text("Options"),
         actions: [
           CustomOutlinedButton<SetOptionValueBaseState,
@@ -40,25 +46,25 @@ class SetOptionValueBuilder extends StatelessWidget {
   Widget build(BuildContext context) {
     ///
     final setOptionBloc = context.watch<SetOptionValueBloc>();
-    return ListView(
-      controller: setOptionBloc.scrollController,
-      children: [
-        /// bloc
-        /// formBoxCount = 2
-        /// formGroup = {1:[TextEditingController()*2],2:[TextEditingController()*2]}
-        /// Map<int,List<FormField>>;assert(List.lenght >= 2)
-        /// formBoxCount + 1
-        /// formGroup.add()
-        ///
-        ///
-        /// list = [1,2,3,4];-> 0,1,2,3
-        /// enter index 1
-        /// if list.length-1 == enter index && enter index > 0
-        /// add new attribute form
-        for (int groupId in setOptionBloc.formGroups.keys)
-          Form(
-            key: setOptionBloc.getFormKey(groupId),
-            child: FormBox(
+    return Form(
+      key: setOptionBloc.formGroups.values.first.formKey,
+      child: ListView(
+        controller: setOptionBloc.scrollController,
+        children: [
+          /// bloc
+          /// formBoxCount = 2
+          /// formGroup = {1:[TextEditingController()*2],2:[TextEditingController()*2]}
+          /// Map<int,List<FormField>>;assert(List.lenght >= 2)
+          /// formBoxCount + 1
+          /// formGroup.add()
+          ///
+          ///
+          /// list = [1,2,3,4];-> 0,1,2,3
+          /// enter index 1
+          /// if list.length-1 == enter index && enter index > 0
+          /// add new attribute form
+          for (int groupId in setOptionBloc.formGroups.keys)
+            FormBox(
               margin: const EdgeInsets.only(top: 10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -148,15 +154,28 @@ class SetOptionValueBuilder extends StatelessWidget {
                                       setOptionBloc.getForm(groupId).length > 2)
                               ? null
                               : "Attribute Name is required",
+                          decoration: InputDecoration(
+                            suffixIcon: InkWell(
+                              onTap: () {
+                                setOptionBloc.add(
+                                  RemoveAttributeFieldEvent(fieldId, groupId),
+                                );
+                              },
+                              child: const Icon(
+                                Icons.delete,
+                                color: Colors.red,
+                              ),
+                            ),
+                          ),
                         ),
                       )
                     ]
                 ],
               ),
             ),
-          ),
-        const AddNewOptionButton()
-      ],
+          const AddNewOptionButton()
+        ],
+      ),
     );
   }
 }
