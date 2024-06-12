@@ -66,6 +66,8 @@ class SqliteCreateNewProductUseCase
     /// . 3. Variant (product_id) [] * 125, ToParam(),
     /// . 4. Variant Properties (variant_id,value_id)  ToParam(), [[1,2],[2,1],[2,3]]
     ///}: create variant
+    
+    
 
     final variantCreateResult = await Future.wait(param.variant.map((e) {
       e.productID = id;

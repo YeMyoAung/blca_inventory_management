@@ -3,16 +3,30 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:inventory_management_with_sql/core/bloc/sqlite_create_bloc.dart';
+import 'package:inventory_management_with_sql/core/bloc/sqlite_create_event.dart';
 import 'package:inventory_management_with_sql/core/bloc/sqlite_create_state.dart';
 import 'package:inventory_management_with_sql/core/db/interface/database_model.dart';
+import 'package:inventory_management_with_sql/core/db/utils/dep.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_event.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_form.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_state.dart';
+import 'package:inventory_management_with_sql/create_new_product/controller/set_option_value_form.dart';
 import 'package:inventory_management_with_sql/repo/product_repo/v2/product_entity.dart';
 import 'package:inventory_management_with_sql/use_case/sqlite_create_new_product_use_case.dart';
 
-class CreateNewProductBloc extends SqliteCreateBloc<Product,
-    VariantProductParams, SqliteCreateNewProductUseCase, CreateNewProductForm> {
+class ProductCreateEvent extends NullObject {
+  final Map<int, SetOptionValueForm> formGroups;
+  const ProductCreateEvent({
+    required this.formGroups,
+  });
+}
+
+class CreateNewProductBloc extends SqliteCreateBloc<
+    Product,
+    VariantProductParams,
+    SqliteCreateNewProductUseCase,
+    CreateNewProductForm,
+    ProductCreateEvent> {
   final ImagePicker imagePicker;
 
   //left index => ui index
@@ -28,7 +42,10 @@ class CreateNewProductBloc extends SqliteCreateBloc<Product,
     /// index 0 exist => 1
     print("Before: $variantUiAndFormIndexMapper");
     final leftMostV = form.varaints[0];
+    print("LeftMost: ${leftMostV.isVariant}");
     if (!leftMostV.isVariant) {
+      print("Save Left Most Form");
+
       ///origin
       singleProductForm = leftMostV;
       form.varaints.clear();
@@ -60,16 +77,30 @@ class CreateNewProductBloc extends SqliteCreateBloc<Product,
     print("After: $variantUiAndFormIndexMapper ${form.varaints}");
   }
 
-  void changeToSingleProduct() {
-    print(singleProductForm);
-    print("Before: $variantUiAndFormIndexMapper");
+  void clean() {
+    final temp = form.varaints[0];
+    if (!temp.isVariant) {
+      return;
+    }
+    changeToSingleProduct();
+  }
 
-    if (singleProductForm != null) return;
+  void changeToSingleProduct() {
+    if (singleProductForm == null) return;
     form.varaints.clear();
     form.varaints.add(singleProductForm!);
     form.index = 0;
+  }
 
-    print("After: $variantUiAndFormIndexMapper");
+  @override
+  FutureOr<Result<Product>> onCreate(
+    SqliteCreateEvent<ProductCreateEvent> event,
+    VariantProductParams param,
+  ) async {
+    final uiKeys = variantUiAndFormIndexMapper.keys; // option-value index
+    logger.i(event.arguments?.formGroups);
+
+    return Result(exception: Error("Just Test"));
   }
 
   CreateNewProductBloc(
@@ -79,6 +110,9 @@ class CreateNewProductBloc extends SqliteCreateBloc<Product,
   ) {
     on<CreateNewProductPickCoverPhotoEvent>(
       _createNewProductPickCoverPhotoEventListener,
+    );
+    on<CreateNewVariantProductPickCoverPhotoEvent>(
+      _createNewVariantProductPickCoverPhotoEventListener,
     );
     on<CreateNewProductAvailabeToSellWhenOutOfStockEvent>(
       _createNewProductAvailableToSellWhenOutOfStockEventListener,
@@ -128,30 +162,14 @@ class CreateNewProductBloc extends SqliteCreateBloc<Product,
     }
   }
 
-  @override
-  Result<VariantProductParams> toParam() {
-    print("Before Generate Param");
-    final result = super.toParam();
-    print("After Generate Param $result");
-    return result;
-  }
-
-  @override
-  bool isValid() {
-    print("Before From Validate");
-    final result = super.isValid();
-    print("After From Validate");
-    return result;
-  }
-
-  @override
-  FutureOr<Result<Product>> onCreate(VariantProductParams param) {
-    print("Before Create");
-
-    // final result = super.onCreate(param);
-
-    print("After Create");
-
-    return Result(exception: Error("Product Create Step"));
+  Future<void> _createNewVariantProductPickCoverPhotoEventListener(
+    CreateNewVariantProductPickCoverPhotoEvent _,
+    Emitter<SqliteCreateBaseState> emit,
+  ) async {
+    form.variantCoverPhoto.input =
+        (await imagePicker.pickImage(source: ImageSource.gallery))?.path;
+    if (form.variantCoverPhoto.input != null) {
+      emit(CreateNewVariantProductCoverPhotoSelectedState());
+    }
   }
 }

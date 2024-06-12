@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:inventory_management_with_sql/core/bloc/sqlite_create_bloc.dart';
 import 'package:inventory_management_with_sql/core/bloc/sqlite_create_event.dart';
 import 'package:inventory_management_with_sql/core/bloc/sqlite_create_state.dart';
 import 'package:inventory_management_with_sql/core/bloc/sqlite_read_state.dart';
@@ -87,7 +88,7 @@ class CreateNewShopSubmitButton extends StatelessWidget {
     final createNewShopBloc = context.read<CreateNewShopBloc>();
     return ElevatedButton(
       onPressed: () {
-        createNewShopBloc.add(const SqliteCreateEvent());
+        createNewShopBloc.add(const SqliteCreateEvent<NullObject>());
       },
       child: BlocConsumer<CreateNewShopBloc, SqliteCreateBaseState>(
         listenWhen: (_, c) {

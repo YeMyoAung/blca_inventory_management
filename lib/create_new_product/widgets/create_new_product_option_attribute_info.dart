@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/set_option_value_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/set_option_value_state.dart';
 import 'package:inventory_management_with_sql/create_new_product/widgets/add_variant_button.dart';
 import 'package:inventory_management_with_sql/routes/route_name.dart';
+import 'package:inventory_management_with_sql/routes/router.dart';
 import 'package:inventory_management_with_sql/widgest/box/form_box.dart';
 import 'package:inventory_management_with_sql/widgest/button/bloc_outlined_button.dart';
 import 'package:starlight_utils/starlight_utils.dart';
@@ -14,6 +16,7 @@ class CreateNewProductOptionAttributeInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final setOptionValueBloc = context.read<SetOptionValueBloc>();
+    final createNewProductBloc = context.read<CreateNewProductBloc>();
     final theme = context.theme;
     final titleTextStyle = theme.appBarTheme.titleTextStyle;
     return Padding(
@@ -61,7 +64,9 @@ class CreateNewProductOptionAttributeInfo extends StatelessWidget {
                         onPressed: () {
                           StarlightUtils.pushNamed(
                             setOptionValueScreen,
-                            arguments: setOptionValueBloc,
+                            arguments: SetOptionValueArgs(
+                                createNewProductBloc: createNewProductBloc,
+                                setOptionValueBloc: setOptionValueBloc),
                           );
                         },
                         label: "Add More Variants",

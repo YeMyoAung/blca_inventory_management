@@ -21,7 +21,7 @@ class CreateNewCategoryScreen extends StatelessWidget {
           CustomOutlinedButton<SqliteCreateBaseState,
               CreateNewCategoryBloc>.bloc(
             onPressed: (bloc) {
-              bloc.add(const SqliteCreateEvent());
+              bloc.add(const SqliteCreateEvent<NullObject>());
             },
             listener: (_, bloc, state) {
               if (state is SqliteCreatedState) {

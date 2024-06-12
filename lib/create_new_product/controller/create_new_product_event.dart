@@ -5,6 +5,10 @@ class CreateNewProductPickCoverPhotoEvent extends SqliteCreateBaseEvent {
   const CreateNewProductPickCoverPhotoEvent();
 }
 
+class CreateNewVariantProductPickCoverPhotoEvent extends SqliteCreateBaseEvent {
+  const CreateNewVariantProductPickCoverPhotoEvent();
+}
+
 class CreateNewProductAvailabeToSellWhenOutOfStockEvent
     extends SqliteCreateBaseEvent {
   final bool canSell;

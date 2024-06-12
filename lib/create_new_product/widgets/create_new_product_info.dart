@@ -29,38 +29,7 @@ class CreateNewProductInfo extends StatelessWidget {
             "Product Photo",
             style: titleTextStyle,
           ),
-          InkWell(
-            onTap: () {
-              createNewProductBloc
-                  .add(const CreateNewProductPickCoverPhotoEvent());
-            },
-            child: BlocBuilder<CreateNewProductBloc, SqliteCreateBaseState>(
-                buildWhen: (_, state) =>
-                    state is CreateNewProductCoverPhotoSelectedState,
-                builder: (_, state) {
-                  if (createNewProductBloc.form.coverPhoto.input != null) {
-                    return Container(
-                      margin: const EdgeInsets.only(
-                        top: 12,
-                        bottom: 20,
-                      ),
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: FileImage(
-                            File(createNewProductBloc
-                                .form.coverPhoto.notNullInput),
-                          ),
-                        ),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      width: 80,
-                      height: 80,
-                      alignment: Alignment.center,
-                    );
-                  }
-                  return const UploadPhotoPlaceholder();
-                }),
-          ),
+          const ProductPhotoPicker(),
           Text(
             "Product Title",
             style: titleTextStyle,
@@ -100,27 +69,66 @@ class CreateNewProductInfo extends StatelessWidget {
   }
 }
 
+class ProductPhotoPicker extends StatelessWidget {
+  const ProductPhotoPicker({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final createNewProductBloc = context.read<CreateNewProductBloc>();
+    return InkWell(
+      onTap: () {
+        createNewProductBloc.add(const CreateNewProductPickCoverPhotoEvent());
+      },
+      child: BlocBuilder<CreateNewProductBloc, SqliteCreateBaseState>(
+          buildWhen: (_, state) =>
+              state is CreateNewProductCoverPhotoSelectedState,
+          builder: (_, state) {
+            if (createNewProductBloc.form.coverPhoto.input != null) {
+              return Container(
+                margin: const EdgeInsets.only(
+                  top: 12,
+                  bottom: 20,
+                ),
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: FileImage(
+                      File(createNewProductBloc.form.coverPhoto.notNullInput),
+                    ),
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                width: 80,
+                height: 80,
+                alignment: Alignment.center,
+              );
+            }
+            return const UploadPhotoPlaceholder();
+          }),
+    );
+  }
+}
+
 class UploadPhotoPlaceholder extends StatelessWidget {
   const UploadPhotoPlaceholder({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-                    margin: const EdgeInsets.only(
-                      top: 12,
-                      bottom: 20,
-                    ),
-                    decoration: BoxDecoration(
-                      color: context.theme.unselectedWidgetColor,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    width: 80,
-                    height: 80,
-                    alignment: Alignment.center,
-                    child: const Icon(
-                      Icons.upload,
-                      size: 30,
-                    ),
-                  );
+      margin: const EdgeInsets.only(
+        top: 12,
+        bottom: 20,
+      ),
+      decoration: BoxDecoration(
+        color: context.theme.unselectedWidgetColor,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      width: 80,
+      height: 80,
+      alignment: Alignment.center,
+      child: const Icon(
+        Icons.upload,
+        size: 30,
+      ),
+    );
   }
 }

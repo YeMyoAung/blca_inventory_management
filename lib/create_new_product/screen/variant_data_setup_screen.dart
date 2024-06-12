@@ -1,6 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:inventory_management_with_sql/core/bloc/sqlite_create_state.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_bloc.dart';
+import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_event.dart';
+import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_state.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/set_option_value_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_product/widgets/create_new_product_info.dart';
 import 'package:inventory_management_with_sql/create_new_product/widgets/create_new_product_option_attribute_info.dart';
@@ -52,7 +57,7 @@ class VariantDataSetupScreen extends StatelessWidget {
                   "Upload Product Photo",
                   style: titleTextStyle,
                 ),
-                const UploadPhotoPlaceholder(),
+                const VariantProductPhotoPicker(),
                 for (final value in selectedValue)
                   Padding(
                     padding: const EdgeInsets.only(top: 10),
@@ -92,10 +97,72 @@ class VariantDataSetupScreen extends StatelessWidget {
             ),
           ),
           CreateNewProductInventoryButton(
-            onPressed: () {},
+            onPressed: () {
+              StarlightUtils.pushNamed(
+                setProductInventoryScreen,
+                arguments: createNewProductBloc,
+              );
+            },
+            allowPurchaseWhenOutOfStockBuilder: (childBuilder) {
+              return BlocBuilder<CreateNewProductBloc, SqliteCreateBaseState>(
+                  builder: (_, state) {
+                return childBuilder(
+                  createNewProductBloc
+                      .form.availableToSellWhenOutOfStock.notNullInput,
+                  (v) {
+                    createNewProductBloc.add(
+                      CreateNewProductAvailabeToSellWhenOutOfStockEvent(
+                        v,
+                      ),
+                    );
+                  },
+                );
+              });
+            },
           ),
         ],
       ),
     );
   }
 }
+
+
+class VariantProductPhotoPicker extends StatelessWidget {
+  const VariantProductPhotoPicker({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final createNewProductBloc = context.read<CreateNewProductBloc>();
+    return InkWell(
+      onTap: () {
+        createNewProductBloc.add(const CreateNewVariantProductPickCoverPhotoEvent());
+      },
+      child: BlocBuilder<CreateNewProductBloc, SqliteCreateBaseState>(
+          buildWhen: (_, state) =>
+              state is CreateNewVariantProductCoverPhotoSelectedState,
+          builder: (_, state) {
+            if (createNewProductBloc.form.variantCoverPhoto.input != null) {
+              return Container(
+                margin: const EdgeInsets.only(
+                  top: 12,
+                  bottom: 20,
+                ),
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: FileImage(
+                      File(createNewProductBloc.form.variantCoverPhoto.notNullInput!),
+                    ),
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                width: 80,
+                height: 80,
+                alignment: Alignment.center,
+              );
+            }
+            return const UploadPhotoPlaceholder();
+          }),
+    );
+  }
+}
+

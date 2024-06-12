@@ -182,8 +182,10 @@ class SetOptionValueBloc
     scrollEnd(emit);
   }
 
-  FutureOr<void> _addNewAttributeValueEvent(AddNewAttributeValueEvent event,
-      Emitter<SetOptionValueBaseState> emit) async {
+  FutureOr<void> _addNewAttributeValueEvent(
+    AddNewAttributeValueEvent event,
+    Emitter<SetOptionValueBaseState> emit,
+  ) async {
     final form = formGroups[event.attributeId];
     if (form == null) return;
     if (!isLastAttribute(event.optionId, event.attributeId)) return;
@@ -200,7 +202,9 @@ class SetOptionValueBloc
   }
 
   FutureOr<void> _clearOptionValueEvent(
-      ClearOptionValueEvent _, Emitter<SetOptionValueBaseState> emit) {
+    ClearOptionValueEvent _,
+    Emitter<SetOptionValueBaseState> emit,
+  ) {
     clear(emit);
   }
 

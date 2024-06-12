@@ -33,6 +33,7 @@ class CreateNewProductPriceInfo extends StatelessWidget {
         }
         return ProductPriceButton(
           onTap: () {
+            //index 0
             StarlightUtils.pushNamed(
               setProductPriceScreen,
               arguments: createNewProductBloc,

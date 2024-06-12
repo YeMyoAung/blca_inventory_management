@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/set_option_value_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/set_option_value_event.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/set_option_value_state.dart';
@@ -12,6 +13,7 @@ class SetOptionValueScreen extends StatelessWidget {
   const SetOptionValueScreen({super.key});
   @override
   Widget build(BuildContext context) {
+    final createNewProductBloc = context.read<CreateNewProductBloc>();
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -26,6 +28,7 @@ class SetOptionValueScreen extends StatelessWidget {
               SetOptionValueBloc>.bloc(
             onPressed: (bloc) {
               if (bloc.validate()) {
+                createNewProductBloc.clean();
                 StarlightUtils.pop();
               }
             },

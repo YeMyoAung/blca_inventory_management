@@ -42,6 +42,7 @@ class CreateNewProductSelectedVariantsInfo extends StatelessWidget {
             ),
             value: true,
             onChanged: (value) {
+              createNewProductBloc.changeToSingleProduct();
               setOptionValueBloc.add(ClearOptionValueEvent());
             },
           ),
@@ -63,9 +64,7 @@ class CreateNewProductSelectedVariantsInfo extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.only(top: 20),
                           child: InkWell(
-                            onTap: () {
-                              print(
-                                  "From: ${createNewProductBloc.variantUiAndFormIndexMapper},Selected: ${setOptionValueBloc.selectedVariants.value}");
+                            onTap: () { 
                               createNewProductBloc.form.index =
                                   createNewProductBloc
                                       .variantUiAndFormIndexMapper[uiIndex]!;

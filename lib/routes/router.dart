@@ -239,15 +239,22 @@ final Map<String, Route Function(RouteSettings setting)> routes = {
   },
   setOptionValueScreen: (settings) {
     final value = settings.arguments;
-    if (value is! SetOptionValueBloc) {
+    if (value is! SetOptionValueArgs) {
       return _route(
         ErrorWidget("Set option value bloc not found"),
         settings,
       );
     }
     return _route(
-      BlocProvider.value(
-        value: value,
+      MultiBlocProvider(
+        providers: [
+          BlocProvider.value(
+            value: value.setOptionValueBloc,
+          ),
+          BlocProvider.value(
+            value: value.createNewProductBloc,
+          ),
+        ],
         child: const SetOptionValueScreen(),
       ),
       settings,
@@ -302,6 +309,16 @@ final Map<String, Route Function(RouteSettings setting)> routes = {
     );
   }
 };
+
+class SetOptionValueArgs {
+  final CreateNewProductBloc createNewProductBloc;
+  final SetOptionValueBloc setOptionValueBloc;
+
+  const SetOptionValueArgs({
+    required this.createNewProductBloc,
+    required this.setOptionValueBloc,
+  });
+}
 
 class VariantDataSetupArgs {
   final CreateNewProductBloc createNewProductBloc;
