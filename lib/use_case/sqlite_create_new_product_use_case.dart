@@ -2,6 +2,8 @@ import 'package:inventory_management_with_sql/core/db/impl/sqlite_use_case.dart'
 import 'package:inventory_management_with_sql/core/db/interface/database_model.dart';
 import 'package:inventory_management_with_sql/core/db/utils/dep.dart';
 import 'package:inventory_management_with_sql/core/db/utils/sqlite_table_const.dart';
+import 'package:inventory_management_with_sql/repo/attribute_repo/attribute_repo.dart';
+import 'package:inventory_management_with_sql/repo/option_repo/option_repo.dart';
 import 'package:inventory_management_with_sql/repo/product_repo/v2/product_entity.dart';
 import 'package:inventory_management_with_sql/repo/product_repo/v2/product_repo.dart';
 import 'package:inventory_management_with_sql/repo/variant_repo/variant_repo.dart';
@@ -10,10 +12,14 @@ class SqliteCreateNewProductUseCase
     extends SqliteCreateUseCase<Product, VariantProductParams> {
   final SqliteProductRepo productRepo;
   final SqliteVariantRepo variantRepo;
+  final SqliteOptionRepo optionRepo;
+  final SqliteAttributeRepo attributeRepo;
 
   const SqliteCreateNewProductUseCase({
     required this.productRepo,
     required this.variantRepo,
+    required this.optionRepo,
+    required this.attributeRepo,
   });
 
   @override

@@ -54,7 +54,7 @@ class SetOptionValueBloc
               (e) => {
                 "name": e.input?.text,
               },
-            ),
+            ).toList(),
       });
     }
 
@@ -146,13 +146,13 @@ class SetOptionValueBloc
 
     final sizeColorPackageExampleResult = (payload.result ?? []).map((e) {
       final v = e['attributes'].toList() as List<Map>;
-      print(v);
+     
       return v.map((Map v) {
         return {
           ...v,
           "option": e['name'],
         };
-      });
+      }).toList();
     }).toList(); //size,color,package
     if (sizeColorPackageExampleResult.isEmpty) return;
     variants = sizeColorPackageExampleResult.fold<List<List<Map>>>([],

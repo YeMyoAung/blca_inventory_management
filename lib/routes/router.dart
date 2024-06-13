@@ -30,8 +30,10 @@ import 'package:inventory_management_with_sql/dashboard_loader/controller/dashbo
 import 'package:inventory_management_with_sql/dashboard_loader/controller/dashboard_engine_state.dart';
 import 'package:inventory_management_with_sql/dashboard_loader/screen/dashboard_loader_screen.dart';
 import 'package:inventory_management_with_sql/product/controller/product_list_bloc.dart';
+import 'package:inventory_management_with_sql/repo/attribute_repo/attribute_repo.dart';
 import 'package:inventory_management_with_sql/repo/category_repo/category_repo.dart';
 import 'package:inventory_management_with_sql/repo/dashboard_repo/dashboard_repo.dart';
+import 'package:inventory_management_with_sql/repo/option_repo/option_repo.dart';
 import 'package:inventory_management_with_sql/repo/product_repo/v2/product_repo.dart';
 import 'package:inventory_management_with_sql/repo/shop_repo/shop_repo.dart';
 import 'package:inventory_management_with_sql/repo/variant_repo/variant_repo.dart';
@@ -178,6 +180,8 @@ final Map<String, Route Function(RouteSettings setting)> routes = {
               SqliteCreateNewProductUseCase(
                 productRepo: container.get<SqliteProductRepo>(),
                 variantRepo: container.get<SqliteVariantRepo>(),
+                optionRepo: container.get<SqliteOptionRepo>(),
+                attributeRepo: container.get<SqliteAttributeRepo>(),
               ),
             ),
           ),

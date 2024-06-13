@@ -100,7 +100,7 @@ class CreateNewProductForm extends FormGroup<VariantProductParams> {
     ///Value vaild
 
     final variantFormResult = varaints.map((e) {
-      e.coverPhoto.input ??= coverPhoto.notNullInput;
+      e.coverPhoto.input ??= coverPhoto.input;
       return e.toParam();
     });
     final variantFormErrors = variantFormResult.where((e) => e.hasError);
@@ -117,7 +117,7 @@ class CreateNewProductForm extends FormGroup<VariantProductParams> {
           categoryId: category.input!.id,
           barcode: barcode.input!.text,
           description: description.input!.text,
-          coverPhoto: coverPhoto.notNullInput,
+          coverPhoto: coverPhoto.input ?? "",
         ),
         variant: variantFormResult.map((e) => e.result!).toList(),
       ),
@@ -205,7 +205,7 @@ class CreateNewVariantForm extends FormGroup<VariantParam> {
     if (priceData == null) return Result(exception: Error("Missing price"));
     return Result(
       result: VariantParam.toCreate(
-        coverPhoto: coverPhoto.notNullInput,
+        coverPhoto: coverPhoto.input ?? "",
         sku: sku.notNullInput.text,
         price: priceData,
         available: double.tryParse(available.notNullInput.text) ?? 0,

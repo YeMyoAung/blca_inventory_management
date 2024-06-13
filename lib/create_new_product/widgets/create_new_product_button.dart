@@ -36,6 +36,8 @@ class CreateNewProductButton extends StatelessWidget {
         bloc.add(SqliteCreateEvent<ProductCreateEvent>(
           arguments: ProductCreateEvent(
             formGroups: setOptionValueBloc.formGroups,
+            getPayload: setOptionValueBloc.getPayload,
+            selectedVariants: setOptionValueBloc.selectedVariants.value,
           ),
         ));
       },

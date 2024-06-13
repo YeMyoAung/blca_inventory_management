@@ -149,11 +149,14 @@ class SqliteRepo<Model extends DatabaseModel,
     }
   }
 
+  // USDT,BTC -> create
+  // column a -> [USDT,BTC] -> return
   @override
   Future<Result<List<Model>>> bulkCreate(
     List<ModelParam> values,
-    String indexColumn,
-    Function(ModelParam param) indexValue,
+    // String findWhichColumn,
+    // Function(ModelParam param) indexValue,
+    List<WhereOperator> Function(ModelParam param) afterCreate,
   ) async {
     try {
       if (values.isEmpty) {
@@ -180,13 +183,26 @@ class SqliteRepo<Model extends DatabaseModel,
       // values
       //('2','2','${DateTime.now().toIso8601String()}'),
       //('3','3','${DateTime.now().toIso8601String()}') "
-      await database.rawQuery(
-          "Insert into \"$tableName\" $columnNames values ${columnValues.join(",")}");
+      await database.rawQuery("""
+          Insert into "$tableName" $columnNames values ${columnValues.join(",")}""");
 
-      final String indexList =
-          values.map(indexValue).toList().map((e) => "'$e'").join(",");
+      final String whereQuery =
+          values.map(afterCreate).toList().map((e) => "(${e.join(' ')})").toList().join(" or ");
+
+      // logger.i(whereQuery.map((e) => "(${e.join(' ')})").toList().join(" or "));
+      // final result = await database.rawQuery(
+      //   """
+      //     select * from "$tableName" where
+      //     "$findWhichColumn" in ($indexList)
+      //   """,
+      // );
+
       final result = await database.rawQuery(
-          "select * from \"$tableName\" where \"$indexColumn\" in ($indexList)");
+        """
+          select * from "$tableName" where 
+          $whereQuery
+        """,
+      );
 
       final response = Result(
         result: result.map(parser).toList(),
