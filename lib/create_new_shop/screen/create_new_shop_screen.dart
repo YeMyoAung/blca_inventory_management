@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:inventory_management_with_sql/core/bloc/sqlite_create_bloc.dart';
 import 'package:inventory_management_with_sql/core/bloc/sqlite_create_event.dart';
 import 'package:inventory_management_with_sql/core/bloc/sqlite_create_state.dart';
 import 'package:inventory_management_with_sql/core/bloc/sqlite_read_state.dart';
@@ -15,7 +14,8 @@ import 'package:inventory_management_with_sql/create_new_shop/controller/create_
 import 'package:starlight_utils/starlight_utils.dart';
 
 class CreateNewShopScreen extends StatelessWidget {
-  const CreateNewShopScreen({super.key});
+  final String title;
+  const CreateNewShopScreen({super.key, required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -37,9 +37,9 @@ class CreateNewShopScreen extends StatelessWidget {
                     ),
                     Padding(
                       padding: EdgeInsets.only(left: middleWidth),
-                      child: const Text(
-                        "Create New Shop",
-                        style: TextStyle(
+                      child:  Text(
+                      title ,
+                        style: const TextStyle(
                           fontSize: 20,
                         ),
                       ),
@@ -88,28 +88,28 @@ class CreateNewShopSubmitButton extends StatelessWidget {
     final createNewShopBloc = context.read<CreateNewShopBloc>();
     return ElevatedButton(
       onPressed: () {
-        createNewShopBloc.add(const SqliteCreateEvent<NullObject>());
+        createNewShopBloc.add(const SqliteExecuteEvent<NullObject>());
       },
-      child: BlocConsumer<CreateNewShopBloc, SqliteCreateBaseState>(
+      child: BlocConsumer<CreateNewShopBloc, SqliteExecuteBaseState>(
         listenWhen: (_, c) {
-          return c is SqliteCreatedState || c is SqliteCreateErrorState;
+          return c is SqliteExecuteState || c is SqliteExecuteErrorState;
         },
         listener: (_, state) {
           logger.w("CreateShopSubitButton listener get an event");
-          if (state is SqliteCreatedState) {
+          if (state is SqliteExecuteState) {
             StarlightUtils.pop();
             StarlightUtils.snackbar(SnackBar(
                 content: Text(
                     "${createNewShopBloc.form.name.input?.text} was created.")));
             return;
           }
-          state as SqliteCreateErrorState;
+          state as SqliteExecuteErrorState;
           dialog("Failed to create new shop", state.message);
         },
         buildWhen: (_, c) {
-          return c is SqliteCreatingState ||
+          return c is SqliteExecutingState ||
               c is SqliteErrorState ||
-              c is SqliteCreatedState;
+              c is SqliteExecuteState;
         },
         builder: (_, state) {
           logger.w("CreateShopSubitButton builder get an event");
@@ -120,7 +120,7 @@ class CreateNewShopSubmitButton extends StatelessWidget {
           return const Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text("Create Shop"),
+              Text("Save"),
               SizedBox(
                 width: 5,
               ),
@@ -143,7 +143,7 @@ class ShopCoverPhotoPicker extends StatelessWidget {
       onTap: () {
         createNewShopBloc.add(const CreateNewShopPickCoverPhotoEvent());
       },
-      child: BlocBuilder<CreateNewShopBloc, SqliteCreateBaseState>(
+      child: BlocBuilder<CreateNewShopBloc, SqliteExecuteBaseState>(
         builder: (_, state) {
           logger.w("ShopCoverPhotoPicker builder get an event");
 

@@ -1,14 +1,14 @@
-abstract class SqliteCreateBaseEvent {
-  const SqliteCreateBaseEvent();
+abstract class SqliteExecuteBaseEvent {
+  const SqliteExecuteBaseEvent();
 }
 
 abstract class NullObject {
   const NullObject();
 }
 
-class SqliteCreateEvent<T> extends SqliteCreateBaseEvent {
+class SqliteExecuteEvent<T> extends SqliteExecuteBaseEvent {
   final T? arguments;
-  const SqliteCreateEvent({
+  const SqliteExecuteEvent({
     this.arguments,
   });
 }

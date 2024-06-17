@@ -107,6 +107,7 @@ class SqliteInventoryMigration extends SqliteBaseMigration {
               options: "not null",
             ),
             const TableColumn(
+              ///TODO: attribute_id
               name: "value_id",
               type: "integer",
               options: "not null",

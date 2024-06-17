@@ -79,7 +79,7 @@ class ProductPhotoPicker extends StatelessWidget {
       onTap: () {
         createNewProductBloc.add(const CreateNewProductPickCoverPhotoEvent());
       },
-      child: BlocBuilder<CreateNewProductBloc, SqliteCreateBaseState>(
+      child: BlocBuilder<CreateNewProductBloc, SqliteExecuteBaseState>(
           buildWhen: (_, state) =>
               state is CreateNewProductCoverPhotoSelectedState,
           builder: (_, state) {

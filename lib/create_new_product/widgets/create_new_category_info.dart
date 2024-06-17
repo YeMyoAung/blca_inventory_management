@@ -30,7 +30,7 @@ class CreateNewCategoryInfo extends StatelessWidget {
       leading: const Icon(
         Icons.category_outlined,
       ),
-      title: BlocBuilder<CreateNewProductBloc, SqliteCreateBaseState>(
+      title: BlocBuilder<CreateNewProductBloc, SqliteExecuteBaseState>(
           buildWhen: (_, state) =>
               state is CreateNewProductCategorySelectedState,
           builder: (_, state) {

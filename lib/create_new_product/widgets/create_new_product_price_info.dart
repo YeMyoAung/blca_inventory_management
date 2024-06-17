@@ -61,7 +61,7 @@ class ProductPriceBuilder extends StatelessWidget {
   Widget build(BuildContext context) {
     final createNewProductBloc = context.read<CreateNewProductBloc>();
 
-    return BlocBuilder<CreateNewProductBloc, SqliteCreateBaseState>(
+    return BlocBuilder<CreateNewProductBloc, SqliteExecuteBaseState>(
       buildWhen: buildWhen == null
           ? null
           : (_, current) =>

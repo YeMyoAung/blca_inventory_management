@@ -38,7 +38,7 @@ class CreateNewProductSelectedVariantsOrInventoryInfo extends StatelessWidget {
             );
           },
           allowPurchaseWhenOutOfStockBuilder: (buildSwitchTile) {
-            return BlocBuilder<CreateNewProductBloc, SqliteCreateBaseState>(
+            return BlocBuilder<CreateNewProductBloc, SqliteExecuteBaseState>(
               buildWhen: (_, state) => state
                   is CreateNewProductAvailableToSellWhenOutOfStockSelectedState,
               builder: (_, state) {
@@ -57,7 +57,7 @@ class CreateNewProductSelectedVariantsOrInventoryInfo extends StatelessWidget {
             );
           },
           stockBuilder: (stockBuilder) {
-            return BlocBuilder<CreateNewProductBloc, SqliteCreateBaseState>(
+            return BlocBuilder<CreateNewProductBloc, SqliteExecuteBaseState>(
               buildWhen: (_, state) => state is CreateNewProductNewStockState,
               builder: (_, state) {
                 double parse(String? value) =>

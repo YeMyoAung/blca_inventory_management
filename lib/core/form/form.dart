@@ -3,9 +3,11 @@ import 'package:inventory_management_with_sql/core/db/interface/database_model.d
 import 'package:inventory_management_with_sql/core/form/field.dart';
 
 abstract class FormGroup<T extends DatabaseParamModel> {
+  final int? id;
+
   GlobalKey<FormState>? get formKey;
 
-  const FormGroup();
+  const FormGroup([this.id]);
 
   bool validate();
 

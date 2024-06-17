@@ -3,8 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inventory_management_with_sql/core/bloc/sqlite_read_state.dart';
+import 'package:inventory_management_with_sql/create_new_shop/controller/create_new_shop_form.dart';
 import 'package:inventory_management_with_sql/repo/shop_repo/shop_entity.dart';
 import 'package:inventory_management_with_sql/routes/route_name.dart';
+import 'package:inventory_management_with_sql/routes/router.dart';
 import 'package:inventory_management_with_sql/shop_list/controller/shop_list_bloc.dart';
 import 'package:inventory_management_with_sql/widgest/button/bloc_outlined_button.dart';
 import 'package:starlight_utils/starlight_utils.dart';
@@ -37,7 +39,13 @@ class ShopListScreen extends StatelessWidget {
             height: 60,
             child: CustomOutlinedButton(
               onPressed: () {
-                StarlightUtils.pushNamed(createNewShop);
+                StarlightUtils.pushNamed(
+                  createNewShop,
+                  arguments: CreateNewShopArg(
+                    form: ShopCreateForm.form(),
+                    title: "Create New Shop",
+                  ),
+                );
               },
               label: "Create New Shop",
             ),
@@ -108,18 +116,42 @@ class ShopList extends StatelessWidget {
                       ),
                       height: 70,
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          CircleAvatar(
-                            backgroundImage: FileImage(
-                              File(shops[i].coverPhoto),
+                          Expanded(
+                            child: Row(
+                              children: [
+                                CircleAvatar(
+                                  backgroundImage: FileImage(
+                                    File(shops[i].coverPhoto),
+                                  ),
+                                ),
+                                const SizedBox(
+                                  width: 20,
+                                ),
+                                Text(
+                                  shops[i].name,
+                                ),
+                              ],
                             ),
                           ),
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          Text(
-                            shops[i].name,
-                          ),
+                          IconButton(
+                            onPressed: () {
+                              StarlightUtils.pushNamed(
+                                createNewShop,
+                                arguments: CreateNewShopArg(
+                                  form: ShopCreateForm.form(
+                                    name: shops[i].name,
+                                    coverPhoto: shops[i].coverPhoto,
+                                    id: shops[i].id,
+                                  
+                                  ),
+                                  title: "Edit Shop",
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.edit),
+                          )
                         ],
                       ),
                     ),

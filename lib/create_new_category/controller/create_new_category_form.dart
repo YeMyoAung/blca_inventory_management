@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:inventory_management_with_sql/core/db/interface/database_model.dart';
+import 'package:inventory_management_with_sql/core/db/utils/dep.dart';
 import 'package:inventory_management_with_sql/core/form/field.dart';
 import 'package:inventory_management_with_sql/core/form/form.dart';
 import 'package:inventory_management_with_sql/repo/category_repo/category_entity.dart';
@@ -10,17 +11,28 @@ class CreateNewCategoryForm extends FormGroup<CategoryParams> {
   @override
   GlobalKey<FormState>? formKey = GlobalKey<FormState>();
 
-  CreateNewCategoryForm({required this.name});
+  @override
+  final int? id;
 
-  factory CreateNewCategoryForm.form() {
+  CreateNewCategoryForm({required this.name, this.id}) : super(id){
+    logger.i("CreateNewCategoryForm: $id");
+  }
+
+  factory CreateNewCategoryForm.form({
+    String? name,
+    int? id,
+  }) {
     return CreateNewCategoryForm(
       name: Field(
-        input: TextEditingController(),
+        input: TextEditingController(
+          text: name,
+        ),
         isRequired: false,
         dispose: (p0) {
           return p0?.dispose();
         },
       ),
+      id: id,
     );
   }
 
@@ -42,8 +54,16 @@ class CreateNewCategoryForm extends FormGroup<CategoryParams> {
       return Result(exception: Error(errorMessage, StackTrace.current));
     }
 
+    final insertName = name.input!.text;
+
     return Result(
-      result: CategoryParams.create(name: name.input!.text),
+      result: id == null
+          ? CategoryParams.create(
+              name: insertName,
+            )
+          : CategoryParams.update(
+              name: insertName,
+            ),
     );
   }
 

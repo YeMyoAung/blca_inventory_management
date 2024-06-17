@@ -104,7 +104,7 @@ class VariantDataSetupScreen extends StatelessWidget {
               );
             },
             allowPurchaseWhenOutOfStockBuilder: (childBuilder) {
-              return BlocBuilder<CreateNewProductBloc, SqliteCreateBaseState>(
+              return BlocBuilder<CreateNewProductBloc, SqliteExecuteBaseState>(
                   builder: (_, state) {
                 return childBuilder(
                   createNewProductBloc
@@ -137,7 +137,7 @@ class VariantProductPhotoPicker extends StatelessWidget {
       onTap: () {
         createNewProductBloc.add(const CreateNewVariantProductPickCoverPhotoEvent());
       },
-      child: BlocBuilder<CreateNewProductBloc, SqliteCreateBaseState>(
+      child: BlocBuilder<CreateNewProductBloc, SqliteExecuteBaseState>(
           buildWhen: (_, state) =>
               state is CreateNewVariantProductCoverPhotoSelectedState,
           builder: (_, state) {

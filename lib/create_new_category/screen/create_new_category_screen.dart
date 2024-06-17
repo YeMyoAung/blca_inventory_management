@@ -9,34 +9,38 @@ import 'package:inventory_management_with_sql/widgest/button/bloc_outlined_butto
 import 'package:starlight_utils/starlight_utils.dart';
 
 class CreateNewCategoryScreen extends StatelessWidget {
-  const CreateNewCategoryScreen({super.key});
+  final String title;
+  const CreateNewCategoryScreen({
+    super.key,
+    required this.title,
+  });
 
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<CreateNewCategoryBloc>();
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Create Categories"),
+        title:  Text(title),
         actions: [
-          CustomOutlinedButton<SqliteCreateBaseState,
+          CustomOutlinedButton<SqliteExecuteBaseState,
               CreateNewCategoryBloc>.bloc(
             onPressed: (bloc) {
-              bloc.add(const SqliteCreateEvent<NullObject>());
+              bloc.add(const SqliteExecuteEvent<NullObject>());
             },
             listener: (_, bloc, state) {
-              if (state is SqliteCreatedState) {
+              if (state is SqliteExecuteState) {
                 StarlightUtils.pop();
                 StarlightUtils.snackbar(SnackBar(
                     content: Text(
                         "${bloc.form.name.input?.text} was successfully created.")));
                 return;
               }
-              state as SqliteCreateErrorState;
-              dialog("Failed to create category", state.message);
+              state as SqliteExecuteErrorState;
+              dialog("Failed to save category", state.message);
             },
             listenWhen: (_, current) {
-              return current is SqliteCreatedState ||
-                  current is SqliteCreateErrorState;
+              return current is SqliteExecuteState ||
+                  current is SqliteExecuteErrorState;
             },
             label: "Save",
             icon: Icons.save_outlined,

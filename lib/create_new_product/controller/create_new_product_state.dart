@@ -1,16 +1,16 @@
 import 'package:inventory_management_with_sql/core/bloc/sqlite_create_state.dart';
 
-class CreateNewProductCoverPhotoSelectedState extends SqliteCreateBaseState {}
-class CreateNewVariantProductCoverPhotoSelectedState extends SqliteCreateBaseState {}
+class CreateNewProductCoverPhotoSelectedState extends SqliteExecuteBaseState {}
+class CreateNewVariantProductCoverPhotoSelectedState extends SqliteExecuteBaseState {}
 
 class CreateNewProductAvailableToSellWhenOutOfStockSelectedState
-    extends SqliteCreateBaseState {}
+    extends SqliteExecuteBaseState {}
 
-class CreateNewProductNewStockState extends SqliteCreateBaseState {}
+class CreateNewProductNewStockState extends SqliteExecuteBaseState {}
 
-class CreateNewProductCategorySelectedState extends SqliteCreateBaseState {}
+class CreateNewProductCategorySelectedState extends SqliteExecuteBaseState {}
 
-class CreateNewProductSetPriceState extends SqliteCreateBaseState {
+class CreateNewProductSetPriceState extends SqliteExecuteBaseState {
   final int index;
 
   CreateNewProductSetPriceState({required this.index});

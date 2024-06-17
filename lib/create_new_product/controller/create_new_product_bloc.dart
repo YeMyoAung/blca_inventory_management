@@ -16,16 +16,17 @@ import 'package:inventory_management_with_sql/create_new_product/controller/set_
 import 'package:inventory_management_with_sql/repo/attribute_repo/attribute_entity.dart';
 import 'package:inventory_management_with_sql/repo/option_repo/option_entity.dart';
 import 'package:inventory_management_with_sql/repo/product_repo/v2/product_entity.dart';
+import 'package:inventory_management_with_sql/repo/variant_properties_repo/variant_property_entity.dart';
 import 'package:inventory_management_with_sql/use_case/sqlite_create_new_product_use_case.dart';
 
 class ProductCreateEvent extends NullObject {
   final Result<List<Map<String, dynamic>>> Function() getPayload;
   final Map<int, SetOptionValueForm> formGroups;
-  final List<int> selectedVariants;
+  final List<List<Map<dynamic, dynamic>>> variants;
   const ProductCreateEvent({
     required this.formGroups,
     required this.getPayload,
-    required this.selectedVariants,
+    required this.variants,
   });
 }
 
@@ -39,7 +40,7 @@ class OptionAttributePair {
   });
 }
 
-class CreateNewProductBloc extends SqliteCreateBloc<
+class CreateNewProductBloc extends SqliteExecuteBloc<
     Product,
     VariantProductParams,
     SqliteCreateNewProductUseCase,
@@ -111,10 +112,11 @@ class CreateNewProductBloc extends SqliteCreateBloc<
   }
 
   @override
-  FutureOr<Result<Product>> onCreate(
-    SqliteCreateEvent<ProductCreateEvent> event,
-    VariantProductParams param,
-  ) async {
+  FutureOr<Result<Product>> onExecute(
+    SqliteExecuteEvent<ProductCreateEvent> event,
+    VariantProductParams param, [
+    int? id,
+  ]) async {
     final arg = event.arguments;
     if (arg == null) {
       return Result(
@@ -134,7 +136,7 @@ class CreateNewProductBloc extends SqliteCreateBloc<
     // 4. option.id + attribute_names -> attribute create
     // 5. variant properites create
 
-    final productCreateResult = await super.onCreate(event, param);
+    final productCreateResult = await super.onExecute(event, param);
 
     if (productCreateResult.hasError) {
       return productCreateResult;
@@ -231,19 +233,135 @@ class CreateNewProductBloc extends SqliteCreateBloc<
     ///variant properites
     // final uiKeys = variantUiAndFormIndexMapper.keys; // option-value index
     logger.i("Product: $variantUiAndFormIndexMapper");
-    logger.i("Variant: ${arg.selectedVariants}");
-    logger.i("SetOption: ${arg.formGroups}");
+    logger.i("Variant: ${arg.variants}");
+
+    final visitedVariantIDs = <int>[];
+
+    final List<Future<Result<List<VaraintProperty>>>> variantPropertiesPayload =
+        [];
 
     for (final selectedVariantIndex in variantUiAndFormIndexMapper.keys) {
-      final variantForm =
+      final formValue =
           form.varaints[variantUiAndFormIndexMapper[selectedVariantIndex]!];
-      ///TODO
-      /// find variant form
-      /// find attribute
-      /// variantForm == createdVariant and attribute index
+
+      final optionAttributeValue = arg.variants[selectedVariantIndex];
+
+      final matchVariant = productData.variants.firstWhere(
+        (element) {
+          final fPrice =
+              double.tryParse(formValue.price.input?.text ?? "") ?? 0.0;
+          final fAva =
+              double.tryParse(formValue.available.input?.text ?? "") ?? 0.0;
+          final fOnHand =
+              double.tryParse(formValue.onHand.input?.text ?? '') ?? 0.0;
+          final fDamage =
+              double.tryParse(formValue.damage.input?.text ?? "") ?? 0.0;
+          final fLost =
+              double.tryParse(formValue.lost.input?.text ?? "") ?? 0.0;
+          final fCoverPhoto = formValue.coverPhoto.input ?? "";
+          final fAllow = formValue.allowPurchaseWhenOutOfStock.input ?? false;
+          final fSku = formValue.sku.input?.text ?? '';
+
+          // logger.i("Current: $element");
+          // logger.i("Form: $fPrice $fAva $fOnHand $fDamage $fLost");
+
+          return element.price == fPrice &&
+              element.sku == fSku &&
+              element.available == fAva &&
+              element.onHand == fOnHand &&
+              element.damage == fDamage &&
+              element.lost == fLost &&
+              element.allowPurchaseWhenOutOfStock == fAllow &&
+              element.coverPhoto == fCoverPhoto &&
+              !visitedVariantIDs.contains(element.id);
+        },
+        // orElse: () => Variant(
+        //   id: -1,
+        //   productID: -1,
+        //   coverPhoto: '',
+        //   sku: '',
+        //   price: 0,
+        //   available: 0,
+        //   damage: 0,
+        //   onHand: 0,
+        //   lost: 0,
+        //   allowPurchaseWhenOutOfStock: false,
+        //   createdAt: DateTime.now(),
+        //   updatedAt: DateTime.now(),
+        //   properties: [],
+        // ),
+      );
+
+      logger.i("Match $matchVariant");
+
+      if (matchVariant.id == -1) {
+        continue;
+      }
+
+      visitedVariantIDs.add(matchVariant.id);
+
+      final List<Attribute> matchProperties = [];
+
+      for (final setdata in optionAttributeValue) {
+        final opName = setdata['option'];
+        final attName = setdata['name'];
+
+        matchProperties.addAll(bulkCreateResult.where((element) {
+          return element.result?.option.name == opName;
+        }).fold<List<Attribute>>([], (p, c) {
+          p.addAll(c.result?.attribute ?? []);
+          return p;
+        }).where((element) => element.name == attName));
+      }
+
+      logger.i("Match Variant: $matchVariant");
+      logger.i("Match Properties: $matchProperties");
+
+      final variantPropertiesBulk = useCase.variantPropertyRepo.bulkCreate(
+        matchProperties.map((e) {
+          return VariantPropertyParam(
+            variantId: matchVariant.id,
+            valueId: e.id,
+          );
+        }).toList(),
+        (param) {
+          return [
+            FieldValidator(
+              columnName: "variant_id",
+              operationSign: "=",
+              value: param.variantId.toString(),
+            ),
+            const AndOp(),
+            FieldValidator(
+              columnName: "value_id",
+              operationSign: "=",
+              value: param.valueId.toString(),
+            ),
+          ];
+        },
+      );
+
+      variantPropertiesPayload.add(variantPropertiesBulk);
     }
 
-    return Result(exception: Error(productCreateResult.toString()));
+    final variantPropertiesResult = await Future.wait(variantPropertiesPayload);
+
+    final variantPropertiesErr =
+        variantPropertiesResult.where((element) => element.hasError);
+
+    if (variantPropertiesErr.isNotEmpty) {
+      return Result(exception: variantPropertiesErr.elementAt(0).exception);
+    }
+
+    for (int i = 0; i < variantPropertiesResult.length; i++) {
+      productData.variants[i].properties.addAll(
+        variantPropertiesResult[i].result ?? [],
+      );
+    }
+
+    return Result(
+      result: productData,
+    );
   }
 
   CreateNewProductBloc(
@@ -266,21 +384,21 @@ class CreateNewProductBloc extends SqliteCreateBloc<
     on<CreateNewProductNewStockEvent>(_createNewProductNewStockEvent);
 
     on<CreateNewProductSetPriceEvent>((CreateNewProductSetPriceEvent event,
-        Emitter<SqliteCreateBaseState> emit) {
+        Emitter<SqliteExecuteBaseState> emit) {
       emit(CreateNewProductSetPriceState(index: event.index));
     });
   }
 
   FutureOr<void> _createNewProductNewStockEvent(
     CreateNewProductNewStockEvent _,
-    Emitter<SqliteCreateBaseState> emit,
+    Emitter<SqliteExecuteBaseState> emit,
   ) {
     emit(CreateNewProductNewStockState());
   }
 
   FutureOr<void> _createNewProductCategorySelectEvent(
     CreateNewProducCategorySelectEvent event,
-    Emitter<SqliteCreateBaseState> emit,
+    Emitter<SqliteExecuteBaseState> emit,
   ) {
     form.category.input = event.category;
     emit(CreateNewProductCategorySelectedState());
@@ -288,7 +406,7 @@ class CreateNewProductBloc extends SqliteCreateBloc<
 
   FutureOr<void> _createNewProductAvailableToSellWhenOutOfStockEventListener(
     CreateNewProductAvailabeToSellWhenOutOfStockEvent event,
-    Emitter<SqliteCreateBaseState> emit,
+    Emitter<SqliteExecuteBaseState> emit,
   ) {
     form.availableToSellWhenOutOfStock.input = event.canSell;
     emit(CreateNewProductAvailableToSellWhenOutOfStockSelectedState());
@@ -296,7 +414,7 @@ class CreateNewProductBloc extends SqliteCreateBloc<
 
   Future<void> _createNewProductPickCoverPhotoEventListener(
     CreateNewProductPickCoverPhotoEvent _,
-    Emitter<SqliteCreateBaseState> emit,
+    Emitter<SqliteExecuteBaseState> emit,
   ) async {
     form.coverPhoto.input =
         (await imagePicker.pickImage(source: ImageSource.gallery))?.path;
@@ -307,7 +425,7 @@ class CreateNewProductBloc extends SqliteCreateBloc<
 
   Future<void> _createNewVariantProductPickCoverPhotoEventListener(
     CreateNewVariantProductPickCoverPhotoEvent _,
-    Emitter<SqliteCreateBaseState> emit,
+    Emitter<SqliteExecuteBaseState> emit,
   ) async {
     form.variantCoverPhoto.input =
         (await imagePicker.pickImage(source: ImageSource.gallery))?.path;

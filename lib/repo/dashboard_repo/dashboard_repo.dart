@@ -7,6 +7,7 @@ import 'package:inventory_management_with_sql/repo/attribute_repo/attribute_repo
 import 'package:inventory_management_with_sql/repo/category_repo/category_repo.dart';
 import 'package:inventory_management_with_sql/repo/option_repo/option_repo.dart';
 import 'package:inventory_management_with_sql/repo/product_repo/v2/product_repo.dart';
+import 'package:inventory_management_with_sql/repo/variant_properties_repo/variant_property_repo.dart';
 import 'package:inventory_management_with_sql/repo/variant_repo/variant_repo.dart';
 
 class DashboardEngineRepo {
@@ -52,6 +53,11 @@ class DashboardEngineRepo {
     ///attribute repo
     container.setLazy<SqliteAttributeRepo>((){
       return SqliteAttributeRepo(database);
+    });
+
+    ///varaint properites repo
+    container.setLazy<SqliteVariantPropertyRepo>((){
+      return SqliteVariantPropertyRepo(database);
     });
 
     ///inventory repo

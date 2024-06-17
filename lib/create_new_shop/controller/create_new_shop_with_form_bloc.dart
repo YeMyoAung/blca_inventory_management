@@ -9,7 +9,7 @@ import 'package:inventory_management_with_sql/create_new_shop/controller/create_
 import 'package:inventory_management_with_sql/create_new_shop/use_case/sqlite_create_new_shop_use_case.dart';
 import 'package:inventory_management_with_sql/repo/shop_repo/shop_entity.dart';
 
-class CreateNewShopBloc extends SqliteCreateBloc<Shop, ShopParam,
+class CreateNewShopBloc extends SqliteExecuteBloc<Shop, ShopParam,
     SqliteShopCreateUseCase, ShopCreateForm, NullObject> {
   final ImagePicker imagePicker;
   CreateNewShopBloc(

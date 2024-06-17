@@ -5,6 +5,7 @@ import 'package:inventory_management_with_sql/cateogry/controller/category_list_
 import 'package:inventory_management_with_sql/cateogry/screen/add_category_screen.dart';
 import 'package:inventory_management_with_sql/container.dart';
 import 'package:inventory_management_with_sql/core/db/impl/sqlite_database.dart';
+import 'package:inventory_management_with_sql/core/db/utils/dep.dart';
 import 'package:inventory_management_with_sql/core/db/utils/sqlite_table_const.dart';
 import 'package:inventory_management_with_sql/create_new_category/controller/create_new_category_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_category/controller/create_new_category_form.dart';
@@ -36,6 +37,7 @@ import 'package:inventory_management_with_sql/repo/dashboard_repo/dashboard_repo
 import 'package:inventory_management_with_sql/repo/option_repo/option_repo.dart';
 import 'package:inventory_management_with_sql/repo/product_repo/v2/product_repo.dart';
 import 'package:inventory_management_with_sql/repo/shop_repo/shop_repo.dart';
+import 'package:inventory_management_with_sql/repo/variant_properties_repo/variant_property_repo.dart';
 import 'package:inventory_management_with_sql/repo/variant_repo/variant_repo.dart';
 import 'package:inventory_management_with_sql/routes/route_name.dart';
 import 'package:inventory_management_with_sql/shop_list/controller/shop_list_bloc.dart';
@@ -134,34 +136,64 @@ final Map<String, Route Function(RouteSettings)> dashboardRoute = {
   }
 };
 
+class CreateNewShopArg {
+  final ShopCreateForm form;
+  final String title;
+  const CreateNewShopArg({
+    required this.form,
+    required this.title,
+  });
+}
+
 final Map<String, Route Function(RouteSettings setting)> routes = {
   shopList: (settings) => _shopScreen(settings),
-  createNewShop: (settings) => _route(
-        BlocProvider(
-          create: (_) => CreateNewShopBloc(
-            ShopCreateForm.form(),
-            SqliteShopCreateUseCase(
-              shopRepo: container.get<SqliteShopRepo>(),
-            ),
-            container.get<ImagePicker>(),
+  createNewShop: (settings) {
+    final arg = settings.arguments;
+    if (arg is! CreateNewShopArg) {
+      return _route(ErrorWidget("Bad request"), settings);
+    }
+    logger.i("ShpID: ${arg.form.id}");
+    return _route(
+      BlocProvider(
+        create: (_) => CreateNewShopBloc(
+          arg.form,
+          SqliteShopCreateUseCase(
+            shopRepo: container.get<SqliteShopRepo>(),
           ),
-          child: const CreateNewShopScreen(),
+          container.get<ImagePicker>(),
         ),
-        settings,
+        child: CreateNewShopScreen(
+          title: arg.title,
+        ),
       ),
+      settings,
+    );
+  },
   ...dashboardLoaderRoute,
   ...dashboardRoute,
-  createNewCategory: (settings) => _route(
-        BlocProvider(
-          create: (_) => CreateNewCategoryBloc(
-            CreateNewCategoryForm.form(),
-            SqliteCategoryCreateUseCase(
-                categoryRepo: container.get<SqliteCategoryRepo>()),
+  createNewCategory: (settings) {
+    final arg = settings.arguments;
+    if (arg is! CreateNewCategoryArgs) {
+      return _route(ErrorWidget("Bad request"), settings);
+    }
+
+    logger.i("Router ${arg.form.id}");
+
+    return _route(
+      BlocProvider(
+        create: (_) => CreateNewCategoryBloc(
+          arg.form,
+          SqliteCategoryExecuteUseCase(
+            categoryRepo: container.get<SqliteCategoryRepo>(),
           ),
-          child: const CreateNewCategoryScreen(),
         ),
-        settings,
+        child: CreateNewCategoryScreen(
+          title: arg.title,
+        ),
       ),
+      settings,
+    );
+  },
   createNewProduct: (settings) {
     final value = settings.arguments;
     if (value is! CategoryListBloc) {
@@ -182,6 +214,7 @@ final Map<String, Route Function(RouteSettings setting)> routes = {
                 variantRepo: container.get<SqliteVariantRepo>(),
                 optionRepo: container.get<SqliteOptionRepo>(),
                 attributeRepo: container.get<SqliteAttributeRepo>(),
+                variantPropertyRepo: container.get<SqliteVariantPropertyRepo>(),
               ),
             ),
           ),
@@ -357,4 +390,14 @@ Route _route(Widget child, RouteSettings settings) {
     },
     settings: settings,
   );
+}
+
+class CreateNewCategoryArgs {
+  final CreateNewCategoryForm form;
+  final String title;
+
+  const CreateNewCategoryArgs({
+    required this.form,
+    required this.title,
+  });
 }

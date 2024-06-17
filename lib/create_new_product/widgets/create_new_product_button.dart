@@ -13,12 +13,12 @@ class CreateNewProductButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final setOptionValueBloc = context.read<SetOptionValueBloc>();
-    return CustomOutlinedButton<SqliteCreateBaseState,
+    return CustomOutlinedButton<SqliteExecuteBaseState,
         CreateNewProductBloc>.bloc(
       listenWhen: (p0, p1) =>
-          p1 is SqliteCreateErrorState || p1 is SqliteCreatedState,
+          p1 is SqliteExecuteErrorState || p1 is SqliteExecuteState,
       listener: (p0, p1, state) {
-        if (state is SqliteCreateErrorState) {
+        if (state is SqliteExecuteErrorState) {
           StarlightUtils.snackbar(
             SnackBar(
               content: Text(state.message),
@@ -33,11 +33,11 @@ class CreateNewProductButton extends StatelessWidget {
         return false;
       },
       onPressed: (bloc) {
-        bloc.add(SqliteCreateEvent<ProductCreateEvent>(
+        bloc.add(SqliteExecuteEvent<ProductCreateEvent>(
           arguments: ProductCreateEvent(
             formGroups: setOptionValueBloc.formGroups,
             getPayload: setOptionValueBloc.getPayload,
-            selectedVariants: setOptionValueBloc.selectedVariants.value,
+            variants: setOptionValueBloc.variants,
           ),
         ));
       },

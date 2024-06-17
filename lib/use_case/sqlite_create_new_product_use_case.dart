@@ -6,26 +6,27 @@ import 'package:inventory_management_with_sql/repo/attribute_repo/attribute_repo
 import 'package:inventory_management_with_sql/repo/option_repo/option_repo.dart';
 import 'package:inventory_management_with_sql/repo/product_repo/v2/product_entity.dart';
 import 'package:inventory_management_with_sql/repo/product_repo/v2/product_repo.dart';
+import 'package:inventory_management_with_sql/repo/variant_properties_repo/variant_property_repo.dart';
 import 'package:inventory_management_with_sql/repo/variant_repo/variant_repo.dart';
 
 class SqliteCreateNewProductUseCase
-    extends SqliteCreateUseCase<Product, VariantProductParams> {
+    extends SqliteExecuteUseCase<Product, VariantProductParams> {
   final SqliteProductRepo productRepo;
   final SqliteVariantRepo variantRepo;
   final SqliteOptionRepo optionRepo;
   final SqliteAttributeRepo attributeRepo;
+  final SqliteVariantPropertyRepo variantPropertyRepo;
 
   const SqliteCreateNewProductUseCase({
     required this.productRepo,
     required this.variantRepo,
     required this.optionRepo,
     required this.attributeRepo,
+    required this.variantPropertyRepo,
   });
 
   @override
-  Future<Result<Product>> create(
-    VariantProductParams param,
-  ) async {
+  Future<Result<Product>> execute(VariantProductParams param, [int? id]) async {
     final barcode = param.barcode;
     if (barcode.isNotEmpty == true) {
       final isBarcodeAreadyExits = await productRepo.findModels(
@@ -72,8 +73,6 @@ class SqliteCreateNewProductUseCase
     /// . 3. Variant (product_id) [] * 125, ToParam(),
     /// . 4. Variant Properties (variant_id,value_id)  ToParam(), [[1,2],[2,1],[2,3]]
     ///}: create variant
-    
-    
 
     final variantCreateResult = await Future.wait(param.variant.map((e) {
       e.productID = id;

@@ -1,21 +1,21 @@
 import 'package:inventory_management_with_sql/core/bloc/bloc_state.dart';
 
-abstract class SqliteCreateBaseState extends BlocBaseState {
-  SqliteCreateBaseState();
+abstract class SqliteExecuteBaseState extends BlocBaseState {
+  SqliteExecuteBaseState();
 }
 
-class SqliteCreateInitialState extends SqliteCreateBaseState {}
+class SqliteExecuteInitialState extends SqliteExecuteBaseState {}
 
-class SqliteCreatingState extends SqliteCreateBaseState {}
+class SqliteExecutingState extends SqliteExecuteBaseState {}
 
-class SqliteCreateErrorState extends SqliteCreateBaseState {
+class SqliteExecuteErrorState extends SqliteExecuteBaseState {
   final String message;
 
-  SqliteCreateErrorState(this.message);
+  SqliteExecuteErrorState(this.message);
   @override
   String toString() {
     return "${runtimeType.toString()}\n$message";
   }
 }
 
-class SqliteCreatedState extends SqliteCreateBaseState {}
+class SqliteExecuteState extends SqliteExecuteBaseState {}

@@ -17,7 +17,7 @@ class CreateNewShopInitialState extends CreateNewShopState {
   CreateNewShopInitialState();
 }
 
-class CreateNewShopCoverPhotoSelectedState extends SqliteCreateBaseState {
+class CreateNewShopCoverPhotoSelectedState extends SqliteExecuteBaseState {
   CreateNewShopCoverPhotoSelectedState();
 }
 

@@ -7,37 +7,36 @@ import 'package:inventory_management_with_sql/core/db/impl/sqlite_use_case.dart'
 import 'package:inventory_management_with_sql/core/db/interface/database_model.dart';
 import 'package:inventory_management_with_sql/core/form/form.dart';
 
-
-
-abstract class SqliteCreateBloc<
+abstract class SqliteExecuteBloc<
         Model extends DatabaseModel,
         Param extends DatabaseParamModel,
-        UseCase extends SqliteCreateUseCase<Model, Param>,
+        UseCase extends SqliteExecuteUseCase<Model, Param>,
         Form extends FormGroup<Param>,
         Args extends NullObject>
-    extends Bloc<SqliteCreateBaseEvent, SqliteCreateBaseState> {
+    extends Bloc<SqliteExecuteBaseEvent, SqliteExecuteBaseState> {
   final UseCase useCase;
   final Form form;
-  SqliteCreateBloc(this.form, this.useCase)
-      : super(SqliteCreateInitialState()) {
-    on<SqliteCreateEvent<Args>>(_sqliteCreateEventListener);
+  SqliteExecuteBloc(this.form, this.useCase)
+      : super(SqliteExecuteInitialState()) {
+    on<SqliteExecuteEvent<Args>>(_sqliteCreateEventListener);
   }
 
-  bool isValid(SqliteCreateEvent<Args> event) => form.validate();
+  bool isValid(SqliteExecuteEvent<Args> event) => form.validate();
 
-  Result<Param> toParam(SqliteCreateEvent<Args> event) => form.toParam();
+  Result<Param> toParam(SqliteExecuteEvent<Args> event) => form.toParam();
 
-  FutureOr<Result<Model>> onCreate(
-    SqliteCreateEvent<Args> event,
-    Param param,
-  ) =>
-      useCase.create(param);
+  FutureOr<Result<Model>> onExecute(
+    SqliteExecuteEvent<Args> event,
+    Param param, [
+    int? id,
+  ]) =>
+      useCase.execute(param, form.id);
 
   FutureOr<void> _sqliteCreateEventListener(
-    SqliteCreateEvent<Args> event,
-    Emitter<SqliteCreateBaseState> emit,
+    SqliteExecuteEvent<Args> event,
+    Emitter<SqliteExecuteBaseState> emit,
   ) async {
-    if (state is SqliteCreatingState) {
+    if (state is SqliteExecutingState) {
       return;
     }
 
@@ -46,21 +45,21 @@ abstract class SqliteCreateBloc<
     final values = toParam(event);
 
     if (values.hasError) {
-      return emit(SqliteCreateErrorState(values.toString()));
+      return emit(SqliteExecuteErrorState(values.toString()));
     }
-    emit(SqliteCreatingState());
+    emit(SqliteExecutingState());
 
-    final result = await onCreate(event, values.result!);
+    final result = await onExecute(event, values.result!);
 
     if (result.hasError) {
-      return emit(SqliteCreateErrorState(
+      return emit(SqliteExecuteErrorState(
         result.toString(),
       ));
     }
 
-    emit(SqliteCreatingState());
+    emit(SqliteExecutingState());
 
-    emit(SqliteCreatedState());
+    emit(SqliteExecuteState());
   }
 
   @override
