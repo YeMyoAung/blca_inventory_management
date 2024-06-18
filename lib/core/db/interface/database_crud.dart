@@ -61,7 +61,7 @@ class FieldValidator extends WhereOperator {
 
   @override
   String toString() {
-    if(value.isEmpty){
+    if (value.isEmpty) {
       return "$columnName $operationSign";
     }
     return "$columnName $operationSign '$value'";
@@ -105,6 +105,8 @@ abstract class DatabaseCrud<DatabaseType, Model extends DatabaseModel,
   });
 
   DatabaseType get database => store.database!;
+
+  Future<int> count([String? where]);
 
   Future<Result<List<Model>>> find({
     int limit = 20,

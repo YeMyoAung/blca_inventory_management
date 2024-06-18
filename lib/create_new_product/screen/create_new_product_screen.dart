@@ -8,7 +8,8 @@ import 'package:inventory_management_with_sql/create_new_product/widgets/create_
 import 'package:starlight_utils/starlight_utils.dart';
 
 class CreateNewProductScreen extends StatelessWidget {
-  const CreateNewProductScreen({super.key});
+  final String title;
+  const CreateNewProductScreen({super.key,required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +29,7 @@ class CreateNewProductScreen extends StatelessWidget {
       ),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Create Products"),
+          title:  Text(title),
           actions: const [
             CreateNewProductButton(),
           ],

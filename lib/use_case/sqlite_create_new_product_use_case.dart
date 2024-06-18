@@ -46,8 +46,13 @@ class SqliteCreateNewProductUseCase
       (element) => element.sku.isNotEmpty,
     );
     if (skus.isNotEmpty) {
+
+      ///[1,2,3] => (1,2,3)
+      ///1,2,3
+      ///()
       final isSkuAreadyExits = await variantRepo.findModels(
-        where: "where \"$variantTb\".\"sku\" in '${skus.toList()}'",
+        where:
+            "where \"$variantTb\".\"sku\" in (${skus.map((e) => e.sku).toList().join(",")})",
       );
 
       if (!isSkuAreadyExits.hasError) {

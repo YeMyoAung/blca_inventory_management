@@ -11,4 +11,13 @@ class SqliteVariantPropertyRepo
           VaraintProperty.fromJson,
           variantPropertiesTb,
         );
+
+  @override
+  String get refQuery =>
+      """select 
+      $tableName.*,
+      $attributeTb.name as attribute_name,
+      $optionTb.id as option_id,
+      $optionTb.name as option_name
+      from $tableName join $attributeTb on $tableName.value_id=$attributeTb.id join $optionTb on $attributeTb.option_id=$optionTb.id""";
 }

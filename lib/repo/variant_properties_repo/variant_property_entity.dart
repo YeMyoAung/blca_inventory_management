@@ -8,12 +8,18 @@ class VaraintProperty extends DatabaseModel {
   final DateTime createdAt;
   final DateTime? updatedAt;
 
+  final int optionID;
+  final String optionName, attributeName;
+
   const VaraintProperty({
     required super.id,
     required this.variantId,
     required this.valueId,
     required this.createdAt,
     required this.updatedAt,
+    this.optionID = -1,
+    this.optionName = '',
+    this.attributeName = '',
   });
 
   factory VaraintProperty.fromJson(dynamic data) {
@@ -23,6 +29,9 @@ class VaraintProperty extends DatabaseModel {
       valueId: int.parse(data['value_id'].toString()),
       createdAt: DateTime.parse(data['created_at']),
       updatedAt: DateTime.tryParse(data['updated_at'] ?? ''),
+      optionID: int.tryParse(data['option_id'].toString()) ?? -1,
+      optionName: data['option_name'] ?? '',
+      attributeName: data['attribute_name'] ?? '',
     );
   }
 

@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inventory_management_with_sql/cateogry/controller/category_list_bloc.dart';
 import 'package:inventory_management_with_sql/core/bloc/sqlite_read_state.dart';
+import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_form.dart';
 import 'package:inventory_management_with_sql/product/controller/product_list_bloc.dart';
 import 'package:inventory_management_with_sql/repo/product_repo/v2/product_entity.dart';
 import 'package:inventory_management_with_sql/routes/route_name.dart';
+import 'package:inventory_management_with_sql/routes/router.dart';
 import 'package:inventory_management_with_sql/widgest/button/bloc_outlined_button.dart';
 import 'package:starlight_utils/starlight_utils.dart';
 
@@ -13,6 +15,8 @@ class ProductListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final categoryListBloc = context.read<CategoryListBloc>();
+    final productListBloc = context.read<ProductListBloc>();
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -22,7 +26,15 @@ class ProductListView extends StatelessWidget {
             onPressed: () {
               StarlightUtils.pushNamed(
                 createNewProduct,
-                arguments: context.read<CategoryListBloc>(),
+                arguments: CreateNewProductArgs(
+                  title: "Create Product",
+                  categoryListBloc: categoryListBloc,
+                  form: CreateNewProductForm.form(
+                    varaints: [
+                      CreateNewVariantForm.form(),
+                    ],
+                  ),
+                ),
               );
             },
             label: "Create Product",
@@ -36,6 +48,32 @@ class ProductListView extends StatelessWidget {
           itemCount: state.list.length,
           itemBuilder: (_, i) {
             return ListTile(
+              onTap: () async {
+                final product = await productListBloc.detail(i);
+                if (product.hasError) {
+                  //TODO show error
+                  return;
+                }
+                final productDetail = product.result!;
+                StarlightUtils.pushNamed(
+                  createNewProduct,
+                  arguments: CreateNewProductArgs(
+                    title: "Edit Product",
+                    categoryListBloc: categoryListBloc,
+                    form: CreateNewProductForm.form(
+                      name: productDetail.name,
+                      description: productDetail.description,
+                      barcode: productDetail.barcode,
+                      category: productDetail.category,
+
+                      ///
+                      varaints: [
+                        CreateNewVariantForm.form(),
+                      ],
+                    ),
+                  ),
+                );
+              },
               title: Text(state.list[i].name),
             );
           },

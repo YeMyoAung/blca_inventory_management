@@ -116,42 +116,18 @@ class ShopList extends StatelessWidget {
                       ),
                       height: 70,
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Expanded(
-                            child: Row(
-                              children: [
-                                CircleAvatar(
-                                  backgroundImage: FileImage(
-                                    File(shops[i].coverPhoto),
-                                  ),
-                                ),
-                                const SizedBox(
-                                  width: 20,
-                                ),
-                                Text(
-                                  shops[i].name,
-                                ),
-                              ],
+                          CircleAvatar(
+                            backgroundImage: FileImage(
+                              File(shops[i].coverPhoto),
                             ),
                           ),
-                          IconButton(
-                            onPressed: () {
-                              StarlightUtils.pushNamed(
-                                createNewShop,
-                                arguments: CreateNewShopArg(
-                                  form: ShopCreateForm.form(
-                                    name: shops[i].name,
-                                    coverPhoto: shops[i].coverPhoto,
-                                    id: shops[i].id,
-                                  
-                                  ),
-                                  title: "Edit Shop",
-                                ),
-                              );
-                            },
-                            icon: const Icon(Icons.edit),
-                          )
+                          const SizedBox(
+                            width: 20,
+                          ),
+                          Text(
+                            shops[i].name,
+                          ),
                         ],
                       ),
                     ),

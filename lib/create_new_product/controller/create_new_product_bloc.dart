@@ -364,11 +364,15 @@ class CreateNewProductBloc extends SqliteExecuteBloc<
     );
   }
 
+
+
   CreateNewProductBloc(
     super.form,
     this.imagePicker,
     super.useCase,
   ) {
+    
+
     on<CreateNewProductPickCoverPhotoEvent>(
       _createNewProductPickCoverPhotoEventListener,
     );

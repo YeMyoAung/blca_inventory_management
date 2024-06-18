@@ -121,6 +121,10 @@ final Map<String, Route Function(RouteSettings)> dashboardRoute = {
           BlocProvider(
             create: (_) => ProductListBloc(
               container.get<SqliteProductRepo>(),
+              container.get<SqliteVariantRepo>(),
+              container.get<SqliteAttributeRepo>(),
+              container.get<SqliteVariantPropertyRepo>(),
+              container.get<SqliteOptionRepo>(),
             ),
           ),
           BlocProvider(
@@ -195,8 +199,8 @@ final Map<String, Route Function(RouteSettings setting)> routes = {
     );
   },
   createNewProduct: (settings) {
-    final value = settings.arguments;
-    if (value is! CategoryListBloc) {
+    final args = settings.arguments;
+    if (args is! CreateNewProductArgs) {
       return _route(
         ErrorWidget("Category List Bloc not found"),
         settings,
@@ -207,7 +211,7 @@ final Map<String, Route Function(RouteSettings setting)> routes = {
         providers: [
           BlocProvider(
             create: (_) => CreateNewProductBloc(
-              CreateNewProductForm.form(),
+              args.form,
               container.get<ImagePicker>(),
               SqliteCreateNewProductUseCase(
                 productRepo: container.get<SqliteProductRepo>(),
@@ -221,9 +225,13 @@ final Map<String, Route Function(RouteSettings setting)> routes = {
           BlocProvider(
             create: (context) => SetOptionValueBloc(),
           ),
-          BlocProvider.value(value: value),
+          BlocProvider.value(
+            value: args.categoryListBloc,
+          ),
         ],
-        child: const CreateNewProductScreen(),
+        child: CreateNewProductScreen(
+          title: args.title,
+        ),
       ),
       settings,
     );
@@ -399,5 +407,17 @@ class CreateNewCategoryArgs {
   const CreateNewCategoryArgs({
     required this.form,
     required this.title,
+  });
+}
+
+class CreateNewProductArgs {
+  final String title;
+  final CategoryListBloc categoryListBloc;
+  final CreateNewProductForm form;
+
+  CreateNewProductArgs({
+    required this.title,
+    required this.categoryListBloc,
+    required this.form,
   });
 }

@@ -18,9 +18,13 @@ class Field<F> {
     bool isRequired = false,
     String? Function(TextEditingController?)? isValid,
     dynamic Function(TextEditingController?)? dispose,
+    String? text,
   }) =>
       Field(
-        input: TextEditingController(),
+        input: TextEditingController(
+          text: text,
+        ),
+
         isRequired: isRequired,
         isValid: isValid,
         dispose: dispose ??

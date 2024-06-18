@@ -186,8 +186,12 @@ class SqliteRepo<Model extends DatabaseModel,
       await database.rawQuery("""
           Insert into "$tableName" $columnNames values ${columnValues.join(",")}""");
 
-      final String whereQuery =
-          values.map(afterCreate).toList().map((e) => "(${e.join(' ')})").toList().join(" or ");
+      final String whereQuery = values
+          .map(afterCreate)
+          .toList()
+          .map((e) => "(${e.join(' ')})")
+          .toList()
+          .join(" or ");
 
       // logger.i(whereQuery.map((e) => "(${e.join(' ')})").toList().join(" or "));
       // final result = await database.rawQuery(
@@ -305,5 +309,16 @@ class SqliteRepo<Model extends DatabaseModel,
         action: action,
       ));
     }
+  }
+
+  @override
+  Future<int> count([String? where]) async {
+    final result = await database
+        .rawQuery("select count(*) from $tableName ${where ?? ""}");
+    if (result.isEmpty) {
+      return 0;
+    }
+
+    return result.first.values.first as int;
   }
 }

@@ -17,20 +17,33 @@ class CreateNewProductForm extends FormGroup<VariantProductParams> {
 
   ///TODO Option,Value Form
 
-  factory CreateNewProductForm.form() {
+  factory CreateNewProductForm.form({
+    String? name,
+    String? description,
+    String? barcode,
+    Category? category,
+    String? coverPhoto,
+    required List<CreateNewVariantForm> varaints,
+  }) {
     return CreateNewProductForm(
-      name: Field.textEditingController(),
-      description: Field.textEditingController(),
-      barcode: Field.textEditingController(),
+      name: Field.textEditingController(
+        text: name,
+      ),
+      description: Field.textEditingController(
+        text: description,
+      ),
+      barcode: Field.textEditingController(
+        text: barcode,
+      ),
       category: Field<Category>(
+        input: category,
         isValid: (p0) => p0 != null ? null : "Category is required",
       ),
       coverPhoto: Field<String>(
+        input: coverPhoto,
         isValid: (p0) => p0 != null ? null : "Cover Photo is required",
       ),
-      varaints: [
-        CreateNewVariantForm.form(),
-      ],
+      varaints: varaints,
     );
   }
 
