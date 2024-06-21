@@ -11,6 +11,7 @@ class Variant extends DatabaseModel {
 
   final List<VaraintProperty> properties;
 
+
   const Variant({
     required super.id,
     required this.productID,
@@ -39,10 +40,10 @@ class Variant extends DatabaseModel {
       onHand: double.parse(data['on_hand'].toString()),
       lost: double.parse(data['lost'].toString()),
       allowPurchaseWhenOutOfStock:
-          data['allow_purchase_when_out_of_stock'] == true,
+          data['allow_purchase_when_out_of_stock'] == 1,
       createdAt: DateTime.parse(data['created_at']),
       updatedAt: DateTime.tryParse(data['updated_at'] ?? ""),
-      properties: [], //TODO
+      properties: [],
     );
   }
 

@@ -168,19 +168,30 @@ class CreateNewVariantForm extends FormGroup<VariantParam> {
     required this.isVariant,
   });
 
-  factory CreateNewVariantForm.form([bool isVariant = false]) {
+  factory CreateNewVariantForm.form({
+    String? coverPhoto,
+    String? sku,
+    String? price,
+    String? available,
+    String? damage,
+    String? onHand,
+    String? lost,
+    bool? allowPurchaseWhenOutOfStock,
+    bool isVariant = false,
+  }) {
     return CreateNewVariantForm(
       coverPhoto: Field<String>(
+        input: coverPhoto,
         isValid: (p0) => p0 != null ? null : "Cover Photo is required",
       ),
-      sku: Field.textEditingController(),
-      price: Field.textEditingController(),
-      available: Field.textEditingController(),
-      damage: Field.textEditingController(),
-      onHand: Field.textEditingController(),
-      lost: Field.textEditingController(),
+      sku: Field.textEditingController(text: sku),
+      price: Field.textEditingController(text: price),
+      available: Field.textEditingController(text: available),
+      damage: Field.textEditingController(text: damage),
+      onHand: Field.textEditingController(text: onHand),
+      lost: Field.textEditingController(text: lost),
       allowPurchaseWhenOutOfStock: Field<bool>(
-        input: false,
+        input: allowPurchaseWhenOutOfStock ?? false,
         isRequired: true,
         isValid: (p0) =>
             p0 == null ? "Allow purchase when out of stock is reqruied" : null,

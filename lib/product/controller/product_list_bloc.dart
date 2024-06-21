@@ -28,6 +28,8 @@ class ProductListBloc
         variantPropertyRepo: variantPropertyRepo,
         optionRepo: optionRepo,
       ),
+      optionRepo: optionRepo,
+      attributeRepo: attributeRepo,
     );
   }
 

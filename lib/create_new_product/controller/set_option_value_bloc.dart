@@ -54,7 +54,8 @@ class SetOptionValueBloc
               (e) => {
                 "name": e.input?.text,
               },
-            ).toList(),
+            )
+            .toList(),
       });
     }
 
@@ -97,6 +98,7 @@ class SetOptionValueBloc
               1: SetOptionValueForm.instance(),
             },
         super(SetOptionValueInitialState()) {
+
     on<AddNewOptionValueEvent>(_addNewOptionValueEvent);
 
     on<AddNewAttributeValueEvent>(_addNewAttributeValueEvent);
@@ -146,7 +148,7 @@ class SetOptionValueBloc
 
     final sizeColorPackageExampleResult = (payload.result ?? []).map((e) {
       final v = e['attributes'].toList() as List<Map>;
-     
+
       return v.map((Map v) {
         return {
           ...v,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:inventory_management_with_sql/create_new_product/widgets/create_new_category_info.dart';
 import 'package:inventory_management_with_sql/create_new_product/widgets/create_new_product_button.dart';
+import 'package:inventory_management_with_sql/create_new_product/widgets/create_new_product_category_info.dart';
 import 'package:inventory_management_with_sql/create_new_product/widgets/create_new_product_info.dart';
 import 'package:inventory_management_with_sql/create_new_product/widgets/create_new_product_option_attribute_info.dart';
 import 'package:inventory_management_with_sql/create_new_product/widgets/create_new_product_price_info.dart';

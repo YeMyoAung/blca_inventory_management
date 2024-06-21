@@ -1,9 +1,13 @@
 import 'package:inventory_management_with_sql/core/db/interface/database_model.dart';
+import 'package:inventory_management_with_sql/core/db/utils/dep.dart';
+import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_form.dart';
+import 'package:inventory_management_with_sql/create_new_product/controller/set_option_value_form.dart';
 import 'package:inventory_management_with_sql/repo/category_repo/category_entity.dart';
 import 'package:inventory_management_with_sql/repo/variant_repo/variant_entity.dart';
 
 class Product extends DatabaseModel {
   final String name;
+  final String coverPhoto;
   final int categoryId;
   final String barcode;
   final String description;
@@ -16,9 +20,40 @@ class Product extends DatabaseModel {
   ///TODO
   final List<Variant> variants;
 
+  List<CreateNewVariantForm> get variantForm => variants
+      .map(
+        (e) => CreateNewVariantForm.form(
+          coverPhoto: e.coverPhoto,
+          sku: e.sku,
+          price: e.price.toString(),
+          available: e.available.toString(),
+          damage: e.damage.toString(),
+          onHand: e.onHand.toString(),
+          lost: e.lost.toString(),
+          allowPurchaseWhenOutOfStock: e.allowPurchaseWhenOutOfStock,
+          isVariant: variants.length > 1,
+        ),
+      )
+      .toList();
+
+  Map<int, SetOptionValueForm> get propertiesForm {
+    /// varint 3
+    /// Color red,green
+    /// Size  x,xl
+    /// red x, red xl,green x, green xl
+    for (final variant in variants.fold([], (p, c) {
+      return p..addAll(c.properties);
+    })) {
+      logger.e(variant);
+    }
+
+    return {};
+  }
+
   const Product({
     required super.id,
     required this.name,
+    required this.coverPhoto,
     required this.categoryId,
     required this.barcode,
     required this.description,
@@ -29,6 +64,7 @@ class Product extends DatabaseModel {
   });
 
   factory Product.fromJson(dynamic data) {
+    logger.e("Product.From $data");
     Map<String, dynamic>? categoryPayload;
     final categoryId = int.parse(data['category_id'].toString());
     if (data['category_created_at'] != null) {
@@ -40,6 +76,7 @@ class Product extends DatabaseModel {
     }
     return Product(
       id: int.parse(data['id'].toString()),
+      coverPhoto: data['cover_photo'] ?? '',
       name: data['name'],
       categoryId: categoryId,
       barcode: data['barcode'],

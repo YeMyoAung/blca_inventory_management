@@ -92,10 +92,13 @@ class SqliteRepo<Model extends DatabaseModel,
     );
   }
 
+  ///id => product
+  ///id => category
+
   @override
   Future<Result<Model>> get(int id) async {
     final result = await database.rawQuery("""
-          select * from "$tableName" where id=? limit 1;
+        $query where $tableName."id"=? limit 1;
         """, [id]);
     if (result.isEmpty) {
       return Result(
@@ -123,11 +126,14 @@ class SqliteRepo<Model extends DatabaseModel,
     payload
         .addEntries({MapEntry("created_at", DateTime.now().toIso8601String())});
     final insertColumns = payload.keys.map((e) => '"$e"').join(",");
-    final insertValues = payload.values.map((e) => "'$e'").join(",");
+    final insertValues =
+        payload.values.map((e) => e is String ? "'$e'" : e).join(",");
     try {
-      final insertedId = await database.rawInsert("""
+      final createQuery = """
       insert into "$tableName" ($insertColumns) values ($insertValues);
-    """);
+    """;
+      logger.w("Create Query $createQuery");
+      final insertedId = await database.rawInsert(createQuery);
       final model = await get(insertedId);
       _action.sink.add(DatabaseCrudOnAction(
         model: model,
@@ -234,7 +240,9 @@ class SqliteRepo<Model extends DatabaseModel,
 
     /// update table set col1='val1',col2='val2' where id = ?
     final dataSet = payload.keys.map((column) {
-      return "$column = '${payload[column]}'";
+      final value =
+          payload[column] is String ? "'${payload[column]}'" : payload;
+      return "$column = $value";
     }).join(',');
     final effectedRows = await database.rawUpdate("""
       update "$tableName" set $dataSet where id = ?;

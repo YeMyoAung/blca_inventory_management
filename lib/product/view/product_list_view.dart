@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inventory_management_with_sql/cateogry/controller/category_list_bloc.dart';
 import 'package:inventory_management_with_sql/core/bloc/sqlite_read_state.dart';
+import 'package:inventory_management_with_sql/core/db/utils/dep.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_form.dart';
 import 'package:inventory_management_with_sql/product/controller/product_list_bloc.dart';
 import 'package:inventory_management_with_sql/repo/product_repo/v2/product_entity.dart';
@@ -55,6 +56,9 @@ class ProductListView extends StatelessWidget {
                   return;
                 }
                 final productDetail = product.result!;
+
+                logger.e("Product Detail ${productDetail.propertiesForm}");
+                return;
                 StarlightUtils.pushNamed(
                   createNewProduct,
                   arguments: CreateNewProductArgs(
@@ -65,11 +69,8 @@ class ProductListView extends StatelessWidget {
                       description: productDetail.description,
                       barcode: productDetail.barcode,
                       category: productDetail.category,
-
-                      ///
-                      varaints: [
-                        CreateNewVariantForm.form(),
-                      ],
+                      coverPhoto: productDetail.coverPhoto,
+                      varaints: productDetail.variantForm,
                     ),
                   ),
                 );

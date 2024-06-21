@@ -17,6 +17,7 @@ import 'package:inventory_management_with_sql/repo/attribute_repo/attribute_enti
 import 'package:inventory_management_with_sql/repo/option_repo/option_entity.dart';
 import 'package:inventory_management_with_sql/repo/product_repo/v2/product_entity.dart';
 import 'package:inventory_management_with_sql/repo/variant_properties_repo/variant_property_entity.dart';
+import 'package:inventory_management_with_sql/repo/variant_repo/variant_entity.dart';
 import 'package:inventory_management_with_sql/use_case/sqlite_create_new_product_use_case.dart';
 
 class ProductCreateEvent extends NullObject {
@@ -70,7 +71,10 @@ class CreateNewProductBloc extends SqliteExecuteBloc<
       form.varaints.clear();
     }
     // final afterAddingIndex = form.varaints.length; //(1)
-    form.varaints.add(CreateNewVariantForm.form(true)); //length 2,(1,2) ,(0,1)
+    form.varaints.add(CreateNewVariantForm.form(
+      isVariant: true,
+    )); //length 2,(1,2) ,(0,1)
+
     variantUiAndFormIndexMapper[index] = form.varaints.length - 1;
     print("After: $variantUiAndFormIndexMapper");
   }
@@ -262,8 +266,8 @@ class CreateNewProductBloc extends SqliteExecuteBloc<
           final fAllow = formValue.allowPurchaseWhenOutOfStock.input ?? false;
           final fSku = formValue.sku.input?.text ?? '';
 
-          // logger.i("Current: $element");
-          // logger.i("Form: $fPrice $fAva $fOnHand $fDamage $fLost");
+          logger.i(
+              "Form: $fPrice=${element.price} $fAva=${element.available} $fOnHand=${element.onHand} $fDamage=${element.damage} $fLost=${element.lost} $fCoverPhoto=${element.coverPhoto} $fAllow=${element.allowPurchaseWhenOutOfStock} $fSku=${element.sku}");
 
           return element.price == fPrice &&
               element.sku == fSku &&
@@ -275,21 +279,21 @@ class CreateNewProductBloc extends SqliteExecuteBloc<
               element.coverPhoto == fCoverPhoto &&
               !visitedVariantIDs.contains(element.id);
         },
-        // orElse: () => Variant(
-        //   id: -1,
-        //   productID: -1,
-        //   coverPhoto: '',
-        //   sku: '',
-        //   price: 0,
-        //   available: 0,
-        //   damage: 0,
-        //   onHand: 0,
-        //   lost: 0,
-        //   allowPurchaseWhenOutOfStock: false,
-        //   createdAt: DateTime.now(),
-        //   updatedAt: DateTime.now(),
-        //   properties: [],
-        // ),
+        orElse: () => Variant(
+          id: -1,
+          productID: -1,
+          coverPhoto: '',
+          sku: '',
+          price: 0,
+          available: 0,
+          damage: 0,
+          onHand: 0,
+          lost: 0,
+          allowPurchaseWhenOutOfStock: false,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+          properties: [],
+        ),
       );
 
       logger.i("Match $matchVariant");
@@ -364,15 +368,11 @@ class CreateNewProductBloc extends SqliteExecuteBloc<
     );
   }
 
-
-
   CreateNewProductBloc(
     super.form,
     this.imagePicker,
     super.useCase,
   ) {
-    
-
     on<CreateNewProductPickCoverPhotoEvent>(
       _createNewProductPickCoverPhotoEventListener,
     );

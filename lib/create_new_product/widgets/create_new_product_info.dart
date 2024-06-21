@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inventory_management_with_sql/core/bloc/sqlite_create_state.dart';
+import 'package:inventory_management_with_sql/core/db/utils/dep.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_event.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_state.dart';
@@ -83,6 +84,7 @@ class ProductPhotoPicker extends StatelessWidget {
           buildWhen: (_, state) =>
               state is CreateNewProductCoverPhotoSelectedState,
           builder: (_, state) {
+            logger.e("Product Photo ${createNewProductBloc.form.coverPhoto.input}");
             if (createNewProductBloc.form.coverPhoto.input != null) {
               return Container(
                 margin: const EdgeInsets.only(

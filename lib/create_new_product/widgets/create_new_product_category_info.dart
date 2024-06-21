@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inventory_management_with_sql/cateogry/controller/category_list_bloc.dart';
 import 'package:inventory_management_with_sql/core/bloc/sqlite_create_state.dart';
+import 'package:inventory_management_with_sql/core/db/utils/dep.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_event.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_state.dart';
@@ -34,6 +35,7 @@ class CreateNewCategoryInfo extends StatelessWidget {
           buildWhen: (_, state) =>
               state is CreateNewProductCategorySelectedState,
           builder: (_, state) {
+            logger.e("Selected Category ${createNewProductBloc.form.category.input}");
             if (createNewProductBloc.form.category.input != null) {
               return Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
