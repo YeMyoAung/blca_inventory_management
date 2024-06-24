@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:inventory_management_with_sql/core/db/interface/database_model.dart';
-import 'package:inventory_management_with_sql/core/db/utils/dep.dart';
 import 'package:inventory_management_with_sql/repo/attribute_repo/attribute_entity.dart';
 import 'package:inventory_management_with_sql/repo/attribute_repo/attribute_repo.dart';
 import 'package:inventory_management_with_sql/repo/option_repo/option_entity.dart';
@@ -95,11 +94,13 @@ class SqliteProductDetailUsecase {
       attributes.addAll(attributeResult.result ?? []);
     }
 
-    logger.i(productResult);
-    logger.i(productResult.result?.variants);
-    for (final variant in productResult.result?.variants ?? []) {
-      logger.i(variant.properties);
+   
+    for (final option in options) {
+      option.attributes
+          .addAll(attributes.where((element) => element.optionId == option.id));
     }
+
+    productResult.result?.options.addAll(options);
 
     return productResult;
   }

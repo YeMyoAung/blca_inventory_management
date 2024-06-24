@@ -55,28 +55,38 @@ class CreateNewProductBloc extends SqliteExecuteBloc<
 
   CreateNewVariantForm? singleProductForm;
 
-  void addVariant(int index) {
+  void mapUiAndForm(
+    int index,
+    String propertiesString,
+  ) {
+    final int formIndex = form.varaints.indexWhere((element) {
+      return propertiesString == element.propertiesString;
+    });
+
+    variantUiAndFormIndexMapper[index] = formIndex;
+  }
+
+  void addVariant(int index, [CreateNewVariantForm? variantForm]) {
+    logger.w(
+        "Form Length: ${form.varaints.map((e) => e.price.input?.text)}, Index: $index ${variantUiAndFormIndexMapper.length} ${variantUiAndFormIndexMapper.keys} ${variantUiAndFormIndexMapper.values}");
+
     /// single product (variant)= [singleProductFrom]
     /// variant[0] is singleProduct => singleProduct store
     /// varint (1) length=>1,index => 0
     /// index 0 exist => 1
-    print("Before: $variantUiAndFormIndexMapper");
     final leftMostV = form.varaints[0];
-    print("LeftMost: ${leftMostV.isVariant}");
     if (!leftMostV.isVariant) {
-      print("Save Left Most Form");
-
       ///origin
       singleProductForm = leftMostV;
       form.varaints.clear();
     }
     // final afterAddingIndex = form.varaints.length; //(1)
-    form.varaints.add(CreateNewVariantForm.form(
-      isVariant: true,
-    )); //length 2,(1,2) ,(0,1)
+    form.varaints.add(variantForm ??
+        CreateNewVariantForm.form(
+          isVariant: true,
+        )); //length 2,(1,2) ,(0,1)
 
     variantUiAndFormIndexMapper[index] = form.varaints.length - 1;
-    print("After: $variantUiAndFormIndexMapper");
   }
 
   void removeVariant(int index) {
@@ -101,6 +111,7 @@ class CreateNewProductBloc extends SqliteExecuteBloc<
   }
 
   void clean() {
+    if (form.varaints.isEmpty) return;
     final temp = form.varaints[0];
     if (!temp.isVariant) {
       return;
@@ -241,7 +252,7 @@ class CreateNewProductBloc extends SqliteExecuteBloc<
 
     final visitedVariantIDs = <int>[];
 
-    final List<Future<Result<List<VaraintProperty>>>> variantPropertiesPayload =
+    final List<Future<Result<List<VariantProperty>>>> variantPropertiesPayload =
         [];
 
     for (final selectedVariantIndex in variantUiAndFormIndexMapper.keys) {

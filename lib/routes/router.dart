@@ -14,6 +14,8 @@ import 'package:inventory_management_with_sql/create_new_category/use_case/sqlit
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_form.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/set_option_value_bloc.dart';
+import 'package:inventory_management_with_sql/create_new_product/controller/set_option_value_form.dart';
+import 'package:inventory_management_with_sql/create_new_product/controller/variant_form_listener_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_product/screen/create_new_product_screen.dart';
 import 'package:inventory_management_with_sql/create_new_product/screen/set_option_value_screen.dart';
 import 'package:inventory_management_with_sql/create_new_product/screen/set_product_inventory_screen.dart';
@@ -209,6 +211,7 @@ final Map<String, Route Function(RouteSettings setting)> routes = {
     return _route(
       MultiBlocProvider(
         providers: [
+          BlocProvider(create: (_) => VariantFormListenerBloc()),
           BlocProvider(
             create: (_) => CreateNewProductBloc(
               args.form,
@@ -223,7 +226,10 @@ final Map<String, Route Function(RouteSettings setting)> routes = {
             ),
           ),
           BlocProvider(
-            create: (context) => SetOptionValueBloc(),
+            create: (context) => SetOptionValueBloc(
+              args.propertiesForm,
+              args.properties,
+            ),
           ),
           BlocProvider.value(
             value: args.categoryListBloc,
@@ -321,7 +327,8 @@ final Map<String, Route Function(RouteSettings setting)> routes = {
           ),
           BlocProvider.value(
             value: value.setOptionValueBloc,
-          )
+          ),
+          BlocProvider.value(value: value.variantFormListenerBloc)
         ],
         child: const SetVariantScreen(),
       ),
@@ -380,10 +387,12 @@ class VariantDataSetupArgs {
 class VariantScreenArgs {
   final SetOptionValueBloc setOptionValueBloc;
   final CreateNewProductBloc createNewProductBloc;
+  final VariantFormListenerBloc variantFormListenerBloc;
 
   const VariantScreenArgs({
     required this.setOptionValueBloc,
     required this.createNewProductBloc,
+    required this.variantFormListenerBloc,
   });
 }
 
@@ -414,10 +423,13 @@ class CreateNewProductArgs {
   final String title;
   final CategoryListBloc categoryListBloc;
   final CreateNewProductForm form;
-
+  final Map<int, SetOptionValueForm>? propertiesForm;
+  final List<String>? properties;
   CreateNewProductArgs({
     required this.title,
     required this.categoryListBloc,
     required this.form,
+    required this.propertiesForm,
+    required this.properties,
   });
 }

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inventory_management_with_sql/core/db/interface/database_model.dart';
+import 'package:inventory_management_with_sql/core/db/utils/dep.dart';
 import 'package:inventory_management_with_sql/core/form/field.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/set_option_value_event.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/set_option_value_form.dart';
@@ -79,7 +80,7 @@ class SetOptionValueBloc
     //     return false;
     //   }
     // }
-
+    logger.w("formGroups ${formGroups.values.first.formKey}");
     if (formGroups.values.first.formKey?.currentState?.validate() == true) {
       add(GenerateOptionValueEvent());
 
@@ -92,12 +93,17 @@ class SetOptionValueBloc
 
   Map<int, SetOptionValueForm>? form;
 
-  SetOptionValueBloc([this.form])
+  List<String>? properties;
+
+  SetOptionValueBloc([this.form, this.properties])
       : formGroups = form ??
             {
               1: SetOptionValueForm.instance(),
             },
         super(SetOptionValueInitialState()) {
+    if (form != null) {
+      count = form!.length;
+    }
 
     on<AddNewOptionValueEvent>(_addNewOptionValueEvent);
 
@@ -108,6 +114,10 @@ class SetOptionValueBloc
     on<ClearOptionValueEvent>(_clearOptionValueEvent);
 
     on<GenerateOptionValueEvent>(_generateOptionValueEvent);
+
+    if (form != null) {
+      add(GenerateOptionValueEvent());
+    }
 
     on<RemoveAttributeFieldEvent>(
       (event, emit) {
@@ -127,7 +137,6 @@ class SetOptionValueBloc
     final result = group.form.toList()..removeAt(event.attributeId);
     group.form.clear();
     group.form.addAll(result);
-    print(formGroups);
     emit(AddNewOptionValueState());
   }
 
@@ -137,7 +146,7 @@ class SetOptionValueBloc
     GenerateOptionValueEvent _,
     Emitter<SetOptionValueBaseState> emit,
   ) async {
-    print("Start Generating");
+    logger.i("Start Generating");
     emit(GenerateOptionValueState());
 
     /// [{size},{color},{package}]
@@ -172,8 +181,28 @@ class SetOptionValueBloc
       }
       return prob;
     });
-    selectedVariants.value = [];
-    emit(GeneratedOptionValueState());
+
+    if (properties != null) {
+      final selected = <int>[];
+      final selectedPropertiesStrings = <String>[];
+      for (final propertiesString in properties ?? <String>[]) {
+        ///1-2-3 == 1-2-3
+
+        selectedPropertiesStrings.add(propertiesString);
+        selected.add(variants.indexWhere((element) {
+          final String varaintString = element.map((e) => e['name']).join("-");
+          return propertiesString == varaintString;
+        }));
+      }
+      selectedVariants.value = selected;
+      properties = null;
+      emit(GeneratedOptionValueState(
+        selectedProperties: selectedPropertiesStrings,
+      ));
+    } else {
+      selectedVariants.value = [];
+      emit(GeneratedOptionValueState(selectedProperties: null));
+    }
   }
 
   FutureOr<void> _addNewOptionValueEvent(

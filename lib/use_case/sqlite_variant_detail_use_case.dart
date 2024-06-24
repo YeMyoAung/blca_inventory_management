@@ -19,8 +19,8 @@ class SqliteVariantPropertiesDetailUsecase {
 
   final int limit = 100;
 
-  FutureOr<Result<List<VaraintProperty>>> execute(int id) async {
-    final List<VaraintProperty> properties = [];
+  FutureOr<Result<List<VariantProperty>>> execute(int id) async {
+    final List<VariantProperty> properties = [];
     final where = "where variant_id=$id";
     final count = await variantPropertyRepo.count(where);
 

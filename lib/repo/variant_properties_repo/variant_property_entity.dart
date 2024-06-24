@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:inventory_management_with_sql/core/db/interface/database_model.dart';
 
-class VaraintProperty extends DatabaseModel {
+class VariantProperty extends DatabaseModel {
   final int variantId;
   final int valueId;
   final DateTime createdAt;
@@ -11,7 +11,7 @@ class VaraintProperty extends DatabaseModel {
   final int optionID;
   final String optionName, attributeName;
 
-  const VaraintProperty({
+  const VariantProperty({
     required super.id,
     required this.variantId,
     required this.valueId,
@@ -22,8 +22,8 @@ class VaraintProperty extends DatabaseModel {
     this.attributeName = '',
   });
 
-  factory VaraintProperty.fromJson(dynamic data) {
-    return VaraintProperty(
+  factory VariantProperty.fromJson(dynamic data) {
+    return VariantProperty(
       id: int.parse(data['id'].toString()),
       variantId: int.parse(data['variant_id'].toString()),
       valueId: int.parse(data['value_id'].toString()),

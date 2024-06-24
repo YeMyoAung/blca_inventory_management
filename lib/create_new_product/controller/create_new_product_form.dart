@@ -156,6 +156,8 @@ class CreateNewVariantForm extends FormGroup<VariantParam> {
   //variant product = true
   final bool isVariant;
 
+  final String? propertiesString;
+
   const CreateNewVariantForm({
     required this.coverPhoto,
     required this.sku,
@@ -166,6 +168,7 @@ class CreateNewVariantForm extends FormGroup<VariantParam> {
     required this.lost,
     required this.allowPurchaseWhenOutOfStock,
     required this.isVariant,
+    required this.propertiesString,
   });
 
   factory CreateNewVariantForm.form({
@@ -178,6 +181,7 @@ class CreateNewVariantForm extends FormGroup<VariantParam> {
     String? lost,
     bool? allowPurchaseWhenOutOfStock,
     bool isVariant = false,
+    String? propertiesString ,
   }) {
     return CreateNewVariantForm(
       coverPhoto: Field<String>(
@@ -197,6 +201,7 @@ class CreateNewVariantForm extends FormGroup<VariantParam> {
             p0 == null ? "Allow purchase when out of stock is reqruied" : null,
       ),
       isVariant: isVariant,
+      propertiesString: propertiesString,
     );
   }
 

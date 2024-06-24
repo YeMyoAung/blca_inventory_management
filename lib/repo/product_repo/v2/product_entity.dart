@@ -1,8 +1,10 @@
 import 'package:inventory_management_with_sql/core/db/interface/database_model.dart';
 import 'package:inventory_management_with_sql/core/db/utils/dep.dart';
+import 'package:inventory_management_with_sql/core/form/field.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_form.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/set_option_value_form.dart';
 import 'package:inventory_management_with_sql/repo/category_repo/category_entity.dart';
+import 'package:inventory_management_with_sql/repo/option_repo/option_entity.dart';
 import 'package:inventory_management_with_sql/repo/variant_repo/variant_entity.dart';
 
 class Product extends DatabaseModel {
@@ -17,8 +19,8 @@ class Product extends DatabaseModel {
   ///ref
   final Category? category;
 
-  ///TODO
   final List<Variant> variants;
+  final List<Option> options;
 
   List<CreateNewVariantForm> get variantForm => variants
       .map(
@@ -32,6 +34,7 @@ class Product extends DatabaseModel {
           lost: e.lost.toString(),
           allowPurchaseWhenOutOfStock: e.allowPurchaseWhenOutOfStock,
           isVariant: variants.length > 1,
+          propertiesString: e.properties.map((e) => e.attributeName).join("-"),
         ),
       )
       .toList();
@@ -41,13 +44,22 @@ class Product extends DatabaseModel {
     /// Color red,green
     /// Size  x,xl
     /// red x, red xl,green x, green xl
-    for (final variant in variants.fold([], (p, c) {
-      return p..addAll(c.properties);
-    })) {
-      logger.e(variant);
+
+    final Map<int, SetOptionValueForm> form = {};
+    int count = 1;
+    for (final option in options) {
+      form[count] = SetOptionValueForm(
+        form: [
+          Field.textEditingController(text: option.name),
+          ...option.attributes
+              .map((e) => Field.textEditingController(text: e.name)),
+        ],
+        id: option.id,
+      );
+      count++;
     }
 
-    return {};
+    return form;
   }
 
   const Product({
@@ -61,6 +73,7 @@ class Product extends DatabaseModel {
     required this.updatedAt,
     required this.category,
     required this.variants,
+    required this.options,
   });
 
   factory Product.fromJson(dynamic data) {
@@ -88,9 +101,8 @@ class Product extends DatabaseModel {
           : Category.fromJson(
               categoryPayload,
             ),
-
-      ///TODO
       variants: [],
+      options: [],
     );
   }
 

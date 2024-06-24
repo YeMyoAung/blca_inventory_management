@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/set_option_value_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/set_option_value_event.dart';
+import 'package:inventory_management_with_sql/create_new_product/controller/variant_form_listener_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_product/widgets/attribute_builder.dart';
 import 'package:inventory_management_with_sql/create_new_product/widgets/create_new_product_info.dart';
 import 'package:inventory_management_with_sql/create_new_product/widgets/custom_switch_tile.dart';
@@ -31,6 +32,7 @@ class CreateNewProductSelectedVariantsInfo extends StatelessWidget {
     final setOptionValueBloc = context.read<SetOptionValueBloc>();
     final bodyTextStyle = StandardTheme.getBodyTextStyle(context);
     final createNewProductBloc = context.read<CreateNewProductBloc>();
+    final variantFormListenerBloc = context.read<VariantFormListenerBloc>();
     return FormBox(
       margin: const EdgeInsets.only(top: 20),
       child: Column(
@@ -127,6 +129,7 @@ class CreateNewProductSelectedVariantsInfo extends StatelessWidget {
                   arguments: VariantScreenArgs(
                     setOptionValueBloc: setOptionValueBloc,
                     createNewProductBloc: createNewProductBloc,
+                    variantFormListenerBloc: variantFormListenerBloc,
                   ),
                 );
               },

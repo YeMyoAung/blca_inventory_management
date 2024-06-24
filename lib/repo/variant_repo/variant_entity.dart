@@ -9,7 +9,7 @@ class Variant extends DatabaseModel {
   final DateTime createdAt;
   final DateTime? updatedAt;
 
-  final List<VaraintProperty> properties;
+  final List<VariantProperty> properties;
 
 
   const Variant({

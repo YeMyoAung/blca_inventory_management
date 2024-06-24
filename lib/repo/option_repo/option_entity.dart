@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:inventory_management_with_sql/core/db/interface/database_model.dart';
+import 'package:inventory_management_with_sql/repo/attribute_repo/attribute_entity.dart';
 
 ///Set Option Value
 ///Option Name
@@ -15,12 +16,15 @@ class Option extends DatabaseModel {
   final DateTime createdAt;
   final DateTime? updatedAt;
 
+  final List<Attribute> attributes;
+
   const Option({
     required super.id,
     required this.productId,
     required this.name,
     required this.createdAt,
     required this.updatedAt,
+    required this.attributes,
   });
 
   factory Option.fromJson(dynamic data) {
@@ -30,6 +34,7 @@ class Option extends DatabaseModel {
       name: data['name'],
       createdAt: DateTime.parse(data['created_at']),
       updatedAt: DateTime.tryParse(data['updated_at'] ?? ''),
+      attributes: []
     );
   }
 

@@ -5,17 +5,21 @@ import 'package:inventory_management_with_sql/core/form/form.dart';
 
 class SetOptionValueForm extends FormGroup {
   @override
+  final int? id;
+  @override
 
   /// index 0 = option name
   /// index 1 or 1+ = attribute
   final List<Field<TextEditingController>> form;
 
-  SetOptionValueForm({required this.form}) : assert(form.length >= 2);
+  SetOptionValueForm({required this.form, this.id})
+      : assert(form.length >= 2),
+        super(id);
 
   factory SetOptionValueForm.instance() {
     return SetOptionValueForm(form: [
-      Field.textEditingController(),
-      Field.textEditingController(),
+      Field.textEditingController(),// option
+      Field.textEditingController(),// attribute
     ]);
   }
 

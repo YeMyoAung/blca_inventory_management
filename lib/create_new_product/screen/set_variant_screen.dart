@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/set_option_value_bloc.dart';
+import 'package:inventory_management_with_sql/create_new_product/controller/variant_form_listener_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_product/widgets/attribute_builder.dart';
 import 'package:starlight_utils/starlight_utils.dart';
 
@@ -16,6 +17,8 @@ class SetVariantScreen extends StatelessWidget {
         createNewProductBloc.form.name.input?.text ?? "";
     final name =
         createNewProductBlocName.isNotEmpty ? createNewProductBlocName : "NA";
+    final VariantFormListenerBloc variantFormListenerBloc =
+        context.read<VariantFormListenerBloc>();
     final titleTextStyle = context.theme.appBarTheme.titleTextStyle;
     return Scaffold(
       backgroundColor: context.theme.cardColor,
@@ -51,16 +54,16 @@ class SetVariantScreen extends StatelessWidget {
                         valueListenable: setOptionValueBloc.selectedVariants,
                         builder: (_, value, child) {
                           final isExist = value.contains(index);
-                         
+
                           return Checkbox(
                             value: isExist,
                             onChanged: (value) {
                               if (isExist) {
-                                createNewProductBloc.removeVariant(index);
-                                setOptionValueBloc.removeVariants(index);
+                                variantFormListenerBloc.removeVariant(index);
+                                
                               } else {
-                                createNewProductBloc.addVariant(index);
-                                setOptionValueBloc.addVariants(index);
+                                variantFormListenerBloc.addVariant(index);
+                               
                               }
                             },
                           );
