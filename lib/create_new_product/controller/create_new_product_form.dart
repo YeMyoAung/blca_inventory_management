@@ -15,9 +15,11 @@ class CreateNewProductForm extends FormGroup<VariantProductParams> {
   // variant product = varaints.length(>1)
   final List<CreateNewVariantForm> varaints;
 
-  ///TODO Option,Value Form
+  @override
+  final int? id;
 
   factory CreateNewProductForm.form({
+    required int? id,
     String? name,
     String? description,
     String? barcode,
@@ -26,6 +28,7 @@ class CreateNewProductForm extends FormGroup<VariantProductParams> {
     required List<CreateNewVariantForm> varaints,
   }) {
     return CreateNewProductForm(
+      id: id,
       name: Field.textEditingController(
         text: name,
       ),
@@ -77,13 +80,15 @@ class CreateNewProductForm extends FormGroup<VariantProductParams> {
   }
 
   CreateNewProductForm({
+    required this.id,
     required this.coverPhoto,
     required this.name,
     required this.description,
     required this.barcode,
     required this.category,
     required this.varaints,
-  }) : assert(varaints.isNotEmpty);
+  })  : assert(varaints.isNotEmpty),
+        super(id);
 
   @override
   List<Field> get form => [name, description, barcode, category];
@@ -95,6 +100,18 @@ class CreateNewProductForm extends FormGroup<VariantProductParams> {
   bool validate() {
     // return formKey?.currentState?.validate() == true;
     return true;
+  }
+
+  CreateNewProductForm copy() {
+    return CreateNewProductForm(
+      id: id,
+      coverPhoto: coverPhoto,
+      name: name,
+      description: description,
+      barcode: barcode,
+      category: category,
+      varaints: varaints.map((e) => e.copy()).toList(),
+    );
   }
 
   @override
@@ -181,7 +198,7 @@ class CreateNewVariantForm extends FormGroup<VariantParam> {
     String? lost,
     bool? allowPurchaseWhenOutOfStock,
     bool isVariant = false,
-    String? propertiesString ,
+    String? propertiesString,
   }) {
     return CreateNewVariantForm(
       coverPhoto: Field<String>(
@@ -200,6 +217,21 @@ class CreateNewVariantForm extends FormGroup<VariantParam> {
         isValid: (p0) =>
             p0 == null ? "Allow purchase when out of stock is reqruied" : null,
       ),
+      isVariant: isVariant,
+      propertiesString: propertiesString,
+    );
+  }
+
+  CreateNewVariantForm copy() {
+    return CreateNewVariantForm(
+      coverPhoto: coverPhoto,
+      sku: sku,
+      price: price,
+      available: available,
+      damage: damage,
+      onHand: onHand,
+      lost: lost,
+      allowPurchaseWhenOutOfStock: allowPurchaseWhenOutOfStock,
       isVariant: isVariant,
       propertiesString: propertiesString,
     );
@@ -242,9 +274,6 @@ class CreateNewVariantForm extends FormGroup<VariantParam> {
         onHand: double.tryParse(onHand.notNullInput.text) ?? 0,
         lost: double.tryParse(lost.notNullInput.text) ?? 0,
         allowPurchaseWhenOutOfStock: allowPurchaseWhenOutOfStock.notNullInput,
-
-        ///TODO
-        properties: [],
       ),
     );
   }

@@ -30,7 +30,8 @@ class SqliteCreateNewProductUseCase
     final barcode = param.barcode;
     if (barcode.isNotEmpty == true) {
       final isBarcodeAreadyExits = await productRepo.findModels(
-        where: "where \"$productTb\".\"barcode\"='$barcode'",
+        where:
+            "where \"$productTb\".\"barcode\"='$barcode' ${id == null ? "" : "and \"$productTb\".\"id\"!= '$id'"}",
       );
 
       if (!isBarcodeAreadyExits.hasError) {
@@ -46,13 +47,12 @@ class SqliteCreateNewProductUseCase
       (element) => element.sku.isNotEmpty,
     );
     if (skus.isNotEmpty) {
-
       ///[1,2,3] => (1,2,3)
       ///1,2,3
       ///()
       final isSkuAreadyExits = await variantRepo.findModels(
         where:
-            "where \"$variantTb\".\"sku\" in (${skus.map((e) => e.sku).toList().join(",")})",
+            "where \"$variantTb\".\"sku\" in (${skus.map((e) => "'${e.sku}'").toList().join(",")}) ${id == null ? "" : "and \"$variantTb\".\"product_id\"!= '$id'"}",
       );
 
       if (!isSkuAreadyExits.hasError) {
@@ -63,14 +63,24 @@ class SqliteCreateNewProductUseCase
         );
       }
     }
-
-    final productCreateResult = await productRepo.create(param);
-    if (productCreateResult.hasError) {
-      logger.t("Product Create Error $productCreateResult");
-      return productCreateResult;
+    final Result<Product> productCreateOrUpdateResult;
+    if (id == null) {
+      productCreateOrUpdateResult = await productRepo.create(param);
+    } else {
+      productCreateOrUpdateResult = await productRepo.update(id, param);
+    }
+    if (productCreateOrUpdateResult.hasError) {
+      logger.t("Product Create Error $productCreateOrUpdateResult");
+      return productCreateOrUpdateResult;
     }
 
-    final id = productCreateResult.result!.id;
+    if (id != null) {
+      return productCreateOrUpdateResult;
+    }
+
+    /// Create New Variant
+
+    final insertedProductID = productCreateOrUpdateResult.result!.id;
 
     ///1. vairant count > 1 ? {
     /// . 1. Option  (product_id) color,size,package  ToParam()
@@ -80,13 +90,13 @@ class SqliteCreateNewProductUseCase
     ///}: create variant
 
     final variantCreateResult = await Future.wait(param.variant.map((e) {
-      e.productID = id;
+      e.productID = insertedProductID;
       return variantRepo.create(e);
     }));
     final errors = variantCreateResult.where((element) => element.hasError);
     if (errors.isNotEmpty) {
       logger.t("Variant Create Error $variantCreateResult");
-      final deleteResult = await productRepo.delete(id);
+      final deleteResult = await productRepo.delete(insertedProductID);
       if (deleteResult.hasError) {
         logger.t("Product Delete Error $deleteResult");
         return Result(exception: deleteResult.exception);
@@ -100,7 +110,8 @@ class SqliteCreateNewProductUseCase
       return Result(exception: errors.first.exception);
     }
     //category,variant
-    final productFetchResult = await productRepo.getOne(id, true);
+    final productFetchResult =
+        await productRepo.getOne(insertedProductID, true);
     if (productFetchResult.hasError) {
       logger.t("Product Fetch Error $productFetchResult");
 

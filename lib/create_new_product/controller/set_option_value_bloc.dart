@@ -187,12 +187,13 @@ class SetOptionValueBloc
       final selectedPropertiesStrings = <String>[];
       for (final propertiesString in properties ?? <String>[]) {
         ///1-2-3 == 1-2-3
-
-        selectedPropertiesStrings.add(propertiesString);
-        selected.add(variants.indexWhere((element) {
+        final index = variants.indexWhere((element) {
           final String varaintString = element.map((e) => e['name']).join("-");
           return propertiesString == varaintString;
-        }));
+        });
+        if (index == -1) continue;
+        selectedPropertiesStrings.add(propertiesString);
+        selected.add(index);
       }
       selectedVariants.value = selected;
       properties = null;

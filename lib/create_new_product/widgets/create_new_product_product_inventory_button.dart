@@ -13,6 +13,13 @@ class CreateNewProductInventoryButton extends StatelessWidget {
       Function(bool) onChanged,
     ),
   )? allowPurchaseWhenOutOfStockBuilder;
+
+  final Widget Function(
+    Widget Function(String value) getValue,
+  )? skuValueBuilder;
+  final Widget Function(
+    Widget Function(String value) getValue,
+  )? barcodeValueBuilder;
   final Widget Function(
       Widget Function(
         double available,
@@ -25,6 +32,8 @@ class CreateNewProductInventoryButton extends StatelessWidget {
     required this.onPressed,
     this.allowPurchaseWhenOutOfStockBuilder,
     this.stockBuilder,
+    this.skuValueBuilder,
+    this.barcodeValueBuilder,
   });
 
   Widget buildStockRow(
@@ -55,6 +64,13 @@ class CreateNewProductInventoryButton extends StatelessWidget {
     );
   }
 
+  Widget getValue(String value) {
+    return Text(
+      value,
+      textAlign: TextAlign.end,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // final createNewProductBloc = context.read<CreateNewProductBloc>();
@@ -78,20 +94,14 @@ class CreateNewProductInventoryButton extends StatelessWidget {
               "Sku",
               style: bodyTextStyle,
             ),
-            trailing: const Text(
-              "-",
-              textAlign: TextAlign.end,
-            ),
+            trailing: skuValueBuilder?.call(getValue) ?? getValue("-"),
           ),
           KeyValuePairWidget(
             leading: Text(
               "Barcode",
               style: bodyTextStyle,
             ),
-            trailing: const Text(
-              "-",
-              textAlign: TextAlign.end,
-            ),
+            trailing: barcodeValueBuilder?.call(getValue) ?? getValue("-"),
           ),
           allowPurchaseWhenOutOfStockBuilder
                   ?.call(buildAllowPurchaseWhenOutOfStockSwitchTile) ??

@@ -73,7 +73,6 @@ class VariantParam extends DatabaseParamModel {
   final double price, available, damage, onHand, lost;
   final bool? allowPurchaseWhenOutOfStock;
 
-  final List<VariantPropertyParam> properties;
 
   VariantParam._({
     required this.coverPhoto,
@@ -84,7 +83,6 @@ class VariantParam extends DatabaseParamModel {
     required this.onHand,
     required this.lost,
     required this.allowPurchaseWhenOutOfStock,
-    required this.properties,
   });
 
   VariantParam.toCreate({
@@ -96,7 +94,6 @@ class VariantParam extends DatabaseParamModel {
     required this.onHand,
     required this.lost,
     required this.allowPurchaseWhenOutOfStock,
-    required this.properties,
   }) : assert(allowPurchaseWhenOutOfStock != null);
 
   VariantParam.toUpdate({
@@ -108,7 +105,6 @@ class VariantParam extends DatabaseParamModel {
     this.onHand = -1,
     this.lost = -1,
     this.allowPurchaseWhenOutOfStock,
-    required this.properties,
   }) : productID = -1;
 
   @override

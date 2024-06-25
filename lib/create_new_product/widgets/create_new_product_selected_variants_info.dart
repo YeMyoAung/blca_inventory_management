@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:inventory_management_with_sql/core/bloc/sqlite_create_state.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/set_option_value_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/set_option_value_event.dart';
@@ -66,7 +67,7 @@ class CreateNewProductSelectedVariantsInfo extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.only(top: 20),
                           child: InkWell(
-                            onTap: () { 
+                            onTap: () {
                               createNewProductBloc.form.index =
                                   createNewProductBloc
                                       .variantUiAndFormIndexMapper[uiIndex]!;
@@ -81,8 +82,20 @@ class CreateNewProductSelectedVariantsInfo extends StatelessWidget {
                             },
                             child: Row(
                               children: [
-                                //TODO:
-                                const UploadPhotoPlaceholder(),
+                                BlocBuilder<CreateNewProductBloc,
+                                    SqliteExecuteBaseState>(
+                                  builder: (_, state) {
+                                    final form = createNewProductBloc
+                                            .form.varaints[
+                                        createNewProductBloc
+                                                .variantUiAndFormIndexMapper[
+                                            uiIndex]!];
+
+                                    return UploadPhotoPlaceholder(
+                                      path: form.coverPhoto.input,
+                                    );
+                                  },
+                                ),
                                 const SizedBox(
                                   width: 20,
                                 ),
@@ -103,11 +116,18 @@ class CreateNewProductSelectedVariantsInfo extends StatelessWidget {
                                               .variants[uiIndex],
                                         ),
                                       ),
-                                      const Text("0 available"),
-                                      Text(
-                                        "0 MMK",
-                                        style: titleTextStyle,
-                                      )
+                                      BlocBuilder<CreateNewProductBloc,
+                                              SqliteExecuteBaseState>(
+                                          builder: (_, state) {
+                                        return Text(
+                                            "${double.tryParse(createNewProductBloc.form.varaints[createNewProductBloc.variantUiAndFormIndexMapper[uiIndex]!].available.input?.text ?? "") ?? 0} available");
+                                      }),
+                                      BlocBuilder<CreateNewProductBloc,
+                                              SqliteExecuteBaseState>(
+                                          builder: (_, state) {
+                                        return Text(
+                                            "${double.tryParse(createNewProductBloc.form.varaints[createNewProductBloc.variantUiAndFormIndexMapper[uiIndex]!].price.input?.text ?? "") ?? 0} MMK");
+                                      }),
                                     ],
                                   ),
                                 )

@@ -84,34 +84,20 @@ class ProductPhotoPicker extends StatelessWidget {
           buildWhen: (_, state) =>
               state is CreateNewProductCoverPhotoSelectedState,
           builder: (_, state) {
-            logger.e("Product Photo ${createNewProductBloc.form.coverPhoto.input}");
-            if (createNewProductBloc.form.coverPhoto.input != null) {
-              return Container(
-                margin: const EdgeInsets.only(
-                  top: 12,
-                  bottom: 20,
-                ),
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: FileImage(
-                      File(createNewProductBloc.form.coverPhoto.notNullInput),
-                    ),
-                  ),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                width: 80,
-                height: 80,
-                alignment: Alignment.center,
-              );
-            }
-            return const UploadPhotoPlaceholder();
+            logger.e(
+                "Product Photo ${createNewProductBloc.form.coverPhoto.input}");
+
+            return UploadPhotoPlaceholder(
+              path: createNewProductBloc.form.coverPhoto.input,
+            );
           }),
     );
   }
 }
 
 class UploadPhotoPlaceholder extends StatelessWidget {
-  const UploadPhotoPlaceholder({super.key});
+  final String? path;
+  const UploadPhotoPlaceholder({super.key, this.path});
 
   @override
   Widget build(BuildContext context) {
@@ -121,16 +107,21 @@ class UploadPhotoPlaceholder extends StatelessWidget {
         bottom: 20,
       ),
       decoration: BoxDecoration(
-        color: context.theme.unselectedWidgetColor,
+        color: path == null ? context.theme.unselectedWidgetColor : null,
+        image: path != null
+            ? DecorationImage(image: FileImage(File(path!)))
+            : null,
         borderRadius: BorderRadius.circular(8),
       ),
       width: 80,
       height: 80,
       alignment: Alignment.center,
-      child: const Icon(
-        Icons.upload,
-        size: 30,
-      ),
+      child: path != null
+          ? null
+          : const Icon(
+              Icons.upload,
+              size: 30,
+            ),
     );
   }
 }

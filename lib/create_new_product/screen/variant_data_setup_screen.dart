@@ -119,13 +119,44 @@ class VariantDataSetupScreen extends StatelessWidget {
                 );
               });
             },
+            skuValueBuilder: (getValue) =>
+                BlocBuilder<CreateNewProductBloc, SqliteExecuteBaseState>(
+              builder: (_, state) {
+                return getValue(
+                    createNewProductBloc.form.sku.input?.text ?? "-");
+              },
+            ),
+            barcodeValueBuilder: (getValue) =>
+                BlocBuilder<CreateNewProductBloc, SqliteExecuteBaseState>(
+              builder: (_, state) {
+                return getValue(
+                    createNewProductBloc.form.barcode.input?.text ?? "-");
+              },
+            ),
+            stockBuilder: (stockBuilder) {
+              return BlocBuilder<CreateNewProductBloc, SqliteExecuteBaseState>(
+                buildWhen: (_, state) => state is CreateNewProductNewStockState,
+                builder: (_, state) {
+                  double parse(String? value) =>
+                      double.tryParse(
+                        value ?? "0",
+                      ) ??
+                      0;
+                  return stockBuilder(
+                    parse(createNewProductBloc.form.available.input?.text),
+                    parse(createNewProductBloc.form.onHand.input?.text),
+                    parse(createNewProductBloc.form.lost.input?.text),
+                    parse(createNewProductBloc.form.damage.input?.text),
+                  );
+                },
+              );
+            },
           ),
         ],
       ),
     );
   }
 }
-
 
 class VariantProductPhotoPicker extends StatelessWidget {
   const VariantProductPhotoPicker({super.key});
@@ -135,7 +166,8 @@ class VariantProductPhotoPicker extends StatelessWidget {
     final createNewProductBloc = context.read<CreateNewProductBloc>();
     return InkWell(
       onTap: () {
-        createNewProductBloc.add(const CreateNewVariantProductPickCoverPhotoEvent());
+        createNewProductBloc
+            .add(const CreateNewVariantProductPickCoverPhotoEvent());
       },
       child: BlocBuilder<CreateNewProductBloc, SqliteExecuteBaseState>(
           buildWhen: (_, state) =>
@@ -150,7 +182,8 @@ class VariantProductPhotoPicker extends StatelessWidget {
                 decoration: BoxDecoration(
                   image: DecorationImage(
                     image: FileImage(
-                      File(createNewProductBloc.form.variantCoverPhoto.notNullInput!),
+                      File(createNewProductBloc
+                          .form.variantCoverPhoto.notNullInput!),
                     ),
                   ),
                   borderRadius: BorderRadius.circular(8),
@@ -165,4 +198,3 @@ class VariantProductPhotoPicker extends StatelessWidget {
     );
   }
 }
-

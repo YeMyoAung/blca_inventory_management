@@ -37,6 +37,18 @@ class CreateNewProductSelectedVariantsOrInventoryInfo extends StatelessWidget {
               arguments: createNewProductBloc,
             );
           },
+          skuValueBuilder: (getValue) =>
+              BlocBuilder<CreateNewProductBloc, SqliteExecuteBaseState>(
+            builder: (_, state) {
+              return getValue(createNewProductBloc.form.sku.input?.text ?? "-");
+            },
+          ),
+          barcodeValueBuilder: (getValue) =>
+              BlocBuilder<CreateNewProductBloc, SqliteExecuteBaseState>(
+            builder: (_, state) {
+              return getValue(createNewProductBloc.form.barcode.input?.text ?? "-");
+            },
+          ),
           allowPurchaseWhenOutOfStockBuilder: (buildSwitchTile) {
             return BlocBuilder<CreateNewProductBloc, SqliteExecuteBaseState>(
               buildWhen: (_, state) => state

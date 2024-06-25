@@ -30,6 +30,7 @@ class ProductListView extends StatelessWidget {
                   title: "Create Product",
                   categoryListBloc: categoryListBloc,
                   form: CreateNewProductForm.form(
+                    id: null,
                     varaints: [
                       CreateNewVariantForm.form(),
                     ],
@@ -64,6 +65,7 @@ class ProductListView extends StatelessWidget {
                     title: "Edit Product",
                     categoryListBloc: categoryListBloc,
                     form: CreateNewProductForm.form(
+                      id: productDetail.id,
                       name: productDetail.name,
                       description: productDetail.description,
                       barcode: productDetail.barcode,

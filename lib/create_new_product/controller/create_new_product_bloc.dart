@@ -59,16 +59,32 @@ class CreateNewProductBloc extends SqliteExecuteBloc<
     int index,
     String propertiesString,
   ) {
+    if (_form == null) return;
     final int formIndex = form.varaints.indexWhere((element) {
       return propertiesString == element.propertiesString;
     });
 
+    if (formIndex == -1) return;
     variantUiAndFormIndexMapper[index] = formIndex;
   }
 
-  void addVariant(int index, [CreateNewVariantForm? variantForm]) {
-    logger.w(
-        "Form Length: ${form.varaints.map((e) => e.price.input?.text)}, Index: $index ${variantUiAndFormIndexMapper.length} ${variantUiAndFormIndexMapper.keys} ${variantUiAndFormIndexMapper.values}");
+  void addVariant(int index, [String? propertiesString]) {
+    logger.i(
+        "_form: ${_form?.varaints.map((e) => e.propertiesString)} $propertiesString");
+    logger
+        .w("addVariant Before: $variantUiAndFormIndexMapper ${form.varaints}");
+
+    var variantForm = CreateNewVariantForm.form(
+      isVariant: true,
+    );
+
+    if (_form != null) {
+      final formIndex = _form.varaints.indexWhere(
+          (element) => element.propertiesString == propertiesString);
+      if (formIndex != -1) {
+        variantForm = _form.varaints[formIndex].copy();
+      }
+    }
 
     /// single product (variant)= [singleProductFrom]
     /// variant[0] is singleProduct => singleProduct store
@@ -81,18 +97,27 @@ class CreateNewProductBloc extends SqliteExecuteBloc<
       form.varaints.clear();
     }
     // final afterAddingIndex = form.varaints.length; //(1)
-    form.varaints.add(variantForm ??
-        CreateNewVariantForm.form(
-          isVariant: true,
-        )); //length 2,(1,2) ,(0,1)
+    form.varaints.add(variantForm); //length 2,(1,2) ,(0,1)
 
     variantUiAndFormIndexMapper[index] = form.varaints.length - 1;
+
+    logger.w("addVariant:After: $variantUiAndFormIndexMapper ${form.varaints}");
   }
 
   void removeVariant(int index) {
-    print("Before: $variantUiAndFormIndexMapper ${form.varaints}");
+    if (form.varaints.length < 2) {
+      form.varaints[0] = CreateNewVariantForm.form(
+        isVariant: false,
+      );
+      return;
+    }
+    logger.w(
+        "removeVariant Before: $variantUiAndFormIndexMapper ${form.varaints}");
     final formIndex = variantUiAndFormIndexMapper.remove(index);
-    if (formIndex == null) return;
+    if (formIndex == null) {
+      logger.w("removeVariant:Index not found");
+      return;
+    }
     final result = form.varaints.toList()..removeAt(formIndex);
 
     ///[1,2,3] => [1,3]
@@ -107,7 +132,8 @@ class CreateNewProductBloc extends SqliteExecuteBloc<
       return MapEntry(key, formIndex < value ? value - 1 : value);
     });
 
-    print("After: $variantUiAndFormIndexMapper ${form.varaints}");
+    logger.w(
+        "removeVariant:After: $variantUiAndFormIndexMapper ${form.varaints}");
   }
 
   void clean() {
@@ -118,6 +144,8 @@ class CreateNewProductBloc extends SqliteExecuteBloc<
     }
     changeToSingleProduct();
   }
+
+  void restoreExistingForm() {}
 
   void changeToSingleProduct() {
     if (singleProductForm == null) return;
@@ -155,6 +183,10 @@ class CreateNewProductBloc extends SqliteExecuteBloc<
 
     if (productCreateResult.hasError) {
       return productCreateResult;
+    }
+
+    if (form.id != null) {
+      return Result(exception: Error("Unimplemented"));
     }
 
     /// {
@@ -379,11 +411,13 @@ class CreateNewProductBloc extends SqliteExecuteBloc<
     );
   }
 
+  final CreateNewProductForm? _form;
+
   CreateNewProductBloc(
     super.form,
     this.imagePicker,
     super.useCase,
-  ) {
+  ) : _form = form.copy() {
     on<CreateNewProductPickCoverPhotoEvent>(
       _createNewProductPickCoverPhotoEventListener,
     );

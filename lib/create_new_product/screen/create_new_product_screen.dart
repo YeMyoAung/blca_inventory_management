@@ -38,11 +38,12 @@ class CreateNewProductScreen extends StatelessWidget {
       child: BlocListener<SetOptionValueBloc, SetOptionValueBaseState>(
         listener: (context, state) {
           if (state is GeneratedOptionValueState) {
-         
             final properties = state.selectedProperties ?? [];
             for (int i = 0; i < properties.length; i++) {
               createNewProductBloc.mapUiAndForm(
-                  setOptionValueBloc.selectedVariants.value[i], properties[i]);
+                setOptionValueBloc.selectedVariants.value[i],
+                properties[i],
+              );
             }
           }
         },
@@ -52,6 +53,7 @@ class CreateNewProductScreen extends StatelessWidget {
             if (state.isAdded == true) {
               createNewProductBloc.addVariant(
                 state.index,
+                state.propertiesString,
               );
               setOptionValueBloc.addVariants(state.index);
             } else {

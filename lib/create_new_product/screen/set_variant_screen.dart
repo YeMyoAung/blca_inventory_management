@@ -62,8 +62,7 @@ class SetVariantScreen extends StatelessWidget {
                                 variantFormListenerBloc.removeVariant(index);
                                 
                               } else {
-                                variantFormListenerBloc.addVariant(index);
-                               
+                                variantFormListenerBloc.addVariant(index,variants.map((e) => e['name']).join('-'));
                               }
                             },
                           );

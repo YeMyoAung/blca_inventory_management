@@ -17,8 +17,12 @@ class VariantFormState extends BlocBaseState {
 class VariantFormListenerBloc extends Cubit<VariantFormState> {
   VariantFormListenerBloc() : super(VariantFormState());
 
-  void addVariant(int index, [String? propertiesString]) {
-    emit(VariantFormState(isAdded: true, index: index));
+  void addVariant(int index, String propertiesString) {
+    emit(VariantFormState(
+      isAdded: true,
+      index: index,
+      propertiesString: propertiesString,
+    ));
   }
 
   void removeVariant(int index) {

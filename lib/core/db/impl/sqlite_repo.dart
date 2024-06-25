@@ -235,15 +235,20 @@ class SqliteRepo<Model extends DatabaseModel,
   @override
   Future<Result<Model>> update(int id, ModelParam values) async {
     final Map<String, dynamic> payload = values.toUpdate();
+    logger.w("ModelParam Payload: $payload");
     payload
         .addEntries({MapEntry("updated_at", DateTime.now().toIso8601String())});
+    logger.w("Added Update At: $payload");
 
     /// update table set col1='val1',col2='val2' where id = ?
     final dataSet = payload.keys.map((column) {
       final value =
-          payload[column] is String ? "'${payload[column]}'" : payload;
+          payload[column] is String ? "'${payload[column]}'" : payload[column];
       return "$column = $value";
     }).join(',');
+
+    logger.w("Added Update At: $dataSet");
+
     final effectedRows = await database.rawUpdate("""
       update "$tableName" set $dataSet where id = ?;
     """, [id]);
