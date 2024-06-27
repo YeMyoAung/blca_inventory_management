@@ -2,11 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:inventory_management_with_sql/core/db/interface/database_model.dart';
 import 'package:inventory_management_with_sql/core/form/field.dart';
 import 'package:inventory_management_with_sql/core/form/form.dart';
+import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_bloc.dart';
 import 'package:inventory_management_with_sql/repo/category_repo/category_entity.dart';
 import 'package:inventory_management_with_sql/repo/product_repo/v2/product_entity.dart';
 import 'package:inventory_management_with_sql/repo/variant_repo/variant_entity.dart';
 
 class CreateNewProductForm extends FormGroup<VariantProductParams> {
+  final List<OptionAttributePair> properties;
+
   //product
   final Field<String> coverPhoto;
   final Field<TextEditingController> name, description, barcode;
@@ -26,8 +29,10 @@ class CreateNewProductForm extends FormGroup<VariantProductParams> {
     Category? category,
     String? coverPhoto,
     required List<CreateNewVariantForm> varaints,
+    List<OptionAttributePair>? properties,
   }) {
     return CreateNewProductForm(
+      properties: properties ?? [],
       id: id,
       name: Field.textEditingController(
         text: name,
@@ -87,6 +92,7 @@ class CreateNewProductForm extends FormGroup<VariantProductParams> {
     required this.barcode,
     required this.category,
     required this.varaints,
+    required this.properties,
   })  : assert(varaints.isNotEmpty),
         super(id);
 
@@ -111,6 +117,7 @@ class CreateNewProductForm extends FormGroup<VariantProductParams> {
       barcode: barcode,
       category: category,
       varaints: varaints.map((e) => e.copy()).toList(),
+      properties: properties,
     );
   }
 
@@ -175,7 +182,11 @@ class CreateNewVariantForm extends FormGroup<VariantParam> {
 
   final String? propertiesString;
 
+  @override
+  final int? id;
+
   const CreateNewVariantForm({
+    this.id,
     required this.coverPhoto,
     required this.sku,
     required this.price,
@@ -186,9 +197,10 @@ class CreateNewVariantForm extends FormGroup<VariantParam> {
     required this.allowPurchaseWhenOutOfStock,
     required this.isVariant,
     required this.propertiesString,
-  });
+  }) : super(id);
 
   factory CreateNewVariantForm.form({
+    int? id,
     String? coverPhoto,
     String? sku,
     String? price,
@@ -201,6 +213,7 @@ class CreateNewVariantForm extends FormGroup<VariantParam> {
     String? propertiesString,
   }) {
     return CreateNewVariantForm(
+      id: id,
       coverPhoto: Field<String>(
         input: coverPhoto,
         isValid: (p0) => p0 != null ? null : "Cover Photo is required",
@@ -224,6 +237,7 @@ class CreateNewVariantForm extends FormGroup<VariantParam> {
 
   CreateNewVariantForm copy() {
     return CreateNewVariantForm(
+      id: id,
       coverPhoto: coverPhoto,
       sku: sku,
       price: price,

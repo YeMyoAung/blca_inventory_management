@@ -25,6 +25,7 @@ class Product extends DatabaseModel {
   List<CreateNewVariantForm> get variantForm => variants
       .map(
         (e) => CreateNewVariantForm.form(
+          id: e.id,
           coverPhoto: e.coverPhoto,
           sku: e.sku,
           price: e.price.toString(),
@@ -33,7 +34,7 @@ class Product extends DatabaseModel {
           onHand: e.onHand.toString(),
           lost: e.lost.toString(),
           allowPurchaseWhenOutOfStock: e.allowPurchaseWhenOutOfStock,
-          isVariant: variants.length > 1,
+          isVariant: e.properties.isNotEmpty,
           propertiesString: e.properties.map((e) => e.attributeName).join("-"),
         ),
       )

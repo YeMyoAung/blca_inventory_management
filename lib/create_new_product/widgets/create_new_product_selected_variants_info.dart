@@ -44,10 +44,12 @@ class CreateNewProductSelectedVariantsInfo extends StatelessWidget {
               style: titleTextStyle,
             ),
             value: true,
-            onChanged: (value) {
-              createNewProductBloc.changeToSingleProduct();
-              setOptionValueBloc.add(ClearOptionValueEvent());
-            },
+            onChanged: createNewProductBloc.form.id != null
+                ? null
+                : (value) {
+                    createNewProductBloc.changeToSingleProduct();
+                    setOptionValueBloc.add(ClearOptionValueEvent());
+                  },
           ),
 
           Text(

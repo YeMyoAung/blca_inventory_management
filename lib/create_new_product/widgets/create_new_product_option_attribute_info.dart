@@ -58,21 +58,22 @@ class CreateNewProductOptionAttributeInfo extends StatelessWidget {
                         // child: Text(optionAttributes['attributes'].elementAt(0).toString()),
                       )
                     ],
-                    Padding(
-                      padding: const EdgeInsets.only(top: 20),
-                      child: CustomOutlinedButton(
-                        onPressed: () {
-                          StarlightUtils.pushNamed(
-                            setOptionValueScreen,
-                            arguments: SetOptionValueArgs(
-                                createNewProductBloc: createNewProductBloc,
-                                setOptionValueBloc: setOptionValueBloc),
-                          );
-                        },
-                        label: "Add More Variants",
-                        icon: Icons.add_circle_outline,
+                    if (createNewProductBloc.form.id == null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 20),
+                        child: CustomOutlinedButton(
+                          onPressed: () {
+                            StarlightUtils.pushNamed(
+                              setOptionValueScreen,
+                              arguments: SetOptionValueArgs(
+                                  createNewProductBloc: createNewProductBloc,
+                                  setOptionValueBloc: setOptionValueBloc),
+                            );
+                          },
+                          label: "Add More Variants",
+                          icon: Icons.add_circle_outline,
+                        ),
                       ),
-                    ),
                   ],
                 ),
               );

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inventory_management_with_sql/cateogry/controller/category_list_bloc.dart';
 import 'package:inventory_management_with_sql/core/bloc/sqlite_read_state.dart';
+import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_form.dart';
 import 'package:inventory_management_with_sql/product/controller/product_list_bloc.dart';
 import 'package:inventory_management_with_sql/repo/product_repo/v2/product_entity.dart';
@@ -65,6 +66,12 @@ class ProductListView extends StatelessWidget {
                     title: "Edit Product",
                     categoryListBloc: categoryListBloc,
                     form: CreateNewProductForm.form(
+                      properties: productDetail.options.map((e) {
+                        return OptionAttributePair(
+                          option: e,
+                          attribute: e.attributes,
+                        );
+                      }).toList(),
                       id: productDetail.id,
                       name: productDetail.name,
                       description: productDetail.description,

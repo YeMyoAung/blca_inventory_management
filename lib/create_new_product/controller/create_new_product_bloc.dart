@@ -81,6 +81,7 @@ class CreateNewProductBloc extends SqliteExecuteBloc<
     if (_form != null) {
       final formIndex = _form.varaints.indexWhere(
           (element) => element.propertiesString == propertiesString);
+
       if (formIndex != -1) {
         variantForm = _form.varaints[formIndex].copy();
       }
@@ -186,7 +187,99 @@ class CreateNewProductBloc extends SqliteExecuteBloc<
     }
 
     if (form.id != null) {
-      return Result(exception: Error("Unimplemented"));
+      //1. variant update -> variant properties
+      final removeForm = _form?.copy();
+
+      removeForm?.varaints.removeWhere((ele) {
+        return form.varaints.any((element) => element.id == ele.id);
+      });
+
+      final updateForm = _form?.copy();
+
+      updateForm?.varaints.removeWhere((e) {
+        return removeForm?.varaints.any((element) => element.id == e.id) ==
+            true;
+      });
+
+      final updateGroup = <Future<Result<Variant>>>[];
+
+      for (final variant in updateForm?.varaints ?? []) {
+        final index =
+            form.varaints.indexWhere((element) => element.id == variant.id);
+
+        if (index == -1) continue;
+
+        final result = form.varaints[index].toParam();
+
+        if (result.hasError) {
+          return Result(exception: result.exception);
+        }
+
+        updateGroup.add(useCase.variantRepo.update(
+          variant.id!,
+          result.result!,
+        ));
+      }
+
+      final List<Result> updateResult = await Future.wait(updateGroup);
+
+      int errIndex = updateResult.indexWhere((e) => e.hasError);
+      if (errIndex > -1) {
+        return Result(exception: updateResult[errIndex].exception);
+      }
+
+      final createForm = form.copy();
+
+      createForm.varaints.removeWhere((e) {
+        return e.id != null;
+      });
+
+      final createParams = createForm.varaints.map((e) {
+        return e.toParam();
+      }).toList();
+
+      errIndex = createParams.indexWhere((e) => e.hasError);
+
+      if (errIndex > -1) {
+        return Result(exception: createParams[errIndex].exception);
+      }
+      final productID = productCreateResult.result!.id;
+
+      final createList = createParams.map((e) {
+        e.result!.productID = productID;
+        return useCase.variantRepo.create(e.result!);
+      });
+
+      final List<Result<Variant>> variantCreateResult =
+          await Future.wait(createList);
+
+      errIndex = variantCreateResult.indexWhere((element) => element.hasError);
+      if (errIndex > -1) {
+        return Result(exception: variantCreateResult[errIndex].exception);
+      }
+
+      final List<Future<Result<Variant>>> deleteList =
+          removeForm?.varaints.map((e) {
+                return useCase.variantRepo.delete(e.id!);
+              }).toList() ??
+              [];
+
+      final deleteResult = await Future.wait(deleteList);
+
+      errIndex = deleteResult.indexWhere((element) => element.hasError);
+
+      if (errIndex > -1) {
+        return Result(exception: deleteResult[errIndex].exception);
+      }
+
+      productCreateResult.result?.variants
+          .addAll(variantCreateResult.map((e) => e.result!));
+
+      return _createVariantProperties(
+        arg,
+        productCreateResult.result!,
+        form.properties,
+      );
     }
 
     /// {
@@ -282,6 +375,18 @@ class CreateNewProductBloc extends SqliteExecuteBloc<
     logger.i("Product: $variantUiAndFormIndexMapper");
     logger.i("Variant: ${arg.variants}");
 
+    return _createVariantProperties(
+      arg,
+      productData,
+      bulkCreateResult.map((e) => e.result!).toList(),
+    );
+  }
+
+  Future<Result<Product>> _createVariantProperties(
+    ProductCreateEvent arg,
+    Product productData,
+    List<OptionAttributePair> bulkCreateResult,
+  ) async {
     final visitedVariantIDs = <int>[];
 
     final List<Future<Result<List<VariantProperty>>>> variantPropertiesPayload =
@@ -354,9 +459,9 @@ class CreateNewProductBloc extends SqliteExecuteBloc<
         final attName = setdata['name'];
 
         matchProperties.addAll(bulkCreateResult.where((element) {
-          return element.result?.option.name == opName;
+          return element.option.name == opName;
         }).fold<List<Attribute>>([], (p, c) {
-          p.addAll(c.result?.attribute ?? []);
+          p.addAll(c.attribute);
           return p;
         }).where((element) => element.name == attName));
       }
@@ -406,9 +511,7 @@ class CreateNewProductBloc extends SqliteExecuteBloc<
       );
     }
 
-    return Result(
-      result: productData,
-    );
+    return Result(result: productData);
   }
 
   final CreateNewProductForm? _form;
