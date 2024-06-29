@@ -11,6 +11,8 @@ import 'package:inventory_management_with_sql/create_new_category/controller/cre
 import 'package:inventory_management_with_sql/create_new_category/controller/create_new_category_form.dart';
 import 'package:inventory_management_with_sql/create_new_category/screen/create_new_category_screen.dart';
 import 'package:inventory_management_with_sql/create_new_category/use_case/sqlite_create_new_category_use_case.dart';
+import 'package:inventory_management_with_sql/create_new_inventory_log/controller/variant_overview_list_bloc.dart';
+import 'package:inventory_management_with_sql/create_new_inventory_log/screen/create_new_inventory_log_screen.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_form.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/set_option_value_bloc.dart';
@@ -32,10 +34,12 @@ import 'package:inventory_management_with_sql/dashboard/screen/dashboard_screen.
 import 'package:inventory_management_with_sql/dashboard_loader/controller/dashboard_engine_bloc.dart';
 import 'package:inventory_management_with_sql/dashboard_loader/controller/dashboard_engine_state.dart';
 import 'package:inventory_management_with_sql/dashboard_loader/screen/dashboard_loader_screen.dart';
+import 'package:inventory_management_with_sql/inventory/controller/inventory_list_bloc.dart';
 import 'package:inventory_management_with_sql/product/controller/product_list_bloc.dart';
 import 'package:inventory_management_with_sql/repo/attribute_repo/attribute_repo.dart';
 import 'package:inventory_management_with_sql/repo/category_repo/category_repo.dart';
 import 'package:inventory_management_with_sql/repo/dashboard_repo/dashboard_repo.dart';
+import 'package:inventory_management_with_sql/repo/inventory_repo/inventory_repo.dart';
 import 'package:inventory_management_with_sql/repo/option_repo/option_repo.dart';
 import 'package:inventory_management_with_sql/repo/product_repo/v2/product_repo.dart';
 import 'package:inventory_management_with_sql/repo/shop_repo/shop_repo.dart';
@@ -133,6 +137,11 @@ final Map<String, Route Function(RouteSettings)> dashboardRoute = {
             create: (_) => DashboardNavigationBloc(
               const DashboardNavigationState(0),
             ),
+          ),
+          BlocProvider(
+            create: (_) => InventoryListBloc(
+              container.get<SqliteInventoryRepo>(),
+            ),
           )
         ],
         child: const DashboardScreen(),
@@ -153,6 +162,20 @@ class CreateNewShopArg {
 
 final Map<String, Route Function(RouteSettings setting)> routes = {
   shopList: (settings) => _shopScreen(settings),
+  createnewInventoryLogScreen: (settings) {
+    return _route(
+        MultiBlocProvider(
+          providers: [
+            BlocProvider(
+              create: (_) => VariantOverviewListBloc(
+                container.get<SqliteVariantRepo>(),
+              ),
+            )
+          ],
+          child: const CreateNewInventoryLogScreen(),
+        ),
+        settings);
+  },
   createNewShop: (settings) {
     final arg = settings.arguments;
     if (arg is! CreateNewShopArg) {

@@ -37,13 +37,19 @@ abstract class SqliteReadBloc<Model extends DatabaseModel,
     add(SqliteGetEvent());
   }
 
-  void _repOnActionListener(DatabaseCrudOnAction<Model> event) {
+  Future<Result<Model>> map(DatabaseCrudOnAction<Model> event) async {
+    return event.model;
+  }
+
+  void _repOnActionListener(DatabaseCrudOnAction<Model> event) async {
     if (event.action == DatabaseCrudAction.create) {
-      add(SqliteCreatedEvent(event.model));
+      final model = await map(event);
+      add(SqliteCreatedEvent(model));
       return;
     }
     if (event.action == DatabaseCrudAction.update) {
-      add(SqliteUpdatedEvent(event.model));
+      final model = await map(event);
+      add(SqliteUpdatedEvent(model));
       return;
     }
     add(SqliteDeletedEvent(event.model));

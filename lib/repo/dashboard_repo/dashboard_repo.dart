@@ -5,6 +5,7 @@ import 'package:inventory_management_with_sql/core/db/impl/sqlite_database.dart'
 import 'package:inventory_management_with_sql/core/db/interface/database_model.dart';
 import 'package:inventory_management_with_sql/repo/attribute_repo/attribute_repo.dart';
 import 'package:inventory_management_with_sql/repo/category_repo/category_repo.dart';
+import 'package:inventory_management_with_sql/repo/inventory_repo/inventory_repo.dart';
 import 'package:inventory_management_with_sql/repo/option_repo/option_repo.dart';
 import 'package:inventory_management_with_sql/repo/product_repo/v2/product_repo.dart';
 import 'package:inventory_management_with_sql/repo/variant_properties_repo/variant_property_repo.dart';
@@ -46,22 +47,24 @@ class DashboardEngineRepo {
     });
 
     ///option repo
-    container.setLazy<SqliteOptionRepo>((){
+    container.setLazy<SqliteOptionRepo>(() {
       return SqliteOptionRepo(database);
     });
 
     ///attribute repo
-    container.setLazy<SqliteAttributeRepo>((){
+    container.setLazy<SqliteAttributeRepo>(() {
       return SqliteAttributeRepo(database);
     });
 
     ///varaint properites repo
-    container.setLazy<SqliteVariantPropertyRepo>((){
+    container.setLazy<SqliteVariantPropertyRepo>(() {
       return SqliteVariantPropertyRepo(database);
     });
 
     ///inventory repo
-    ///TODO
+    container.setLazy<SqliteInventoryRepo>(() {
+      return SqliteInventoryRepo(database);
+    });
 
     _validate();
 

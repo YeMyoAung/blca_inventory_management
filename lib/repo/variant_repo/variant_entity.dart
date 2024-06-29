@@ -12,7 +12,9 @@ class Variant extends DatabaseModel {
   final List<VariantProperty> properties;
 
 
-  const Variant({
+  String name = "NA";
+
+   Variant({
     required super.id,
     required this.productID,
     required this.coverPhoto,

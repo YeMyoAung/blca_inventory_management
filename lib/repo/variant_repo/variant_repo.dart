@@ -6,4 +6,10 @@ import 'package:inventory_management_with_sql/repo/variant_repo/variant_entity.d
 class SqliteVariantRepo extends SqliteRepo<Variant, VariantParam> {
   SqliteVariantRepo(SqliteDatabase store)
       : super(store, Variant.fromJson, variantTb);
+
+  @override
+  String get refQuery => """
+  SELECT $tableName.*,$productTb.name,$productTb.barcode FROM $tableName
+  JOIN $productTb on $tableName.product_id = $productTb.id
+  """;
 }
