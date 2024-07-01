@@ -3,13 +3,23 @@ import 'package:inventory_management_with_sql/core/db/utils/sqlite_table_const.d
 import 'package:inventory_management_with_sql/repo/variant_repo/variant_repo.dart';
 
 class SqliteVariantOverviewUseCase {
-  final SqliteVariantRepo repo;
+  final SqliteVariantRepo variantRepo;
 
-  SqliteVariantOverviewUseCase({required this.repo});
+  SqliteVariantOverviewUseCase({
+    required this.variantRepo,
+  });
 
   Future<String> getVariantName(int variantID) async {
     try {
-      final result = await repo.database.rawQuery(
+      final product = await variantRepo.database.rawQuery("""
+        SELECT $productTb.name FROM $variantTb
+        join $productTb on $productTb.id=$variantTb.product_id
+        where $variantTb.id=?
+      """, [variantID]);
+      if (product.isEmpty) {
+        return "";
+      }
+      final result = await variantRepo.database.rawQuery(
         """SELECT $optionTb.name as key, $attributeTb.name as value FROM $variantPropertiesTb
          JOIN $attributeTb ON $attributeTb.id=$variantPropertiesTb.value_id
          JOIN $optionTb ON $optionTb.id=$attributeTb.option_id
@@ -18,10 +28,10 @@ class SqliteVariantOverviewUseCase {
       logger.i("SqliteVariantOverviewUseCase: $variantID, $result");
 
       if (result.isEmpty) {
-        return "";
+        return "${product[0]['name']}";
       }
 
-      return result.map((e) => "${e['key']}: ${e['value']}").join(", ");
+      return "${product[0]['name']} (${result.map((e) => "${e['key']}: ${e['value']}").join(", ")})";
     } catch (e) {
       logger.e("SqliteVariantOverviewUseCase: $e");
       return "";

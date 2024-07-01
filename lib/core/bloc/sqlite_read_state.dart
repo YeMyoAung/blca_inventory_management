@@ -4,15 +4,16 @@ import 'package:inventory_management_with_sql/core/db/interface/database_model.d
 // const array = fix size
 //       list  = dynamic size
 
-abstract class SqliteReadState<Model extends DatabaseModel> extends BlocBaseState {
+abstract class SqliteReadState<Model extends DatabaseModel>
+    extends BlocBaseState {
   final List<Model> list;
 
   SqliteReadState(this.list);
 }
 
-class SqliteInitialState<Model extends DatabaseModel>
+class SqliteReadInitialState<Model extends DatabaseModel>
     extends SqliteReadState<Model> {
-  SqliteInitialState(List<Model> list) : super(list);
+  SqliteReadInitialState(List<Model> list) : super(list);
 }
 
 class SqliteLoadingState<Model extends DatabaseModel>
@@ -35,4 +36,9 @@ class SqliteErrorState<Model extends DatabaseModel>
   final String message;
 
   SqliteErrorState(super.list, this.message);
+}
+
+class SqliteForceStopState<Model extends DatabaseModel>
+    extends SqliteReadState<Model> {
+  SqliteForceStopState(super.list);
 }

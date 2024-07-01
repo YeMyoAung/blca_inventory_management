@@ -1,4 +1,5 @@
 import 'package:inventory_management_with_sql/core/bloc/sqlite_read_bloc.dart';
+import 'package:inventory_management_with_sql/core/bloc/sqlite_read_state.dart';
 import 'package:inventory_management_with_sql/core/db/interface/database_model.dart';
 import 'package:inventory_management_with_sql/repo/attribute_repo/attribute_repo.dart';
 import 'package:inventory_management_with_sql/repo/option_repo/option_repo.dart';
@@ -13,12 +14,12 @@ class ProductListBloc
     extends SqliteReadBloc<Product, VariantProductParams, SqliteProductRepo> {
   late final SqliteProductDetailUsecase detailUsecase;
   ProductListBloc(
-    super.repo,
+    SqliteProductRepo repo,
     SqliteVariantRepo variantRepo,
     SqliteAttributeRepo attributeRepo,
     SqliteVariantPropertyRepo variantPropertyRepo,
     SqliteOptionRepo optionRepo,
-  ) {
+  ) : super(repo, SqliteReadInitialState(<Product>[])) {
     detailUsecase = SqliteProductDetailUsecase(
       productRepo: repo,
       variantRepo: variantRepo,
@@ -33,7 +34,7 @@ class ProductListBloc
     );
   }
 
-  Future<Result<Product>>  detail(int index) async {
+  Future<Result<Product>> detail(int index) async {
     if (index > state.list.length) {
       return Result(exception: Error("Index out of bound"));
     }

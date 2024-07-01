@@ -18,7 +18,8 @@ abstract class SqliteReadBloc<Model extends DatabaseModel,
   final Repo repo;
   SqliteReadBloc(
     this.repo,
-  ) : super(SqliteInitialState(<Model>[])) {
+    super.initialState,
+  ) {
     //on action
     onChangeSubscription = repo.onAction.listen(_repOnActionListener);
 
@@ -34,7 +35,11 @@ abstract class SqliteReadBloc<Model extends DatabaseModel,
     ///Delete Event
     on<SqliteDeletedEvent<Model>>(_sqliteDeletedEventListener);
 
-    add(SqliteGetEvent());
+    logger.i("SqliteReadBloc $state ${state is! SqliteForceStopState<Model>}");
+
+    if (state is! SqliteForceStopState<Model>) {
+      add(SqliteGetEvent());
+    }
   }
 
   Future<Result<Model>> map(DatabaseCrudOnAction<Model> event) async {

@@ -11,6 +11,8 @@ import 'package:inventory_management_with_sql/create_new_category/controller/cre
 import 'package:inventory_management_with_sql/create_new_category/controller/create_new_category_form.dart';
 import 'package:inventory_management_with_sql/create_new_category/screen/create_new_category_screen.dart';
 import 'package:inventory_management_with_sql/create_new_category/use_case/sqlite_create_new_category_use_case.dart';
+import 'package:inventory_management_with_sql/create_new_inventory_log/controller/create_new_inventory_log_bloc.dart';
+import 'package:inventory_management_with_sql/create_new_inventory_log/controller/create_new_inventory_log_form.dart';
 import 'package:inventory_management_with_sql/create_new_inventory_log/controller/variant_overview_list_bloc.dart';
 import 'package:inventory_management_with_sql/create_new_inventory_log/screen/create_new_inventory_log_screen.dart';
 import 'package:inventory_management_with_sql/create_new_product/controller/create_new_product_bloc.dart';
@@ -46,8 +48,10 @@ import 'package:inventory_management_with_sql/repo/shop_repo/shop_repo.dart';
 import 'package:inventory_management_with_sql/repo/variant_properties_repo/variant_property_repo.dart';
 import 'package:inventory_management_with_sql/repo/variant_repo/variant_repo.dart';
 import 'package:inventory_management_with_sql/routes/route_name.dart';
+import 'package:inventory_management_with_sql/select_variant/screen/select_variant_screen.dart';
 import 'package:inventory_management_with_sql/shop_list/controller/shop_list_bloc.dart';
 import 'package:inventory_management_with_sql/shop_list/screen/shop_list_screen.dart';
+import 'package:inventory_management_with_sql/use_case/sqlite_create_new_invenoty_log_usecase.dart';
 import 'package:inventory_management_with_sql/use_case/sqlite_create_new_product_use_case.dart';
 
 Route _shopScreen(RouteSettings settings) {
@@ -160,15 +164,50 @@ class CreateNewShopArg {
   });
 }
 
+class SelectVariantScreenArgs {
+  final VariantOverviewListBloc variantOverviewListBloc;
+
+  const SelectVariantScreenArgs({required this.variantOverviewListBloc});
+}
+
 final Map<String, Route Function(RouteSettings setting)> routes = {
+  selectVariantScreen: (settings) {
+    final arg = settings.arguments;
+
+    if (arg is! SelectVariantScreenArgs) {
+      return _route(ErrorWidget("Bad request"), settings);
+    }
+
+    return _route(
+      BlocProvider.value(
+        value: arg.variantOverviewListBloc,
+        child: const SelectVariantScreen(),
+      ),
+      settings,
+    );
+  },
   shopList: (settings) => _shopScreen(settings),
   createnewInventoryLogScreen: (settings) {
+    final arg = settings.arguments;
+    if (arg is! CreateNewInventoryLogForm) {
+      return _route(ErrorWidget("Bad request"), settings);
+    }
     return _route(
         MultiBlocProvider(
           providers: [
             BlocProvider(
               create: (_) => VariantOverviewListBloc(
                 container.get<SqliteVariantRepo>(),
+                arg.id,
+              ),
+            ),
+            BlocProvider(
+              create: (_) => CreateNewInventoryLogBloc(
+                arg,
+                SqliteCreateNewInventoryLogUseCase(
+                  variantRepo: container.get<SqliteVariantRepo>(),
+                  inventoryrepo: container.get<SqliteInventoryRepo>(),
+                ),
               ),
             )
           ],

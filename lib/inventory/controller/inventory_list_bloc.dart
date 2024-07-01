@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:inventory_management_with_sql/core/bloc/sqlite_read_bloc.dart';
+import 'package:inventory_management_with_sql/core/bloc/sqlite_read_state.dart';
 import 'package:inventory_management_with_sql/core/db/interface/database_crud.dart';
 import 'package:inventory_management_with_sql/core/db/interface/database_model.dart';
 import 'package:inventory_management_with_sql/repo/inventory_repo/inventory_entity.dart';
@@ -10,8 +11,9 @@ import 'package:inventory_management_with_sql/use_case/sqlite_inventory_list_use
 class InventoryListBloc
     extends SqliteReadBloc<Inventory, InventoryParam, SqliteInventoryRepo> {
   final SqliteInventoryListUseCase usecase;
-  InventoryListBloc(super.repo)
-      : usecase = SqliteInventoryListUseCase(repo: repo);
+  InventoryListBloc(SqliteInventoryRepo repo)
+      : usecase = SqliteInventoryListUseCase(repo: repo),
+        super(repo, SqliteReadInitialState(<Inventory>[]));
 
   @override
   Future<Result<Inventory>> map(

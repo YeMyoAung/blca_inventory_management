@@ -10,4 +10,5 @@ const String shopList = "/shops",
     setOptionValueScreen = "/set/option-value",
     setVariantScreen = "/set/variant",
     variantDataSetupScreen = "/variant/edit",
+    selectVariantScreen = "/select/variant",
     createnewInventoryLogScreen = "/create/inventory-log";

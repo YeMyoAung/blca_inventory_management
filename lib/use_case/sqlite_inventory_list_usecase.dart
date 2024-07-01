@@ -9,6 +9,14 @@ class SqliteInventoryListUseCase {
 
   Future<String> getVariantName(int variantID) async {
     try {
+      final product = await repo.database.rawQuery("""
+        SELECT $productTb.name FROM $variantTb
+        join $productTb on $productTb.id=$variantTb.product_id
+        where $variantTb.id=?
+      """, [variantID]);
+      if (product.isEmpty) {
+        return "";
+      }
       final result = await repo.database.rawQuery(
         """SELECT $optionTb.name as key, $attributeTb.name as value FROM $variantPropertiesTb
          JOIN $attributeTb ON $attributeTb.id=$variantPropertiesTb.value_id
@@ -18,10 +26,10 @@ class SqliteInventoryListUseCase {
       logger.i("SqliteInventoryListUseCase: $variantID, $result");
 
       if (result.isEmpty) {
-        return "";
+        return '${product[0]['name']}';
       }
 
-      return result.map((e) => "${e['key']}: ${e['value']}").join(", ");
+      return "${product[0]['name']} (${result.map((e) => "${e['key']}: ${e['value']}").join(", ")})";
     } catch (e) {
       logger.e("SqliteInventoryListUseCase: $e");
       return "";
