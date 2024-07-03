@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inventory_management_with_sql/core/bloc/sqlite_create_event.dart';
@@ -8,7 +9,6 @@ import 'package:inventory_management_with_sql/create_new_inventory_log/controlle
 import 'package:inventory_management_with_sql/create_new_inventory_log/controller/create_new_inventory_log_event.dart';
 import 'package:inventory_management_with_sql/create_new_inventory_log/controller/create_new_inventory_log_state.dart';
 import 'package:inventory_management_with_sql/create_new_inventory_log/controller/variant_overview_list_bloc.dart';
-import 'package:inventory_management_with_sql/create_new_inventory_log/controller/variant_overview_list_state.dart';
 import 'package:inventory_management_with_sql/repo/variant_repo/variant_entity.dart';
 import 'package:inventory_management_with_sql/routes/route_name.dart';
 import 'package:inventory_management_with_sql/routes/router.dart';
@@ -66,17 +66,17 @@ class CreateNewInventoryLogScreen extends StatelessWidget {
             ),
           ),
           child: BlocBuilder<VariantOverviewListBloc, SqliteReadState<Variant>>(
-              buildWhen: (_, c) =>
-                  c is SqliteForceStopState ||
-                  c is VariantOverviewListLoadedState,
+              // buildWhen: (_, c) =>
+              //     c is SqliteForceStopState ||
+              //     c is VariantOverviewListLoadedState,
               builder: (context, state) {
                 logger.i("VariantOverviewListBloc $state ");
-                // if (state is SqliteForceStopState) {
-                //   return const Center(
-                //     child: CupertinoActivityIndicator(),
-                //   );
-                // }
-                return Text("${state.list.length}");
+                if (state is SqliteForceStopState) {
+                  return const Center(
+                    child: CupertinoActivityIndicator(),
+                  );
+                }
+                // return Text("${state.list.length}");
                 return Form(
                   key: createNewInventoryLogBloc.form.formKey,
                   child: ListView(

@@ -47,4 +47,9 @@ class ProductListBloc
     state.list[index] = product.result!;
     return product;
   }
+
+  @override
+  Future<Result<List<Product>>> onSearch(String value) {
+    return repo.findModels(where: "where name like '%$value%'");
+  }
 }

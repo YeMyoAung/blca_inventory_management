@@ -101,22 +101,22 @@ class UploadPhotoPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final showImage = path != null && path?.isNotEmpty == true;
     return Container(
       margin: const EdgeInsets.only(
         top: 12,
         bottom: 20,
       ),
       decoration: BoxDecoration(
-        color: path == null ? context.theme.unselectedWidgetColor : null,
-        image: path != null
-            ? DecorationImage(image: FileImage(File(path!)))
-            : null,
+        color: !showImage ? context.theme.unselectedWidgetColor : null,
+        image:
+            showImage ? DecorationImage(image: FileImage(File(path!))) : null,
         borderRadius: BorderRadius.circular(8),
       ),
       width: 80,
       height: 80,
       alignment: Alignment.center,
-      child: path != null
+      child: showImage
           ? null
           : const Icon(
               Icons.upload,

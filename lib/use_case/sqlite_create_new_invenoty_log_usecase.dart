@@ -8,6 +8,10 @@ import 'package:inventory_management_with_sql/repo/inventory_repo/inventory_repo
 import 'package:inventory_management_with_sql/repo/variant_repo/variant_entity.dart';
 import 'package:inventory_management_with_sql/repo/variant_repo/variant_repo.dart';
 
+const String SELL = "Sell",
+    PURCHASE = "Purchase",
+    DAMAGE = "Damage",
+    LOST = "Lost";
 final Map<
     String,
     Future<Result<Variant>> Function(
@@ -15,7 +19,7 @@ final Map<
       int variantID,
       double quantities,
     )> Reasons = {
-  "Sell": (
+  SELL: (
     repo,
     variantID,
     quantities,
@@ -43,7 +47,7 @@ final Map<
       ),
     );
   },
-  "Purchase": (
+  PURCHASE: (
     repo,
     variantID,
     quantities,
@@ -62,7 +66,7 @@ final Map<
       ),
     );
   },
-  "Damage": (
+  DAMAGE: (
     repo,
     variantID,
     quantities,
@@ -86,7 +90,7 @@ final Map<
       ),
     );
   },
-  "Lost": (
+  LOST: (
     repo,
     variantID,
     quantities,

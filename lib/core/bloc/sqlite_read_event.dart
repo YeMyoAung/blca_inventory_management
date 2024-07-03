@@ -25,3 +25,10 @@ class SqliteDeletedEvent<Model extends DatabaseModel>
   final Result<Model> model;
   const SqliteDeletedEvent(this.model);
 }
+
+class SqliteSearchEvent<Model extends DatabaseModel>
+    extends SqliteEvent<Model> {
+  final String value;
+
+  const SqliteSearchEvent({required this.value});
+}
