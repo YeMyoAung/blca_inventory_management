@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:inventory_management_with_sql/core/db/impl/sqlite_use_case.dart';
 import 'package:inventory_management_with_sql/core/db/interface/database_model.dart';
 import 'package:inventory_management_with_sql/core/db/utils/dep.dart';
@@ -12,6 +13,30 @@ const String SELL = "Sell",
     PURCHASE = "Purchase",
     DAMAGE = "Damage",
     LOST = "Lost";
+
+Color getColor(String reason) {
+
+  // inventories[i].reason == PURCHASE
+  //                   ? Colors.green
+  //                   : inventories[i].reason == DAMAGE
+  //                       ? Colors.orange
+  //                       : inventories[i].reason == SELL
+  //                           ? Colors.amber
+  //                           : Colors.red
+  switch (reason) {
+    case SELL:
+      return Colors.amber;
+    case PURCHASE:
+      return Colors.green;
+    case DAMAGE:
+      return Colors.orange;
+    case LOST:
+      return Colors.red;
+    default:
+      return Colors.green;
+  }
+}
+
 final Map<
     String,
     Future<Result<Variant>> Function(

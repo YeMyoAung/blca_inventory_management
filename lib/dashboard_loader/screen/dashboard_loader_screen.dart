@@ -19,7 +19,10 @@ class DashboardLoadingScreen extends StatelessWidget {
       listener: (_, state) async {
         if (state is DashboardEngineReadyState) {
           /// go to dashboard screen
-          StarlightUtils.pushNamed(dashboard);
+          StarlightUtils.pushNamed(
+            dashboard,
+            arguments: context.read<DashboardEngineBloc>(),
+          );
           return;
         }
         state as DashboardEngineErrorState;

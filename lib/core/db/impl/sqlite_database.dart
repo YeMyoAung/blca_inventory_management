@@ -72,7 +72,10 @@ class SqliteDatabase implements DataStore<Database> {
     int version = 1,
     String storePath = "/sqlite",
   ]) {
-    assert(_instance[dbName] == null);
+    if (_instance[dbName] != null) {
+      return _instance[dbName]!;
+    }
+    // assert(== null);
     _instance[dbName] ??= SqliteDatabase._(
       dbName,
       tableColumns,

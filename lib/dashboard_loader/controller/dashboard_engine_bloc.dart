@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:inventory_management_with_sql/container.dart';
 import 'package:inventory_management_with_sql/dashboard_loader/controller/dashboard_engine_event.dart';
 import 'package:inventory_management_with_sql/dashboard_loader/controller/dashboard_engine_state.dart';
 import 'package:inventory_management_with_sql/repo/dashboard_repo/dashboard_repo.dart';
@@ -42,8 +41,9 @@ class DashboardEngineBloc
       repo.dispose(),
     ]);
 
-    return super.close().then((value) {
-      container.remove<DashboardEngineBloc>();
-    });
+    // return super.close().then((value) {
+    //   container.remove<DashboardEngineBloc>();
+    // });
+    return super.close();
   }
 }

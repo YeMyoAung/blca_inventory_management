@@ -73,11 +73,30 @@ class DashboardEngineRepo {
 
   Future<void> dispose() async {
     _validate();
-    await Future.wait([
-      _isReady.close(),
-      database.close(),
-    ]);
+    // await Future.wait([
+    //   _isReady.close(),
+    //   database.close(),
+    // ]);
+     ///category repo
     container.remove<SqliteCategoryRepo>();
+
+    ///product repo
     container.remove<SqliteProductRepo>();
+
+    ///variant repo
+    container.remove<SqliteVariantRepo>();
+
+    ///option repo
+    container.remove<SqliteOptionRepo>();
+
+    ///attribute repo
+    container.remove<SqliteAttributeRepo>();
+
+    ///varaint properites repo
+    container.remove<SqliteVariantPropertyRepo>();
+
+    ///inventory repo
+    container.remove<SqliteInventoryRepo>();
+
   }
 }

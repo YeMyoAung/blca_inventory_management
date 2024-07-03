@@ -4,6 +4,7 @@ import 'package:inventory_management_with_sql/cateogry/view/category_list_view.d
 import 'package:inventory_management_with_sql/dashboard/controller/dashboard_navigation_bloc.dart';
 import 'package:inventory_management_with_sql/dashboard/controller/dashboard_navigation_event.dart';
 import 'package:inventory_management_with_sql/dashboard/controller/dashboard_navigation_state.dart';
+import 'package:inventory_management_with_sql/dashboard/view/dashboard_view.dart';
 import 'package:inventory_management_with_sql/inventory/view/inventory_view.dart';
 import 'package:inventory_management_with_sql/product/view/product_list_view.dart';
 
@@ -17,7 +18,7 @@ class DashboardScreen extends StatelessWidget {
       body: BlocBuilder<DashboardNavigationBloc, DashboardNavigationState>(
           builder: (_, state) {
         return [
-          const CategoryListView(),
+          const DashboardView(),
           const CategoryListView(),
           const ProductListView(),
           const InventoryListView(),

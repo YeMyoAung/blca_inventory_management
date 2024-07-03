@@ -32,43 +32,46 @@ class InventoryListView extends StatelessWidget {
       ),
       body: GenericView<Inventory, InventoryListBloc>(
           builder: (_, inventories, i) {
-        return InkWell(
-          onTap: () {
-            StarlightUtils.pushNamed(
-              createnewInventoryLogScreen,
-              arguments: CreateNewInventoryLogForm.form(
-                id: inventories[i].id,
-                variantID: inventories[i].variantID,
-                reason: inventories[i].reason,
-                quantities: inventories[i].quantity.toString(),
-                description: inventories[i].description,
-              ),
-            );
-          },
-          child: ListTile(
-            dense: false,
-            title: Text(inventories[i].createdAt.toString()),
-            trailing: Text(
-              (inventories[i].quantity *
-                      (inventories[i].reason != PURCHASE ? -1 : 1))
-                  .toString(),
-              style: TextStyle(
-                fontSize: 14,
-                color: inventories[i].reason == PURCHASE
-                    ? Colors.green
-                    : inventories[i].reason == DAMAGE
-                        ? Colors.orange
-                        : inventories[i].reason == SELL
-                            ? Colors.amber
-                            : Colors.red,
-              ),
-            ),
-            subtitle: Text(
-              "${inventories[i].variantName} as ${inventories[i].reason} ",
-            ),
+        return InventoryItem(inventory: inventories[i]);
+      }),
+    );
+  }
+}
+
+class InventoryItem extends StatelessWidget {
+  final Inventory inventory;
+  const InventoryItem({super.key, required this.inventory});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        StarlightUtils.pushNamed(
+          createnewInventoryLogScreen,
+          arguments: CreateNewInventoryLogForm.form(
+            id: inventory.id,
+            variantID: inventory.variantID,
+            reason: inventory.reason,
+            quantities: inventory.quantity.toString(),
+            description: inventory.description,
           ),
         );
-      }),
+      },
+      child: ListTile(
+        dense: false,
+        title: Text(inventory.createdAt.toString()),
+        trailing: Text(
+          (inventory.quantity * (inventory.reason != PURCHASE ? -1 : 1))
+              .toString(),
+          style: TextStyle(
+            fontSize: 14,
+            color: getColor(inventory.reason),
+          ),
+        ),
+        subtitle: Text(
+          "${inventory.variantName} as ${inventory.reason} ",
+        ),
+      ),
     );
   }
 }

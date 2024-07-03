@@ -70,40 +70,53 @@ final Map<String, Route Function(RouteSettings setting)> dashboardLoaderRoute =
     {
   dashboardLoading: (settings) {
     final arg = settings.arguments;
-    if (arg is! String) {
+    if (arg is! String || arg.isEmpty) {
       ///TODO
       return _route(ErrorWidget("Bad request"), settings);
     }
 
-    if (container.exists<DashboardEngineBloc>()) {
-      return _route(
-        BlocProvider.value(
-          value: container.get<DashboardEngineBloc>(),
-          child: const DashboardLoadingScreen(),
-        ),
-        settings,
-      );
-    }
+    // if (container.exists<DashboardEngineBloc>()) {
+    //   return _route(
+    //     BlocProvider.value(
+    //       value: container.get<DashboardEngineBloc>(),
+    //       child: const DashboardLoadingScreen(),
+    //     ),
+    //     settings,
+    //   );
+    // }
 
     return _route(
       BlocProvider(
         create: (_) {
-          container.set(
-            DashboardEngineBloc(
-              const DashboardEngineInitialState(),
-              DashboardEngineRepo(
-                shopName: arg,
-                database: SqliteDatabase.newInstance(
-                  arg,
-                  inventoryMangementTableColumns,
-                  // 1,
-                  // 2,
-                  3,
-                ),
+          return DashboardEngineBloc(
+            const DashboardEngineInitialState(),
+            DashboardEngineRepo(
+              shopName: arg,
+              database: SqliteDatabase.newInstance(
+                arg,
+                inventoryMangementTableColumns,
+                // 1,
+                // 2,
+                3,
               ),
             ),
           );
-          return container.get<DashboardEngineBloc>();
+          // container.set(
+          //   DashboardEngineBloc(
+          //     const DashboardEngineInitialState(),
+          //     DashboardEngineRepo(
+          //       shopName: arg,
+          //       database: SqliteDatabase.newInstance(
+          //         arg,
+          //         inventoryMangementTableColumns,
+          //         // 1,
+          //         // 2,
+          //         3,
+          //       ),
+          //     ),
+          //   ),
+          // );
+          // return container.get<DashboardEngineBloc>();
         },
         child: const DashboardLoadingScreen(),
       ),
@@ -114,14 +127,21 @@ final Map<String, Route Function(RouteSettings setting)> dashboardLoaderRoute =
 
 final Map<String, Route Function(RouteSettings)> dashboardRoute = {
   dashboard: (settings) {
-    if (!container.exists<DashboardEngineBloc>()) {
-      return _shopScreen(settings);
+    // if (!container.exists<DashboardEngineBloc>()) {
+    //   return _shopScreen(settings);
+    // }
+    final args = settings.arguments;
+    if (args is! DashboardEngineBloc) {
+      return _route(ErrorWidget("Bad request"), settings);
     }
     return _route(
       MultiBlocProvider(
         providers: [
+          // BlocProvider.value(
+          //   value: container.get<DashboardEngineBloc>(),
+          // ),
           BlocProvider.value(
-            value: container.get<DashboardEngineBloc>(),
+            value: args,
           ),
           BlocProvider(
             create: (_) => CategoryListBloc(
